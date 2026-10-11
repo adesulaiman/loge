@@ -11,12 +11,12 @@ compile-time chokepoint. EE for group-derived ACL entries, curator scoping, and
 per-field post-query censoring.
 **Owns:**
 `backend/onyx/access/access.py`, `models.py`, `utils.py`, `hierarchy_access.py`,
-`backend/ee/onyx/access/access.py`, `hierarchy_access.py`,
+`backend/loge/access/access.py`, `hierarchy_access.py`,
 `backend/onyx/db/document_access.py`, `permissions.py`, `scoped_permissions.py`,
 `backend/onyx/db/document_set.py`, `user_group.py`, `hierarchy.py`,
 `backend/onyx/server/features/document_set/`, `backend/onyx/server/features/hierarchy/`,
-`backend/ee/onyx/server/user_group/`, `backend/ee/onyx/db/user_group.py`, `external_perm.py`,
-`backend/ee/onyx/external_permissions/post_query_censoring.py`, `perm_sync_types.py`,
+`backend/loge/server/user_group/`, `backend/loge/db/user_group.py`, `external_perm.py`,
+`backend/loge/external_permissions/post_query_censoring.py`, `perm_sync_types.py`,
 `utils.py`, `sync_params.py`,
 `backend/onyx/context/search/preprocessing/access_filters.py`,
 `backend/onyx/document_index/opensearch/search.py` (the `_get_search_filters` chokepoint),
@@ -71,14 +71,14 @@ and §9).
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
-| GET/POST/PATCH/DELETE | `/admin/user-group[/{id}]` | `ee/onyx/server/user_group/api.py` | EE only. Gated by `Permission.MANAGE_USER_GROUPS` / `READ_USER_GROUPS`, several with `allow_scope=True` so a curator (group manager) can reach the handler; the handler itself must then re-check scope (GATE 2). |
+| GET/POST/PATCH/DELETE | `/admin/user-group[/{id}]` | `loge/server/user_group/api.py` | EE only. Gated by `Permission.MANAGE_USER_GROUPS` / `READ_USER_GROUPS`, several with `allow_scope=True` so a curator (group manager) can reach the handler; the handler itself must then re-check scope (GATE 2). |
 | GET | `/user-groups/minimal` | same file | `Permission.BASIC_ACCESS`; any authenticated user can list group names (not membership) for persona/document-set configuration UIs. |
 | PUT | `/admin/user-group/{id}/permissions` | same file | `Permission.MANAGE_USER_GROUPS` / `FULL_ADMIN_PANEL_ACCESS` depending on the specific route; sets what a group's members can do, not document access. |
 | CRUD | `/document-set*` | `backend/onyx/server/features/document_set/api.py` | Creating/editing a set with `is_public=False` requires naming the owning user or group(s); `filter_document_set_names_by_user_access`/`filter_document_set_ids_by_user_access` (`db/document_set.py`) are the read-side access check reused everywhere a caller supplies set names or IDs. |
-| GET/PUT | `/manage/admin/cc-pair/{id}/data-access`, `/manage/admin/cc-pair/{id}/manage-access` | `ee/onyx/server/documents/cc_pair.py` | EE only. Data-access groups decide who reads a connector's documents. Manage-access groups (with an `EDITOR` or `OPERATOR` role) decide who administers the connector. |
-| PUT | `/manage/admin/user-group/{id}/data-access-cc-pairs`, `/manage/admin/user-group/{id}/managed-cc-pairs` | `ee/onyx/server/user_group/api.py` | EE only. The same two relations, set from the group side. |
+| GET/PUT | `/manage/admin/cc-pair/{id}/data-access`, `/manage/admin/cc-pair/{id}/manage-access` | `loge/server/documents/cc_pair.py` | EE only. Data-access groups decide who reads a connector's documents. Manage-access groups (with an `EDITOR` or `OPERATOR` role) decide who administers the connector. |
+| PUT | `/manage/admin/user-group/{id}/data-access-cc-pairs`, `/manage/admin/user-group/{id}/managed-cc-pairs` | `loge/server/user_group/api.py` | EE only. The same two relations, set from the group side. |
 | GET | `/hierarchy/*` | `backend/onyx/server/features/hierarchy/api.py` | Folder/space browsing scoped by `get_user_external_group_ids` and `get_accessible_hierarchy_nodes_for_source` (see §4). |
-| SCIM | `backend/ee/onyx/server/scim/*.py` | | Provisions users and groups from an external IdP; writes the same `UserGroup`/`User__UserGroup` rows the manual admin UI writes. |
+| SCIM | `backend/loge/server/scim/*.py` | | Provisions users and groups from an external IdP; writes the same `UserGroup`/`User__UserGroup` rows the manual admin UI writes. |
 
 ### The role/permission model
 
@@ -152,17 +152,17 @@ OpenSearch chunk document
   CC_PAIR_IDS_FIELD_NAME: int[]           # cc-pairs the document belongs to (§4.3a)
 ```
 
-- `UserGroup` (`onyx/db/models.py`, EE-managed via `ee/onyx/db/user_group.py`):
+- `UserGroup` (`onyx/db/models.py`, EE-managed via `loge/db/user_group.py`):
   a named group. Two are seeded and protected as "default": Admin and Basic
   (`onyx/db/user_group.py:assert_group_config_is_editable`,
   `assert_not_shared_with_default_group`). Sharing a resource with the Basic
   default group is refused outright: use the resource's own `is_public` flag
   instead, since Basic holds every user. The Community downgrade
-  (`ee/onyx/db/community_downgrade.py:remove_custom_user_groups__no_commit`,
+  (`loge/db/community_downgrade.py:remove_custom_user_groups__no_commit`,
   [[billing]] §4.5) deletes every non-default group row directly. It does not
-  mark the group with `ee/onyx/db/user_group.py:prepare_user_group_for_deletion`
+  mark the group with `loge/db/user_group.py:prepare_user_group_for_deletion`
   and wait for the Celery group sync
-  (`ee/onyx/background/celery/tasks/vespa/tasks.py:monitor_usergroup_taskset`)
+  (`loge/background/celery/tasks/vespa/tasks.py:monitor_usergroup_taskset`)
   to delete it. First it makes the resources shared with those groups public:
   personas shared with or owned by a group (`public_permission` becomes
   `VIEWER`, and their user files get `needs_persona_sync`), document sets, LLM
@@ -187,7 +187,7 @@ OpenSearch chunk document
 - `Document.external_user_emails` / `external_user_group_ids` / `is_public`: the
   raw permission-sync output, written by [[permission-sync]] connectors, read by
   `access/access.py` to build the indexed ACL. `ExternalUserGroup`
-  (`ee/onyx/db/external_perm.py`) maps a synced external group ID to member
+  (`loge/db/external_perm.py`) maps a synced external group ID to member
   emails; `fetch_public_external_group_ids` marks certain external groups (for
   example, a Google Drive domain-wide share) as effectively public.
 - `HierarchyNode` (`db/hierarchy.py`): folder/space-level access, with its own
@@ -195,7 +195,7 @@ OpenSearch chunk document
   from `NodeExternalAccess`, separate from but structurally identical to
   `Document`'s.
 - The Community downgrade
-  (`ee/onyx/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`)
+  (`loge/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`)
   sets every cc-pair to `PUBLIC`. It clears `external_user_emails` and
   `external_user_group_ids` on every `Document` and `HierarchyNode`, sets
   `Document.is_public` to false, and deletes every `User__ExternalUserGroupId`
@@ -229,7 +229,7 @@ external group ID can never collide in the same set:
 ```
 [[permission-sync]] connector crawl
   └─ writes Document.external_user_emails / external_user_group_ids / is_public
-     and ExternalUserGroup rows                    ee/onyx/db/external_perm.py
+     and ExternalUserGroup rows                    loge/db/external_perm.py
 
 indexing/adapters/document_indexing_adapter.py:DocumentIndexingAdapter.prepare_enrichment
   └─ get_access_for_documents(document_ids, db_session)      access/access.py
@@ -342,10 +342,10 @@ sorts every live cc-pair into three sets for the acting user:
 `connector_edit_requests.py:apply_access_change__no_commit` sets the mark when
 a pair enters `SYNC` or `SYNC_RESTRICTED` from `PUBLIC` or `PRIVATE`, and only
 for a source with a doc permission sync
-(`ee/onyx/external_permissions/sync_params.py:source_requires_doc_sync`).
+(`loge/external_permissions/sync_params.py:source_requires_doc_sync`).
 Salesforce checks access after search (§4.5) and gets no mark. The
 doc-permission-sync beat clears the mark
-(`ee/onyx/background/celery/tasks/doc_permission_syncing/tasks.py:clear_caught_up_perm_sync_pending_marks`)
+(`loge/background/celery/tasks/doc_permission_syncing/tasks.py:clear_caught_up_perm_sync_pending_marks`)
 once a doc permission sync and, for a source with one, an external group sync
 that started after the mark succeed, and no indexed document of the pair waits
 for metadata sync (`db/document.py:build_cc_pair_has_unsynced_documents_clause`).
@@ -398,7 +398,7 @@ index-query one: `db/hierarchy.py:get_accessible_hierarchy_nodes_for_source` /
 implementation is explicitly unfiltered by design
 (`onyx/db/hierarchy.py`, comment: "MIT hierarchy queries intentionally omit
 permission filters... Supported Community connectors are public"); the EE
-implementation (`ee/onyx/db/hierarchy.py`) applies the real per-node ACL, keyed
+implementation (`loge/db/hierarchy.py`) applies the real per-node ACL, keyed
 by `get_user_external_group_ids` (`access/hierarchy_access.py`, dispatched the
 same CE/EE way as `get_acl_for_user`). This governs the folder-browse UI
 (`server/features/hierarchy/api.py`), not chunk retrieval.
@@ -406,7 +406,7 @@ same CE/EE way as `get_acl_for_user`). This governs the folder-browse UI
 ### 4.5 EE post-query field censoring
 
 Some connectors (Salesforce is the concrete example in
-`ee/onyx/external_permissions/sync_params.py`) can only sync document-level
+`loge/external_permissions/sync_params.py`) can only sync document-level
 access, not field-level access, at index time; a user may be allowed to see a
 record but not every field on it. For these sources,
 `_get_access_for_documents` marks the document `is_public` at the index level
@@ -415,7 +415,7 @@ record but not every field on it. For these sources,
 passes the ACL clause for everyone, then narrows the actual field content after
 retrieval:
 
-`ee/onyx/external_permissions/post_query_censoring.py:_post_query_chunk_censoring`
+`loge/external_permissions/post_query_censoring.py:_post_query_chunk_censoring`
 groups the retrieved chunks by source, and for each source with censoring
 enabled, calls that source's `censor_chunks_for_source` function
 (`CensoringFuncType`, `perm_sync_types.py`) with the user's email. A chunk
@@ -583,7 +583,7 @@ These are the rules whose violation is silent: nothing crashes, a user just sees
 | touches `fetch_versioned_implementation` dispatch or `global_version` | every CE/EE pair in this document; verify the CE fallback still narrows rather than widens (§5.9) |
 | changes group membership resolution (`fetch_user_groups_for_user`, `fetch_external_groups_for_user`) | re-run the two-user integration test (§8); a stale cache or a membership write that doesn't invalidate it is a data-exposure bug, not a performance bug |
 | changes curator/group-manager scoping (`is_group_manager`, `within_managed_scope_clause`, `allow_scope`) | every route using `require_permission(..., allow_scope=True)` has a real GATE 2 check; this governs admin capability, not document ACL, but a bug here can let a curator manage a document set outside their scope, which does affect who a persona can search |
-| adds a resource that can be shared with a user group (a `*__UserGroup` link table) | the Community downgrade in `ee/onyx/db/community_downgrade.py`: `_make_group_shared_resources_public__no_commit` must make the resource public, and `_UNCASCADED_GROUP_LINKS` must list the link table if the group row's delete does not cascade to it |
+| adds a resource that can be shared with a user group (a `*__UserGroup` link table) | the Community downgrade in `loge/db/community_downgrade.py`: `_make_group_shared_resources_public__no_commit` must make the resource public, and `_UNCASCADED_GROUP_LINKS` must list the link table if the group row's delete does not cascade to it |
 | adds an ACL bypass parameter anywhere in the search chain | re-verify §5.3 still holds: there is no such flag today. Adding one is a security review |
 
 ---

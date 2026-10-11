@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 import { paidTierGated } from "@/ce";
-import { QueryControllerProvider as EEQueryControllerProvider } from "@/ee/providers/QueryControllerProvider";
+import { QueryControllerProvider as LogeQueryControllerProvider } from "@/loge/providers/QueryControllerProvider";
 import { SearchDocWithContent, BaseFilters } from "@/lib/search/types";
 
 export type AppMode = "auto" | "search" | "chat";
@@ -54,4 +54,4 @@ export function useQueryController(): QueryControllerValue {
   return useContext(QueryControllerContext);
 }
 
-export const QueryControllerProvider = paidTierGated(EEQueryControllerProvider);
+export const QueryControllerProvider = paidTierGated(LogeQueryControllerProvider);

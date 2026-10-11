@@ -136,7 +136,7 @@ Detail doc: `audit.md` (to be written).
 - **Approval enforcement must live in Onyx-controlled paths** (proxy + backend orchestration). Agent prompts and OpenCode tool permissions are guidance, not the approval boundary.
 - **Repo conventions to follow throughout:**
   - Raise `OnyxError` (not `HTTPException`); typed FastAPI returns (no `response_model=`).
-  - All DB ops under `backend/onyx/db` or `backend/ee/onyx/db`.
+  - All DB ops under `backend/onyx/db` or `backend/loge/db`.
   - All Celery tasks use `@shared_task` and every enqueue includes `expires=`. Existing direct sandbox file-sync enqueues should be removed or given expirations as part of search/sandbox work.
   - Implement timeout logic in task bodies — Celery's time limits don't work with thread pools.
   - Restart Celery workers after task changes (no auto-reload).

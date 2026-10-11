@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import text, update
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.hierarchy import _get_accessible_hierarchy_nodes_for_source
+from loge.db.hierarchy import _get_accessible_hierarchy_nodes_for_source
 from onyx.configs.constants import DocumentSource
 from onyx.db.document import get_accessible_documents_for_hierarchy_node_paginated
 from onyx.db.enums import (

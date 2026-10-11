@@ -6,13 +6,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.external_permissions.canvas.access import (
+from loge.external_permissions.canvas.access import (
     CanvasCoursePermissionContext,
     get_announcement_permissions,
     get_assignment_permissions,
     get_page_permissions,
 )
-from ee.onyx.external_permissions.canvas.group_sync import (
+from loge.external_permissions.canvas.group_sync import (
     _referenced_group_and_section_ids,
 )
 from onyx.access.models import ExternalAccess

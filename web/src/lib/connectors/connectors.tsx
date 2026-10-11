@@ -348,11 +348,22 @@ export const connectorConfigs: Record<
       },
       {
         type: "checkbox",
+        query: "Include repository files?",
+        label: "Include repository files",
+        name: "include_files",
+        description:
+          "Index the latest tip of the selected branch(es) — docs and source files. Does not index commit history.",
+        optional: true,
+        default: true,
+      },
+      {
+        type: "checkbox",
         query: "Include pull requests",
         label: "Include pull requests",
         description: "Index pull requests from repositories",
         name: "include_prs",
         optional: true,
+        default: false,
       },
       {
         type: "checkbox",
@@ -361,26 +372,33 @@ export const connectorConfigs: Record<
         name: "include_issues",
         description: "Index issues from repositories",
         optional: true,
-      },
-      {
-        type: "checkbox",
-        query: "Include documents?",
-        label: "Include Documents",
-        name: "include_files",
-        description:
-          "Index text-based documents (markdown, text, etc.) from repositories",
-        optional: true,
+        default: false,
       },
     ],
     advanced_values: [
       {
+        type: "select",
+        query: "Which branches should become knowledge?",
+        label: "Branch scope",
+        name: "branch_mode",
+        options: [
+          { name: "One branch (recommended)", value: "single" },
+          { name: "All branches", value: "all" },
+        ],
+        default: "single",
+        description:
+          "Index the latest commit tip of one branch, or every branch tip. Never indexes full commit history.",
+      },
+      {
         type: "text",
-        query: "Enter the branch to index documents from:",
+        query: "Enter the branch to index files from:",
         label: "Branch",
         name: "branch",
         optional: true,
         description:
-          "Branch to index documents from (e.g. gh-pages). Leave blank to use each repository's default branch. Only applies when 'Include Documents?' is enabled. After changing this on an existing connector, trigger a re-index to pick up the new branch immediately.",
+          "Used when branch scope is one branch. Leave blank for each repository's default branch (e.g. main). After changing this, trigger a re-index.",
+        visibleCondition: (values, _credential) =>
+          (values.branch_mode ?? "single") !== "all",
       },
     ],
   },
@@ -440,15 +458,48 @@ export const connectorConfigs: Record<
         name: "project_name",
         optional: false,
       },
+      {
+        type: "checkbox",
+        query: "Include repository files?",
+        label: "Include repository files",
+        name: "include_code_files",
+        description:
+          "Index the latest tip of the selected branch(es) — docs and source files. Does not index commit history.",
+        default: true,
+      },
     ],
     advanced_values: [
+      {
+        type: "select",
+        query: "Which branches should become knowledge?",
+        label: "Branch scope",
+        name: "branch_mode",
+        options: [
+          { name: "One branch (recommended)", value: "single" },
+          { name: "All branches", value: "all" },
+        ],
+        default: "single",
+        description:
+          "Index the latest commit tip of one branch, or every branch tip. Never indexes full commit history.",
+      },
+      {
+        type: "text",
+        query: "Enter the branch to index files from:",
+        label: "Branch",
+        name: "branch",
+        optional: true,
+        description:
+          "Used when branch scope is one branch. Leave blank for the project's default branch. After changing this, trigger a re-index.",
+        visibleCondition: (values, _credential) =>
+          (values.branch_mode ?? "single") !== "all",
+      },
       {
         type: "checkbox",
         query: "Include merge requests?",
         label: "Include MRs",
         name: "include_mrs",
         description: "Index merge requests from repositories",
-        default: true,
+        default: false,
       },
       {
         type: "checkbox",
@@ -456,7 +507,7 @@ export const connectorConfigs: Record<
         label: "Include Issues",
         name: "include_issues",
         description: "Index issues from repositories",
-        default: true,
+        default: false,
       },
     ],
   },

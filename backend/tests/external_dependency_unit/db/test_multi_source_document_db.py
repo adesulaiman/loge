@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import delete, event
 from sqlalchemy.orm import Session
 
-from ee.onyx.background.celery.tasks.doc_permission_syncing.tasks import (
+from loge.background.celery.tasks.doc_permission_syncing.tasks import (
     element_update_permissions,
 )
 from onyx.access.models import DocExternalAccess, ExternalAccess

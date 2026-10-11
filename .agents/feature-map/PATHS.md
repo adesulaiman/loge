@@ -25,7 +25,7 @@ here. Read the component that documents the setting in its env table.
 | `backend/onyx/chat/llm_loop.py`, `backend/onyx/chat/llm_step.py`, `backend/onyx/chat/process_message.py`, `backend/onyx/chat/chat_state.py`, `backend/onyx/chat/chat_processing_checker.py`, `backend/onyx/chat/stop_signal_checker.py` | core-chat-loop |
 | `backend/onyx/chat/emitter.py`, `stream_buffer.py` | core-chat-loop, streaming-protocol |
 | `backend/onyx/chat/prompt_utils.py`, `compression.py`, `incognito*.py`, `backend/onyx/llm/token_budget.py` | context-assembly |
-| `backend/onyx/prompts/`, `backend/ee/onyx/prompts/` | context-assembly, agents-personas |
+| `backend/onyx/prompts/`, `backend/loge/prompts/` | context-assembly, agents-personas |
 | `backend/onyx/chat/citation_processor.py`, `citation_utils.py` | citations |
 | `backend/onyx/chat/save_chat.py`, `backend/onyx/db/chat.py`, `db/chat_search.py`, `db/feedback.py` | chat-persistence |
 | `backend/onyx/server/query_and_chat/chat_backend.py`, `models.py`, `session_loading.py`, `chat_utils.py` | core-chat-loop, chat-persistence |
@@ -58,11 +58,11 @@ here. Read the component that documents the setting in its env table.
 | `backend/onyx/natural_language_processing/` | document-index, internal-search |
 | `backend/onyx/db/search_settings.py`, `db/swap_index.py` | document-index |
 | `backend/onyx/server/manage/search_settings.py`, `server/manage/embedding/` | document-index |
-| `backend/onyx/server/features/search/`, `server/query_and_chat/query_backend.py`, `backend/ee/onyx/server/query_and_chat/search_backend.py`, `backend/ee/onyx/search/` | internal-search |
-| `backend/ee/onyx/server/query_and_chat/token_limit.py` | rate-and-usage-limits |
-| `backend/onyx/access/`, `backend/ee/onyx/access/`, `backend/onyx/db/document_access.py`, `db/permissions.py`, `db/scoped_permissions.py` | access-control |
+| `backend/onyx/server/features/search/`, `server/query_and_chat/query_backend.py`, `backend/loge/server/query_and_chat/search_backend.py`, `backend/loge/search/` | internal-search |
+| `backend/loge/server/query_and_chat/token_limit.py` | rate-and-usage-limits |
+| `backend/onyx/access/`, `backend/loge/access/`, `backend/onyx/db/document_access.py`, `db/permissions.py`, `db/scoped_permissions.py` | access-control |
 | `backend/onyx/db/document_set.py`, `db/user_group.py`, `server/features/document_set/` | access-control |
-| `backend/ee/onyx/external_permissions/`, `backend/onyx/db/permission_sync_attempt.py` | permission-sync |
+| `backend/loge/external_permissions/`, `backend/onyx/db/permission_sync_attempt.py` | permission-sync |
 | `backend/onyx/kg/`, `backend/onyx/db/entities.py`, `db/entity_type.py`, `db/relationships.py`, `db/kg_config.py`, `server/kg/` | **incomplete feature.** Knowledge graph storage, config and admin API; no extraction pipeline or UI yet. See INDEX.md, Incomplete features. |
 | `backend/onyx/federated_connectors/`, `backend/onyx/db/federated.py`, `server/federated/` | federated-search |
 | `backend/onyx/server/features/web_search/`, `server/manage/web_search/`, `db/web_search.py` | web-search |
@@ -94,7 +94,7 @@ here. Read the component that documents the setting in its env table.
 
 | Path | Component(s) |
 |---|---|
-| `backend/onyx/auth/`, `backend/ee/onyx/auth/`, `backend/onyx/server/auth/`, `server/saml*.py`, `server/oidc_multi.py`, `server/sso_discovery.py`, `server/manage/sso/` | auth-and-identity |
+| `backend/onyx/auth/`, `backend/loge/auth/`, `backend/onyx/server/auth/`, `server/saml*.py`, `server/oidc_multi.py`, `server/sso_discovery.py`, `server/manage/sso/` | auth-and-identity |
 | `backend/onyx/db/users.py`, `db/auth.py`, `db/api_key.py`, `db/pat.py`, `db/saml.py`, `db/sso_provider.py`, `server/api_key/`, `server/pat/`, `server/manage/users.py` | auth-and-identity |
 | `backend/onyx/oauth/`, `backend/onyx/db/oauth_config.py`, `server/features/oauth_config/`, `server/features/user_oauth_token/` | auth-and-identity |
 | `backend/onyx/oauth_provider/`, `backend/onyx/db/oauth_provider.py`, `server/oauth_provider/` | auth-and-identity |
@@ -105,8 +105,8 @@ here. Read the component that documents the setting in its env table.
 | `backend/onyx/db/tenant_shard.py`, `db/engine/`, `backend/onyx/server/middleware/` | multi-tenancy |
 | `backend/onyx/server/middleware/rate_limiting.py` | rate-and-usage-limits |
 | `backend/onyx/server/middleware/latency_logging.py` | observability |
-| `backend/onyx/background/celery/`, `background/periodic_poller.py`, `background/task_utils.py`, `backend/ee/onyx/background/`, `backend/onyx/db/tasks.py`, `db/scheduled_task.py`, `db/sync_record.py` | background-jobs |
-| `backend/onyx/feature_flags/`, `backend/ee/onyx/feature_flags/`, `backend/onyx/db/gated_app.py`, `backend/onyx/configs/app_configs.py` | editions-and-gating |
+| `backend/onyx/background/celery/`, `background/periodic_poller.py`, `background/task_utils.py`, `backend/loge/background/`, `backend/onyx/db/tasks.py`, `db/scheduled_task.py`, `db/sync_record.py` | background-jobs |
+| `backend/onyx/feature_flags/`, `backend/loge/feature_flags/`, `backend/onyx/db/gated_app.py`, `backend/onyx/configs/app_configs.py` | editions-and-gating |
 | `backend/onyx/configs/chat_configs.py` | chat-persistence, context-assembly, llm-providers |
 | `backend/onyx/configs/llm_configs.py`, `backend/onyx/configs/model_configs.py` | llm-providers |
 | `backend/onyx/configs/onyxbot_configs.py` | slack-bot |
@@ -115,16 +115,16 @@ here. Read the component that documents the setting in its env table.
 | `backend/onyx/utils/fleet_telemetry.py`, `fleet_query_telemetry.py`, `fleet_telemetry_collector.py`, `fleet_telemetry_resources.py`, `telemetry.py`, `timing.py`, `backend/onyx/db/fleet_enrollment.py` | observability |
 | `backend/onyx/db/fleet_telemetry.py` | observability, indexing-pipeline |
 | `backend/onyx/db/token_limit.py`, `server/token_rate_limits/`, `server/usage_limits.py`, `server/tenant_usage_limits.py` | rate-and-usage-limits |
-| `backend/ee/onyx/server/billing/`, `backend/ee/onyx/server/license/`, `backend/ee/onyx/utils/tier.py` | billing, editions-and-gating |
-| `backend/ee/onyx/db/community_downgrade.py` | billing, access-control |
-| `backend/ee/onyx/server/settings/api.py` | editions-and-gating |
-| `backend/ee/onyx/server/enterprise_settings/` | whitelabelling-and-theme |
-| `backend/ee/onyx/db/standard_answer.py`, `backend/ee/onyx/server/manage/standard_answer.py`, `*/onyxbot/slack/handlers/handle_standard_answers.py` | standard-answers |
+| `backend/loge/server/billing/`, `backend/loge/server/license/`, `backend/loge/utils/tier.py` | billing, editions-and-gating |
+| `backend/loge/db/community_downgrade.py` | billing, access-control |
+| `backend/loge/server/settings/api.py` | editions-and-gating |
+| `backend/loge/server/enterprise_settings/` | whitelabelling-and-theme |
+| `backend/loge/db/standard_answer.py`, `backend/loge/server/manage/standard_answer.py`, `*/onyxbot/slack/handlers/handle_standard_answers.py` | standard-answers |
 | `backend/onyx/db/notification.py`, `db/release_notes.py`, `db/admin_banner.py`, `server/features/notifications/`, `features/release_notes/`, `features/admin_banner/` | notifications |
 | `backend/onyx/db/models.py` | **any**. Check which tables the diff touches, then map those. |
 | `backend/alembic/`, `backend/alembic_tenants/` | the component that owns the table being migrated |
 | `backend/onyx/server/settings/`, `server/security/`, `db/security_settings.py` | editions-and-gating, auth-and-identity |
-| `backend/onyx/hooks/`, `backend/ee/onyx/hooks/`, `db/hook.py`, `server/features/hooks/` | observability |
+| `backend/onyx/hooks/`, `backend/loge/hooks/`, `db/hook.py`, `server/features/hooks/` | observability |
 | `backend/onyx/server/features/password/` | auth-and-identity |
 | `backend/onyx/evals/` | the component being evaluated. A prompt or retrieval change needs an eval, not only a unit test. |
 | `backend/onyx/db/seeding/` | the component owning the seeded rows. Note `backend/onyx/seeding/` is an empty package; the default agent and built-in tool rows come from alembic migrations, not a seeding module. |
@@ -145,11 +145,11 @@ so verify the callers rather than a single component.
 
 | Path | Component(s) |
 |---|---|
-| `backend/onyx/onyxbot/`, `backend/ee/onyx/onyxbot/`, `backend/onyx/db/slack_bot.py`, `db/slack_channel_config.py`, `server/manage/slack_bot.py` | slack-bot |
+| `backend/onyx/onyxbot/`, `backend/loge/onyxbot/`, `backend/onyx/db/slack_bot.py`, `db/slack_channel_config.py`, `server/manage/slack_bot.py` | slack-bot |
 | `backend/onyx/db/discord_bot.py`, `server/manage/discord_bot/` | discord-bot |
 | `backend/onyx/server/onyx_api/` | onyx-api |
 | `backend/onyx/mcp_server/`, `backend/onyx/mcp_server_main.py` | mcp-server |
-| `backend/onyx/server/gateway/`, `backend/ee/onyx/server/gateway/` | llm-gateway |
+| `backend/onyx/server/gateway/`, `backend/loge/server/gateway/` | llm-gateway |
 | `backend/onyx/voice/`, `server/manage/voice/`, `db/voice.py` | voice |
 | `backend/onyx/image_gen/`, `server/features/image_generation/`, `server/manage/image_generation/`, `db/image_generation.py` | image-generation |
 | `backend/onyx/db/code_interpreter.py`, `server/manage/code_interpreter/` | code-execution |
@@ -183,7 +183,7 @@ so verify the callers rather than a single component.
 | `web/src/app/admin/bots/`, `admin/discord-bot/` | slack-bot, discord-bot |
 | `web/src/app/admin/sso-providers/`, `admin/security/`, `admin/oauth-test/` | auth-and-identity |
 | `web/src/app/admin/token-rate-limits/` | rate-and-usage-limits |
-| `web/src/app/ee/admin/` | **a second admin route tree**, reached by a rewrite. `web/src/proxy.ts:EE_ROUTES` lists the paths that get rewritten to `/ee/...`: the `/admin/*` paths groups, performance/usage, performance/analytics, performance/query-history, performance/custom-analytics, theme, standard-answer, and export-logs, plus `/agents/stats`. A page under `ee/admin/` can also load directly at `/ee/admin/...`. Only the `/admin/...` alias needs an `EE_ROUTES` entry. Check `EE_ROUTES` before assuming which copy handles an `/admin/...` path. |
+| `web/src/app/admin/` | **a second admin route tree**, reached by a rewrite. `web/src/proxy.ts:EE_ROUTES` lists the paths that get rewritten to `/ee/...`: the `/admin/*` paths groups, performance/usage, performance/analytics, performance/query-history, performance/custom-analytics, theme, standard-answer, and export-logs, plus `/agents/stats`. A page under `ee/admin/` can also load directly at `/ee/admin/...`. Only the `/admin/...` alias needs an `EE_ROUTES` entry. Check `EE_ROUTES` before assuming which copy handles an `/admin/...` path. |
 | `web/src/lib/admin-routes.ts` | the authoritative list of admin routes. Changing it changes the admin panel's surface, so re-check coverage against this map. |
 | `web/src/app/admin/craft/` | craft-admin |
 | `web/src/app/admin/tracing/`, `admin/systeminfo/` | observability |

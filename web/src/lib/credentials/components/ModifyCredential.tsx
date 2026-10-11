@@ -93,7 +93,8 @@ function CredentialSelectionTable({
                   <td className="p-2">{credential.id}</td>
                   <td className="p-2">
                     <p>
-                      {credential.name ?? t("credentials.table.untitled.label")}
+                      {credential.name?.trim() ||
+                        t("credentials.table.untitled.label")}
                     </p>
                   </td>
                   <td className="p-2">

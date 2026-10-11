@@ -7,14 +7,14 @@
 **Verified against:** `268e4d5a3d` (2026-10-05)
 **Domain:** platform (bot surface)
 **Edition:** CE core listener and regular-answer path. Standard answers are EE
-(`backend/ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py`); CE falls back to a
+(`backend/loge/onyxbot/slack/handlers/handle_standard_answers.py`); CE falls back to a
 no-op that never matches. Multi-tenant scaling (per-pod tenant acquisition, Redis
 locks) applies to cloud only.
 **Owns:**
 `backend/onyx/onyxbot/slack/listener.py`, `handlers/handle_message.py`,
 `handlers/handle_regular_answer.py`, `handlers/handle_standard_answers.py`,
 `handlers/handle_buttons.py`, `blocks.py`, `config.py`, `constants.py`, `models.py`,
-`utils.py`, `backend/ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py`,
+`utils.py`, `backend/loge/onyxbot/slack/handlers/handle_standard_answers.py`,
 `backend/onyx/db/slack_bot.py`, `backend/onyx/db/slack_channel_config.py`,
 `backend/onyx/server/manage/slack_bot.py`, `backend/onyx/server/manage/validate_tokens.py`,
 `web/src/app/admin/bots/`
@@ -230,7 +230,7 @@ see §5 for the exact rule.
 
 `handle_standard_answers` (`handlers/handle_standard_answers.py`) dispatches via
 `fetch_versioned_implementation` to the EE implementation
-(`ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py:_handle_standard_answers`)
+(`loge/onyxbot/slack/handlers/handle_standard_answers.py:_handle_standard_answers`)
 when EE is active, else a CE no-op that always returns `False`. The EE version
 matches the message against the channel's configured
 `standard_answer_categories`, excluding answers already used in this Slack

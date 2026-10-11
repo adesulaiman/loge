@@ -16,9 +16,9 @@ on:
   # never checks out or executes PR code. Do not add a checkout step.
   pull_request_target: # zizmor: ignore[dangerous-triggers]
     paths:
-      - "backend/ee/**"
-      - "web/src/ee/**"
-      - "web/src/app/ee/**"
+      - "backend/loge/**"
+      - "web/src/loge/**"
+      - "web/src/app/**"
 
 permissions:
   contents: read
@@ -139,7 +139,7 @@ jobs:
           done <<< "${unmapped}"
 
           if [ -n "${failures}" ]; then
-            echo "This PR changes EE code (backend/ee/, web/src/ee/, or web/src/app/ee/)."
+            echo "This PR changes EE code (backend/loge/, web/src/loge/, or web/src/app/)."
             echo "Only organization members can author changes to these directories."
             echo "Problems found:"
             echo "${failures}"

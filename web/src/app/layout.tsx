@@ -12,7 +12,12 @@ import {
   WebVitals,
 } from "@/lib/analytics/shared";
 import Script from "next/script";
-import { DM_Mono, Hanken_Grotesk } from "next/font/google";
+import {
+  Chakra_Petch,
+  Dela_Gothic_One,
+  JetBrains_Mono,
+  Zen_Kaku_Gothic_New,
+} from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import StatsOverlayLoader from "@/components/dev/StatsOverlayLoader";
@@ -29,18 +34,43 @@ import { DirectionProvider } from "@radix-ui/react-direction";
 import { cookies } from "next/headers";
 import { htmlDirForLocale, messageLocale, type HtmlDir } from "@/i18n/config";
 
+// Loge UI stack (design-loge): Zen Kaku for body, Dela Gothic for brand,
+// Chakra Petch for HUD labels, JetBrains Mono for code. Keep the
+// --font-hanken-grotesk / --font-dm-mono variable names so Opal consumers
+// pick up the new faces without a rename churn.
+//
 // No generic at the end of either fallback list: the generic comes last in
 // the composed --font-* variables on <html> below, after the per-locale CJK
 // tail (--font-cjk-sans, defined in globals.css). A generic here would sit
 // before the CJK fonts and swallow every CJK codepoint.
-const hankenGrotesk = Hanken_Grotesk({
+const zenKaku = Zen_Kaku_Gothic_New({
   subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
   display: "swap",
-  fallback: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto"],
+  fallback: [
+    "Hiragino Kaku Gothic ProN",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+  ],
 });
 
-const dmMono = DM_Mono({
+const delaGothic = Dela_Gothic_One({
+  subsets: ["latin"],
   weight: "400",
+  display: "swap",
+  fallback: ["Zen Kaku Gothic New", "sans-serif"],
+});
+
+const chakraPetch = Chakra_Petch({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+  fallback: ["Zen Kaku Gothic New", "sans-serif"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  weight: ["400", "500"],
   subsets: ["latin"],
   display: "swap",
   fallback: [
@@ -96,11 +126,13 @@ export default async function Layout({ children }: LayoutProps) {
       // and the tail have to be joined in one declaration. Every
       // `var(--font-hanken-grotesk)` / `var(--font-dm-mono)` consumer (Opal
       // text presets, the font-hanken/font-sans utilities, app CSS) resolves
-      // through these.
+      // through these. Brand/HUD vars are Loge-specific.
       style={
         {
-          "--font-hanken-grotesk": `${hankenGrotesk.style.fontFamily}, var(--font-cjk-sans), sans-serif`,
-          "--font-dm-mono": `${dmMono.style.fontFamily}, var(--font-cjk-sans), monospace`,
+          "--font-hanken-grotesk": `${zenKaku.style.fontFamily}, var(--font-cjk-sans), sans-serif`,
+          "--font-dm-mono": `${jetbrainsMono.style.fontFamily}, var(--font-cjk-sans), monospace`,
+          "--font-loge-brand": `${delaGothic.style.fontFamily}, ${zenKaku.style.fontFamily}, sans-serif`,
+          "--font-loge-hud": `${chakraPetch.style.fontFamily}, ${zenKaku.style.fontFamily}, sans-serif`,
         } as React.CSSProperties
       }
       suppressHydrationWarning

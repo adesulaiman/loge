@@ -22,8 +22,8 @@ packages:
   src/app/config: 100
   src/app/connector: 100
   src/app/craft: 99.2
-  src/app/ee: 95.6
   src/app/federated: 97
+  src/loge/app: 95.6
   src/app/mcp: 99.5
   src/app/nrf: 99.2
   src/app/oauth-config: 100
@@ -45,11 +45,11 @@ packages:
   src/components/tooltip: 100
   src/components/ui: 99.9
   src/components/voice: 100
-  src/ee/hooks: 93.5
-  src/ee/lib: 100
-  src/ee/providers: 99.3
-  src/ee/sections: 100
-  src/ee/views: 99.7
+  src/loge/hooks: 93.5
+  src/loge/lib: 100
+  src/loge/providers: 99.3
+  src/loge/sections: 100
+  src/loge/views: 99.7
   src/hooks: 98.5
   src/i18n: 99
   src/i18n/messages: 100

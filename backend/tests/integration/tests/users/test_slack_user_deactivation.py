@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 
 import redis
 
-from ee.onyx.server.license.models import LicenseMetadata, LicenseSource, PlanType
+from loge.server.license.models import LicenseMetadata, LicenseSource, PlanType
 from onyx.configs.app_configs import REDIS_DB_NUMBER, REDIS_HOST, REDIS_PORT
 from onyx.db.engine.sql_engine import get_session_with_current_tenant
 from onyx.db.users import add_slack_user_if_not_exists

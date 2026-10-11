@@ -17,7 +17,7 @@ from scripts.tenant_cleanup.on_pod_scripts.cleanup_tenant_schema import (
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-from ee.onyx.server.tenants.schema_management import create_schema_if_not_exists
+from loge.server.tenants.schema_management import create_schema_if_not_exists
 from onyx.db import tenant_shard as tenant_shard_module
 from onyx.db.engine import shard_registry, shard_routing
 from onyx.db.engine.shard_registry import (
@@ -293,7 +293,7 @@ def test_rollback_keeps_the_mapping_when_the_schema_drop_fails(
 ) -> None:
     """The mapping is the only route to the schema. Clearing it after a failed drop
     strands the schema on a shard nothing can resolve."""
-    import ee.onyx.server.tenants.provisioning as provisioning
+    import loge.server.tenants.provisioning as provisioning
 
     tenant_id = f"tenant_{uuid4()}"
     placement_on_second_shard["created"].append(tenant_id)

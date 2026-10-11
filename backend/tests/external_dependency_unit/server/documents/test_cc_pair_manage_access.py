@@ -8,14 +8,14 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.server.documents.cc_pair import (
+from loge.server.documents.cc_pair import (
     get_cc_pair_manage_access,
     get_manage_access_prefill,
     set_cc_pair_manage_access,
 )
-from ee.onyx.server.documents.manage_access import CCPairManageAccessUpdateRequest
-from ee.onyx.server.user_group.api import set_group_managed_cc_pairs
-from ee.onyx.server.user_group.models import (
+from loge.server.documents.manage_access import CCPairManageAccessUpdateRequest
+from loge.server.user_group.api import set_group_managed_cc_pairs
+from loge.server.user_group.models import (
     GroupManagedCCPairsUpdateRequest,
     ManagedCCPairEntry,
 )

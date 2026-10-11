@@ -18,9 +18,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.access.access import _get_acl_for_user
-from ee.onyx.external_permissions.zoom.doc_sync import zoom_doc_sync
-from ee.onyx.external_permissions.zoom.group_sync import zoom_group_sync
+from loge.access.access import _get_acl_for_user
+from loge.external_permissions.zoom.doc_sync import zoom_doc_sync
+from loge.external_permissions.zoom.group_sync import zoom_group_sync
 from onyx.access.models import DocExternalAccess, DocumentAccess, ExternalAccess
 from onyx.access.utils import build_domain_group_id, build_ext_group_name_for_onyx
 from onyx.configs.constants import DocumentSource
@@ -401,9 +401,9 @@ def _acl_of(viewer: str, groups: dict[str, set[str]]) -> set[str]:
         if viewer in members
     ]
     with (
-        patch("ee.onyx.access.access.fetch_user_groups_for_user", return_value=[]),
+        patch("loge.access.access.fetch_user_groups_for_user", return_value=[]),
         patch(
-            "ee.onyx.access.access.fetch_external_groups_for_user",
+            "loge.access.access.fetch_external_groups_for_user",
             return_value=memberships,
         ),
     ):

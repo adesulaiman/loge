@@ -27,9 +27,9 @@ from typing import NamedTuple
 
 from onyx.db.engine.sql_engine import SqlEngine
 from onyx.db.engine.tenant_utils import get_schemas_needing_migration
-from ee.onyx.db.tenant_snapshot import ensure_template_schema
-from ee.onyx.db.tenant_snapshot import get_head_revision
-from ee.onyx.db.tenant_snapshot import store_template_snapshots
+from loge.db.tenant_snapshot import ensure_template_schema
+from loge.db.tenant_snapshot import get_head_revision
+from loge.db.tenant_snapshot import store_template_snapshots
 from onyx.db.engine.shard_registry import get_shard_specs
 from onyx.db.engine.tenant_utils import get_tenant_ids_by_shard
 from shared_configs.configs import TENANT_ID_PREFIX

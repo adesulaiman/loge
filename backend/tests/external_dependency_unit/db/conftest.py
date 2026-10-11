@@ -14,7 +14,7 @@ from uuid import UUID, uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.scim import ScimDAL
+from loge.db.scim import ScimDAL
 from onyx.db.models import ScimToken, ScimUserMapping, User, UserGroup
 from tests.external_dependency_unit.conftest import create_test_user
 from tests.external_dependency_unit.db.shard_test_utils import temporary_database

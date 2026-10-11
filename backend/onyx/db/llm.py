@@ -36,6 +36,7 @@ from onyx.llm.model_capabilities import get_max_input_tokens
 from onyx.llm.models import ReasoningEffort
 from onyx.llm.utils import model_supports_image_input
 from onyx.llm.well_known_providers.auto_update_models import LLMRecommendations
+from onyx.llm.well_known_providers.constants import OPENROUTER_PROVIDER_NAME
 from onyx.natural_language_processing.embedding_auth import build_embedding_auth
 from onyx.server.manage.embedding.models import (
     CloudEmbeddingProvider,
@@ -653,12 +654,16 @@ def sync_model_configurations(
 
     existing_by_name = {mc.name: mc for mc in provider.model_configurations}
 
+    # OpenRouter's catalog is the source of truth: newly fetched chat models
+    # are selectable by default (opt-out). Other dynamic providers stay opt-in.
+    default_new_visible = provider.provider == OPENROUTER_PROVIDER_NAME
+
     new_models: list[NewModelConfiguration] = []
     upgraded_count: int = 0
     for model in models:
         existing = existing_by_name.get(model.name)
         if existing is None:
-            # Insert new model with is_visible=False (user must explicitly enable)
+            # Non-OpenRouter: is_visible=False so the admin opts in explicitly.
             supported_flows = [LLMModelFlowType.CHAT]
             if model.supports_image_input:
                 supported_flows.append(LLMModelFlowType.VISION)
@@ -669,7 +674,7 @@ def sync_model_configurations(
                 NewModelConfiguration(
                     name=model.name,
                     supported_flows=supported_flows,
-                    is_visible=False,
+                    is_visible=default_new_visible,
                     max_input_tokens=model.max_input_tokens,
                     display_name=model.display_name,
                     is_router=model.is_router,
@@ -1513,7 +1518,11 @@ def sync_auto_mode_models(
 ) -> int:
     """Sync models from GitHub config to a provider in Auto mode.
 
-    In Auto mode, the model list and default are controlled by GitHub config.
+    In Auto mode, the recommended config controls the default model and ensures
+    listed models stay visible. For most providers, models outside that list are
+    hidden. OpenRouter is an exception: the live `/models` catalog stays visible
+    and recommendations only add/highlight defaults.
+
     The schema has:
     - default_model: The default model config (always visible)
     - additional_visible_models: List of additional visible models
@@ -1523,7 +1532,7 @@ def sync_auto_mode_models(
     Args:
         db_session: Database session
         provider: LLM provider in Auto mode
-        github_config: Configuration from GitHub
+        llm_recommendations: Recommended model configuration
 
     Returns:
         The number of changes made.
@@ -1609,6 +1618,10 @@ def sync_auto_mode_models(
     # admin can no longer see or change. Every other write path keeps a default
     # model visible.
     #
+    # OpenRouter is a live catalog: recommended models are defaults / highlights
+    # only. Hiding everything outside that short list would collapse the UI to
+    # four models and undo an admin refetch of OpenRouter `/models`.
+    #
     # Both statements test the default in SQL rather than from a snapshot read
     # here. A default assigned between the two would otherwise be missed, and
     # the model hidden anyway. They synchronize the session because sessions are
@@ -1616,49 +1629,53 @@ def sync_auto_mode_models(
     # put_llm_provider does — would otherwise serialize stale visibility.
     db_session.flush()
 
-    dropped_names = [
-        name for name in existing_models if name not in recommended_visible_model_names
-    ]
-    if dropped_names:
-        holds_a_default = (
-            select(LLMModelFlow.id)
-            .where(
-                LLMModelFlow.model_configuration_id == ModelConfiguration.id,
-                LLMModelFlow.is_default == True,  # noqa: E712
+    if provider.provider != OPENROUTER_PROVIDER_NAME:
+        dropped_names = [
+            name
+            for name in existing_models
+            if name not in recommended_visible_model_names
+        ]
+        if dropped_names:
+            holds_a_default = (
+                select(LLMModelFlow.id)
+                .where(
+                    LLMModelFlow.model_configuration_id == ModelConfiguration.id,
+                    LLMModelFlow.is_default == True,  # noqa: E712
+                )
+                .exists()
             )
-            .exists()
-        )
-        dropped_models = (
-            ModelConfiguration.llm_provider_id == provider.id,
-            ModelConfiguration.name.in_(dropped_names),
-        )
-
-        hidden = db_session.execute(
-            update(ModelConfiguration)
-            .where(
-                *dropped_models,
-                ModelConfiguration.is_visible == True,  # noqa: E712
-                ~holds_a_default,
+            dropped_models = (
+                ModelConfiguration.llm_provider_id == provider.id,
+                ModelConfiguration.name.in_(dropped_names),
             )
-            .values(is_visible=False)
-            .execution_options(synchronize_session="fetch")
-        )
 
-        # An earlier sync could have hidden a model that still holds a default,
-        # so restore those rather than leaving the default unreachable forever.
-        restored = db_session.execute(
-            update(ModelConfiguration)
-            .where(
-                *dropped_models,
-                ModelConfiguration.is_visible == False,  # noqa: E712
-                holds_a_default,
+            hidden = db_session.execute(
+                update(ModelConfiguration)
+                .where(
+                    *dropped_models,
+                    ModelConfiguration.is_visible == True,  # noqa: E712
+                    ~holds_a_default,
+                )
+                .values(is_visible=False)
+                .execution_options(synchronize_session="fetch")
             )
-            .values(is_visible=True)
-            .execution_options(synchronize_session="fetch")
-        )
 
-        changes += int(hidden.rowcount)  # ty: ignore[unresolved-attribute]
-        changes += int(restored.rowcount)  # ty: ignore[unresolved-attribute]
+            # An earlier sync could have hidden a model that still holds a
+            # default, so restore those rather than leaving the default
+            # unreachable forever.
+            restored = db_session.execute(
+                update(ModelConfiguration)
+                .where(
+                    *dropped_models,
+                    ModelConfiguration.is_visible == False,  # noqa: E712
+                    holds_a_default,
+                )
+                .values(is_visible=True)
+                .execution_options(synchronize_session="fetch")
+            )
+
+            changes += int(hidden.rowcount)  # ty: ignore[unresolved-attribute]
+            changes += int(restored.rowcount)  # ty: ignore[unresolved-attribute]
 
     db_session.commit()
     return changes

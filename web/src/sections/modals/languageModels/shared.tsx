@@ -12,9 +12,10 @@ import { useTierAtLeast } from "@/hooks/useTierAtLeast";
 import { Tier } from "@/lib/settings/types";
 import { useAgents } from "@/lib/agents/hooks";
 import { useUserGroups } from "@/lib/hooks";
-import type {
-  LLMProviderView,
-  ModelConfiguration,
+import {
+  LLMProviderName,
+  type LLMProviderView,
+  type ModelConfiguration,
 } from "@/lib/languageModels/types";
 import { InputCheckbox } from "@opal/components";
 import InputTypeInField from "@/refresh-components/form/InputTypeInField";
@@ -752,6 +753,11 @@ export function ModelSelectionField({
   // otherwise models can't be deselected and "Select All" stays disabled.
   const isAutoMode =
     shouldShowAutoUpdateToggle && formikProps.values.is_auto_mode;
+  // OpenRouter Auto mode still refreshes recommended defaults, but the live
+  // `/models` catalog must stay listed and editable (opt-out, not exclusive).
+  const isOpenRouterCatalog =
+    formikProps.values.provider === LLMProviderName.OPENROUTER;
+  const locksVisibility = isAutoMode && !isOpenRouterCatalog;
   const models = formikProps.values.model_configurations;
 
   // Snapshot the original model visibility so we can restore it when
@@ -843,7 +849,7 @@ export function ModelSelectionField({
         >
           <Section flexDirection="row" gap={0}>
             <Button
-              disabled={isAutoMode || models.length === 0}
+              disabled={locksVisibility || models.length === 0}
               prominence="tertiary"
               size="md"
               onClick={handleToggleSelectAll}
@@ -864,7 +870,7 @@ export function ModelSelectionField({
         ) : (
           <Section gap={1} alignItems="stretch">
             {(() => {
-              const baseModels = isAutoMode ? visibleModels : models;
+              const baseModels = locksVisibility ? visibleModels : models;
               // Sort alphabetically by id for providers that ship rich model
               // metadata (Nebius TokenFactory) so the order is stable across
               // refetches; otherwise keep the given order.
@@ -887,7 +893,7 @@ export function ModelSelectionField({
                     <ModelRow
                       key={model.name}
                       model={model}
-                      isAutoMode={isAutoMode}
+                      isAutoMode={locksVisibility}
                       onToggleVisibility={(visible) =>
                         setVisibility(model.name, visible)
                       }

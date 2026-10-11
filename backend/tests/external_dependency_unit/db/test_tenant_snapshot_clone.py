@@ -12,8 +12,8 @@ from unittest.mock import patch
 import pytest
 from sqlalchemy import Table, delete, func, select, text
 
-from ee.onyx.db import tenant_snapshot
-from ee.onyx.server.tenants import schema_management
+from loge.db import tenant_snapshot
+from loge.server.tenants import schema_management
 from onyx.db.engine import tenant_utils
 from onyx.db.engine.shard_registry import (
     get_default_shard_name,

@@ -13,7 +13,7 @@ from pathlib import Path
 import pydantic
 import pytest
 
-from ee.onyx.server.enterprise_settings.models import (
+from loge.server.enterprise_settings.models import (
     APPEARANCE_FIELD_MAX_LENGTHS,
     MAX_APPLICATION_NAME_LEN,
     MAX_CONSENT_SCREEN_PROMPT_LEN,
@@ -25,7 +25,7 @@ from ee.onyx.server.enterprise_settings.models import (
     MAX_POPUP_HEADER_LEN,
     EnterpriseSettings,
 )
-from ee.onyx.server.enterprise_settings.store import _clamp_appearance_fields
+from loge.server.enterprise_settings.store import _clamp_appearance_fields
 from onyx.server.features.admin_banner.api import MAX_CONTENT_LEN, MAX_TITLE_LEN
 
 THEME_PAGE = (

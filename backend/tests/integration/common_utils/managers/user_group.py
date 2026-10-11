@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import httpx
 
-from ee.onyx.server.user_group.models import UserGroup
+from loge.server.user_group.models import UserGroup
 from onyx.db.enums import ConnectorManageRole
 from tests.integration.common_utils.constants import API_SERVER_URL, MAX_DELAY
 from tests.integration.common_utils.http_client import client

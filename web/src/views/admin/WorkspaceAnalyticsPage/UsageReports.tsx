@@ -28,7 +28,7 @@ import {
 import { humanReadableFormat, humanReadableFormatWithTime } from "@opal/time";
 import { errorHandlingFetcher } from "@/lib/fetcher";
 import { SWR_KEYS } from "@/lib/swr-keys";
-import { UsageReport } from "@/app/ee/admin/performance/usage/types";
+import { UsageReport } from "@/app/admin/performance/usage/types";
 import {
   PendingReport,
   ReportPeriod,

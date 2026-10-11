@@ -15,7 +15,7 @@
 `backend/onyx/db/incognito.py`,
 `backend/onyx/server/query_and_chat/session_loading.py`,
 `backend/onyx/server/query_and_chat/chat_backend.py` (session-lifecycle
-endpoints), `backend/ee/onyx/background/celery/tasks/ttl_management/tasks.py`
+endpoints), `backend/loge/background/celery/tasks/ttl_management/tasks.py`
 
 **Read first:** `backend/onyx/db/README.md`. It is the design rationale for
 the tree structure and the tool-call nesting, written by the people who built
@@ -471,7 +471,7 @@ uv run --env-file .vscode/.env pytest backend/tests/external_dependency_unit/db/
 - **Deleting a session does not unshare it.** `shared_status` is untouched by
   delete; only the `deleted` / hard-delete guard on `get_chat_session_by_id`
   keeps a deleted session from being readable through the share link.
-- **The chat-retention TTL job is EE-only** (`ee/onyx/background/celery/tasks/ttl_management`).
+- **The chat-retention TTL job is EE-only** (`loge/background/celery/tasks/ttl_management`).
   CE deployments have no automatic chat expiry regardless of any setting.
 
 [[core-chat-loop]] [[citations]] [[context-assembly]] [[streaming-protocol]]

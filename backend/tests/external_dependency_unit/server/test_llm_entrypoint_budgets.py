@@ -19,8 +19,8 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 import onyx.server.query_and_chat.token_limit as token_limit
-from ee.onyx.server.query_and_chat.models import SendSearchQueryRequest
-from ee.onyx.server.query_and_chat.search_backend import handle_send_search_message
+from loge.server.query_and_chat.models import SendSearchQueryRequest
+from loge.server.query_and_chat.search_backend import handle_send_search_message
 from onyx.configs.constants import TokenRateLimitScope
 from onyx.db.llm_usage import LLMUsageRecord
 from onyx.db.models import TokenRateLimit, User, UserUsage
@@ -43,7 +43,7 @@ from tests.external_dependency_unit.conftest import create_test_user, delete_tes
 pytestmark = pytest.mark.usefixtures("tenant_context")
 
 _HANDLE_REGULAR_ANSWER = "onyx.onyxbot.slack.handlers.handle_regular_answer"
-_SEARCH_BACKEND = "ee.onyx.server.query_and_chat.search_backend"
+_SEARCH_BACKEND = "loge.server.query_and_chat.search_backend"
 _BUDGET_MESSAGE = "You've reached the usage budget for your organization."
 
 

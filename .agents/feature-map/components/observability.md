@@ -13,17 +13,17 @@ hooks, usage export/reporting, log export, and query history.
 including `framework/` and `processors/`), `backend/onyx/server/manage/tracing/api.py`,
 `backend/onyx/db/tracing.py`, `backend/onyx/db/usage.py`, `db/user_usage.py`,
 `db/system_usage.py`, `db/llm_usage.py`, `backend/onyx/server/features/usage/`,
-`backend/onyx/hooks/`, `backend/ee/onyx/hooks/`, `backend/onyx/db/hook.py`,
-`backend/onyx/server/features/hooks/`, `backend/ee/onyx/server/features/hooks/`,
+`backend/onyx/hooks/`, `backend/loge/hooks/`, `backend/onyx/db/hook.py`,
+`backend/onyx/server/features/hooks/`, `backend/loge/server/features/hooks/`,
 `backend/onyx/server/middleware/latency_logging.py`,
 `backend/onyx/utils/audit.py`, `backend/onyx/utils/credential_audit.py`,
 `backend/onyx/utils/fleet_telemetry.py`, `fleet_query_telemetry.py`,
 `fleet_telemetry_collector.py`, `fleet_telemetry_resources.py`, `telemetry.py`,
 `timing.py`, `backend/onyx/db/fleet_telemetry.py`, `db/fleet_enrollment.py`,
 `deployment/fleet-telemetry.md`,
-`backend/ee/onyx/server/query_history/`, `backend/ee/onyx/server/log_export/`,
-`backend/ee/onyx/background/celery/tasks/usage_reporting/`,
-`backend/ee/onyx/background/celery/tasks/log_export/`,
+`backend/loge/server/query_history/`, `backend/loge/server/log_export/`,
+`backend/loge/background/celery/tasks/usage_reporting/`,
+`backend/loge/background/celery/tasks/log_export/`,
 `web/src/app/admin/tracing/`, `web/src/app/admin/systeminfo/`
 
 **Read first:** `docs/METRICS.md` and `docs/AUDIT_LOGGING.md`, plus
@@ -51,14 +51,14 @@ A user sees their own token/cost usage on a Usage tab
 company-wide usage broken out by user (`GET /admin/usage/export`) and by
 non-user system flows such as contextual RAG (`GET /admin/usage/system`), can
 reset a user's usage window, and can request a downloadable usage report ZIP
-(`ee/onyx/background/celery/tasks/usage_reporting/tasks.py:generate_usage_report_task`)
+(`loge/background/celery/tasks/usage_reporting/tasks.py:generate_usage_report_task`)
 containing per-user and per-system CSVs plus a PDF summary (see
 `docs/usage/usage-reports.md`).
 
 An admin with the right permission also reviews **Query History**
-(`ee/onyx/server/query_history/api.py`) for chat-session-level audit and
+(`loge/server/query_history/api.py`) for chat-session-level audit and
 exports it, downloads a **log export** bundle of raw log files for support or
-compliance (`ee/onyx/server/log_export/api.py`), and reads security-relevant
+compliance (`loge/server/log_export/api.py`), and reads security-relevant
 events (login, permission changes, credential access) as JSON lines on the
 `onyx.audit` logger tree, shipped to whatever SIEM the operator points a log
 shipper at (`docs/AUDIT_LOGGING.md`).
@@ -66,7 +66,7 @@ shipper at (`docs/AUDIT_LOGGING.md`).
 An admin can also register an **outbound hook**: an HTTPS endpoint Onyx calls
 synchronously at a fixed point in a pipeline (document ingestion, document
 push, or query processing) and waits on for a response, configurable at
-**Admin > Hooks** (`ee/onyx/server/features/hooks/api.py`).
+**Admin > Hooks** (`loge/server/features/hooks/api.py`).
 
 By default, every installation also sends fleet telemetry to the Onyx fleet
 service. It sends approved health, version, connector, indexing, query-timing,
@@ -110,7 +110,7 @@ Every route in this router carries `Depends(_reject_if_multi_tenant)`
 | POST | `/admin/usage/reset` | `reset_usage` | Clears one user's usage across every active rate-limit window. |
 | GET/PUT/DELETE | `/admin/cost-overrides` | `list_cost_overrides`, `upsert_cost_override`, `delete_cost_override` | Per-model price overrides used by cost computation. |
 
-### Hooks endpoints (`ee/onyx/server/features/hooks/api.py`, prefix `/admin/hooks`)
+### Hooks endpoints (`loge/server/features/hooks/api.py`, prefix `/admin/hooks`)
 
 `GET /admin/hooks/specs`, `GET|POST /admin/hooks`, `GET|PATCH|DELETE /admin/hooks/{hook_id}`,
 `POST /admin/hooks/{hook_id}/activate`, `.../deactivate`, `.../validate`,
@@ -118,12 +118,12 @@ Every route in this router carries `Depends(_reject_if_multi_tenant)`
 
 ### Query history and log export (EE)
 
-`ee/onyx/server/query_history/api.py`: `GET /admin/chat-sessions`,
+`loge/server/query_history/api.py`: `GET /admin/chat-sessions`,
 `GET /admin/chat-session-history`, `GET /admin/chat-session-history/{id}`,
 `GET /admin/query-history/list`, `POST /admin/query-history/start-export`,
 `GET /admin/query-history/export-status`, `GET /admin/query-history/download`.
 
-`ee/onyx/server/log_export/api.py`: `POST /admin/log-export`,
+`loge/server/log_export/api.py`: `POST /admin/log-export`,
 `GET /admin/log-export/{export_id}`, `GET /admin/log-export/{export_id}/download`.
 
 ### Fleet telemetry
@@ -344,9 +344,9 @@ questions:
   per-user ledger. See `[[rate-and-usage-limits]]`.
 
 The EE usage-report pipeline
-(`ee/onyx/background/celery/tasks/usage_reporting/tasks.py:generate_usage_report_task`)
+(`loge/background/celery/tasks/usage_reporting/tasks.py:generate_usage_report_task`)
 runs as a Celery task and calls
-`ee/onyx/server/reporting/usage_export_generation.py:create_new_usage_report`,
+`loge/server/reporting/usage_export_generation.py:create_new_usage_report`,
 which builds the CSV+PDF ZIP described in `docs/usage/usage-reports.md`.
 
 ### 4.10 Hooks
@@ -357,7 +357,7 @@ three fixed points (`db/enums.py:HookPoint`: `DOCUMENT_INGESTION`,
 registered in `hooks/registry.py:_REGISTRY`. The CE entry point,
 `hooks/executor.py:execute_hook`, dispatches through
 `fetch_versioned_implementation` to a CE no-op (`HookSkipped`) or, on EE, to
-`ee/onyx/hooks/executor.py:_execute_hook_impl`, which looks up the active hook,
+`loge/hooks/executor.py:_execute_hook_impl`, which looks up the active hook,
 posts the payload via `utils/external_endpoint.py:post_json_to_endpoint`, and
 applies the hook's `fail_strategy` (`HARD` raises `OnyxError`, aborting the
 pipeline; `SOFT` logs and returns `HookSoftFailed`, letting the caller fall
@@ -365,9 +365,9 @@ back to default behavior). Execution is logged only on failure
 (`db/hook.py:create_hook_execution_log__no_commit`); `is_reachable` is updated
 best-effort in its own session so a concurrent hook deletion cannot block the
 failure log write. At most one non-deleted hook exists per `HookPoint`.
-Hooks are unavailable under `MULTI_TENANT` (`ee/onyx/hooks/executor.py:_lookup_hook`).
+Hooks are unavailable under `MULTI_TENANT` (`loge/hooks/executor.py:_lookup_hook`).
 The Community downgrade soft-deletes every hook (`deleted=True`, `is_active=False`)
-in `ee/onyx/db/community_downgrade.py:disable_paid_features__no_commit` (see [[billing]] §4.5).
+in `loge/db/community_downgrade.py:disable_paid_features__no_commit` (see [[billing]] §4.5).
 `QUERY_PROCESSING` fires only for chat queries submitted through the Onyx
 app; it never fires for `/gateway/*` requests, so a hook cannot inspect or
 reject content an external tool sends to a model provider through
@@ -401,7 +401,7 @@ every five minutes.
   `chat/process_message.py:handle_stream_message_objects` and
   `handle_multi_model_stream`. `telemetry_query` wraps
   `server/features/search/api.py:search` and
-  `ee/onyx/search/process_search_query.py:stream_search_query`. A request that
+  `loge/search/process_search_query.py:stream_search_query`. A request that
   fails with a 4xx `OnyxError` sends no event. This includes a chat that a
   query-processing hook rejects (`QUERY_REJECTED`): the chat stream sends the
   error as a `StreamingError` packet, and `QueryObservation.error_packet` reads

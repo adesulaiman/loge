@@ -89,10 +89,12 @@ import WelcomeMessage from "@/app/app/components/WelcomeMessage";
 import ChatUI from "@/sections/chat/ChatUI";
 import { useFullWidthChat } from "@/providers/FullWidthChatProvider";
 import { paidTierGated } from "@/ce";
-import EESearchUI from "@/ee/sections/SearchUI";
-const SearchUI = paidTierGated(EESearchUI);
+import LogeSearchUI from "@/loge/sections/SearchUI";
+import LogeSkyBackground from "@/sections/chrome/LogeSkyBackground";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
+
+const SearchUI = paidTierGated(LogeSearchUI);
 
 interface FadeProps {
   show: boolean;
@@ -779,7 +781,8 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
           </RootLayout.RightPanel>
         ))}
 
-      <div className="w-full h-full overflow-hidden">
+      <div className="w-full h-full overflow-hidden relative">
+        <LogeSkyBackground />
         {/* noPaste: the input bar already uploads pasted files itself. Without
             it react-dropzone handles the same paste again and attaches the
             image twice. */}
@@ -792,7 +795,7 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
         >
           {({ getRootProps }) => (
             <div
-              className="h-full w-full flex flex-col items-center outline-hidden relative"
+              className="h-full w-full flex flex-col items-center outline-hidden relative z-1"
               {...getRootProps({ tabIndex: -1 })}
             >
               {/* Main content grid — 3 rows, animated */}

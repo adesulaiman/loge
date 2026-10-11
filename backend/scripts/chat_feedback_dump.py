@@ -8,7 +8,7 @@ from uuid import UUID
 
 import requests
 
-from ee.onyx.server.query_history.api import ChatSessionSnapshot
+from loge.server.query_history.api import ChatSessionSnapshot
 from onyx.server.manage.models import AllUsersResponse
 from onyx.server.query_and_chat.models import ChatSessionsResponse
 

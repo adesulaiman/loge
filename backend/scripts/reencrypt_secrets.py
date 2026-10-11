@@ -24,7 +24,7 @@ import sys
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from ee.onyx.db.tenant_snapshot import template_session  # noqa: E402
+from loge.db.tenant_snapshot import template_session  # noqa: E402
 from onyx.db.engine.sql_engine import (  # noqa: E402
     SqlEngine,
     get_session_with_tenant,

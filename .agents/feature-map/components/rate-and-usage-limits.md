@@ -22,11 +22,11 @@ overrides are EE/cloud-only. HTTP and invite/signup rate limiting are CE.
 `backend/onyx/auth/signup_rate_limit.py`,
 `backend/onyx/server/manage/invite_rate_limit.py`,
 `backend/onyx/db/tenant_invite_counter.py`,
-`backend/ee/onyx/server/query_and_chat/token_limit.py`,
-`backend/ee/onyx/server/usage_limits.py`,
-`backend/ee/onyx/server/tenant_usage_limits.py`,
-`backend/ee/onyx/server/token_rate_limits/api.py`,
-`backend/ee/onyx/db/token_limit.py`,
+`backend/loge/server/query_and_chat/token_limit.py`,
+`backend/loge/server/usage_limits.py`,
+`backend/loge/server/tenant_usage_limits.py`,
+`backend/loge/server/token_rate_limits/api.py`,
+`backend/loge/db/token_limit.py`,
 `web/src/app/admin/token-rate-limits/`
 
 ---
@@ -73,9 +73,9 @@ invisible in normal use.
 | (inline) | chat session auto-naming | `_generate_or_fallback_chat_session_name` | Calls `check_token_rate_limits` directly, not as a `Depends`. `chat_backend.py:_generate_or_fallback_chat_session_name` |
 | POST | `/build/sessions/{id}/send-message` | (Craft turn) | Called inline before creating the user message. `features/build/session/messages.py:send_message`  |
 | POST | `/build/sessions/{id}/subagents/{sub_id}/send-message` | `send_subagent_message` | `features/build/session/messages.py:send_subagent_message` |
-| POST | `/gateway/v1/chat/completions`, `/gateway/v1/responses`, `/gateway/v1/messages` | `gateway_chat_completions`, `gateway_responses`, `gateway_anthropic_messages` | The AI Gateway (OpenAI/Anthropic-compatible passthrough), EE-only. `_resolve_metered_gateway_model` also runs `check_llm_cost_limit_for_provider` on the resolved provider's key. `ee/onyx/server/gateway/api.py` |
+| POST | `/gateway/v1/chat/completions`, `/gateway/v1/responses`, `/gateway/v1/messages` | `gateway_chat_completions`, `gateway_responses`, `gateway_anthropic_messages` | The AI Gateway (OpenAI/Anthropic-compatible passthrough), EE-only. `_resolve_metered_gateway_model` also runs `check_llm_cost_limit_for_provider` on the resolved provider's key. `loge/server/gateway/api.py` |
 | POST | `/search` | `search` | Called inline before the LLM is resolved. Also runs `check_api_key_usage`. Used by the MCP server. `features/search/api.py:search` |
-| POST | `/search/send-search-message` | `handle_send_search_message` | The EE Search UI. Checks the token budgets and the cloud cost cap only when the request runs query expansion or LLM document selection. `ee/onyx/server/query_and_chat/search_backend.py` |
+| POST | `/search/send-search-message` | `handle_send_search_message` | The EE Search UI. Checks the token budgets and the cloud cost cap only when the request runs query expansion or LLM document selection. `loge/server/query_and_chat/search_backend.py` |
 | POST | `/search/search-flow-classification` | `search_flow_classification` | Runs only the cloud cost cap (`check_llm_cost_limit_for_provider`), not the token budgets. Same file. |
 | (in process) | Slack bot answer | `handle_regular_answer` | Called inline, charged to `usage_user`. An over-budget request gets the budget message in the thread. `onyxbot/slack/handlers/handle_regular_answer.py` |
 
@@ -116,7 +116,7 @@ to.
 
 Admin-configured, not env: every `TokenRateLimit` row (budget, period, scope),
 created through `/admin/token-rate-limits/*` (EE-only router,
-`ee/onyx/server/token_rate_limits/api.py`).
+`loge/server/token_rate_limits/api.py`).
 
 ---
 
@@ -138,7 +138,7 @@ impossible to insert.
 
 The Community downgrade deletes every `token_rate_limit` and
 `token_rate_limit__user_group` row, in every scope
-(`ee/onyx/db/community_downgrade.py:disable_paid_features__no_commit`, see
+(`loge/db/community_downgrade.py:disable_paid_features__no_commit`, see
 [[billing]] §4.5).
 
 ### `token_rate_limit__user_group` (`TokenRateLimit__UserGroup`)
@@ -422,8 +422,8 @@ Invite limits (`server/manage/invite_rate_limit.py`), called from
 ```bash
 cd backend && uv run pytest tests/unit/onyx/server/query_and_chat/test_token_limit.py
 cd backend && uv run pytest tests/unit/onyx/server/query_and_chat/test_any_rate_limit_exists_tenant_scope.py
-cd backend && uv run pytest tests/unit/ee/onyx/db/test_user_group_cost_token_limit.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/token_rate_limits
+cd backend && uv run pytest tests/unit/loge/db/test_user_group_cost_token_limit.py
+cd backend && uv run pytest tests/unit/loge/server/token_rate_limits
 cd backend && uv run pytest tests/unit/onyx/server/test_token_rate_limit_budget_models.py
 cd backend && uv run pytest tests/unit/onyx/server/manage/test_invite_rate_limit.py
 cd backend && uv run pytest tests/unit/onyx/auth/test_signup_rate_limit.py
@@ -469,7 +469,7 @@ See `backend/AGENTS.md` for required env and secrets.
   caller before it resolves an LLM. A new in-process entry point gets no
   budget check unless it adds one. `SlackRateLimiter` (`ONYX_BOT_MAX_QPM`) is
   a separate, per-process QPM gate and is not a budget.
-- **The AI Gateway (`ee/onyx/server/gateway/api.py`) checks
+- **The AI Gateway (`loge/server/gateway/api.py`) checks
   `check_token_rate_limits` and the cloud cost cap, but never
   `check_api_key_usage` (on purpose, see [[llm-gateway]] §4.8).** Gateway
   callers authenticate via `Permission.USE_LLM_GATEWAY`, not necessarily the
@@ -489,7 +489,7 @@ See `backend/AGENTS.md` for required env and secrets.
   `open_urls` tools spend web-search provider quota, which none of these
   checks meter. See [[mcp-server]] §9.
 - **Community Edition cannot create or edit any `TokenRateLimit`, including
-  GLOBAL scope, through the admin API.** `ee/onyx/server/token_rate_limits/api.py`
+  GLOBAL scope, through the admin API.** `loge/server/token_rate_limits/api.py`
   says so directly: "Spending limits are an Enterprise feature, so every
   endpoint here is mounted only by the EE app." The CE enforcement code
   (`onyx/server/query_and_chat/token_limit.py:_check_token_rate_limits`)

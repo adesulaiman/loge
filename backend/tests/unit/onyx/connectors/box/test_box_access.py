@@ -21,7 +21,7 @@ from box_sdk_gen.schemas.web_link import (
     WebLinkSharedLinkField,
 )
 
-from ee.onyx.external_permissions.box.access import (
+from loge.external_permissions.box.access import (
     BoxAccessContext,
     apply_collaborations_to_access,
     apply_shared_link_to_access,

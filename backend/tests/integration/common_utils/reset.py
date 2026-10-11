@@ -318,8 +318,8 @@ def _seed_dev_license_if_set(db_session: Session) -> None:
     if blob.startswith(_PEM_BEGIN) and blob.endswith(_PEM_END):
         blob = "\n".join(blob.split("\n")[1:-1]).strip()
 
-    from ee.onyx.db.license import upsert_license
-    from ee.onyx.utils.license import verify_license_signature
+    from loge.db.license import upsert_license
+    from loge.utils.license import verify_license_signature
 
     verify_license_signature(blob)
     upsert_license(db_session, blob)

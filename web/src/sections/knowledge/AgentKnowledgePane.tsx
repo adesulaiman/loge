@@ -23,7 +23,7 @@ import type {
 import type { ProjectFile } from "@/lib/projects/types";
 import type { DocumentSetSummary } from "@/lib/types";
 import type { ValidSources } from "@/lib/connectors/types/source";
-import { searchDocuments } from "@/ee/lib/search/svc";
+import { searchDocuments } from "@/loge/lib/search/svc";
 import { Disabled } from "@opal/core";
 import { Card, InputSwitch } from "@opal/components";
 import { Content, InputHorizontal, Section } from "@opal/layouts";

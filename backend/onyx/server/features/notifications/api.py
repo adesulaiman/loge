@@ -26,11 +26,7 @@ from onyx.server.features.notifications.models import (
     PaginatedNotifications,
 )
 from onyx.server.features.notifications.utils import (
-    ensure_permissions_migration_notification,
     ensure_system_announcement_notification,
-)
-from onyx.server.features.release_notes.utils import (
-    ensure_release_notes_fresh_and_notify,
 )
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
@@ -65,24 +61,15 @@ def _check_for_notifications_to_create(
     user: User,
     db_session: Session,
 ) -> None:
+    # Upstream Onyx release-notes and permissions-migration announcements are
+    # not created for Loge (and existing rows are filtered in
+    # onyx.db.notification).
     try:
         ensure_build_mode_intro_notification(user, db_session)
     except Exception:
         logger.exception(
             "Failed to check for build mode intro in notifications endpoint"
         )
-
-    try:
-        ensure_permissions_migration_notification(user, db_session)
-    except Exception:
-        logger.exception(
-            "Failed to create permissions_migration_v1 announcement in notifications endpoint"
-        )
-
-    try:
-        ensure_release_notes_fresh_and_notify(db_session)
-    except Exception:
-        logger.exception("Failed to check for release notes in notifications endpoint")
 
 
 def _ensure_system_announcement_notification(user: User, db_session: Session) -> bool:

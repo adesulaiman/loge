@@ -17,6 +17,9 @@ export interface GithubConfig {
   include_prs: boolean;
   include_issues: boolean;
   include_files: boolean;
+  /** single = one tip (default); all = every branch tip. */
+  branch_mode?: "single" | "all";
+  /** Used when branch_mode is single. Blank means the repo default branch. */
   branch?: string;
 }
 
@@ -25,6 +28,9 @@ export interface GitlabConfig {
   project_name: string;
   include_mrs: boolean;
   include_issues: boolean;
+  include_code_files?: boolean;
+  branch_mode?: "single" | "all";
+  branch?: string;
 }
 
 export interface LumAppsConfig {

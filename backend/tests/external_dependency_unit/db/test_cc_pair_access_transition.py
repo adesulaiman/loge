@@ -14,14 +14,14 @@ import pytest
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from ee.onyx.background.celery.tasks.doc_permission_syncing.tasks import (
+from loge.background.celery.tasks.doc_permission_syncing.tasks import (
     clear_caught_up_perm_sync_pending_marks,
     is_external_doc_permissions_sync_due,
 )
-from ee.onyx.background.celery.tasks.external_group_syncing.tasks import (
+from loge.background.celery.tasks.external_group_syncing.tasks import (
     is_external_group_sync_due,
 )
-from ee.onyx.db.connector_credential_pair import clear_perm_sync_pending__no_commit
+from loge.db.connector_credential_pair import clear_perm_sync_pending__no_commit
 from onyx.configs.constants import DocumentSource
 from onyx.db.connector import mark_cc_pair_as_permissions_synced
 from onyx.db.connector_edit_requests import apply_access_change__no_commit

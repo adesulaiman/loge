@@ -20,7 +20,7 @@ from pathlib import Path
 import httpx
 from pydantic import BaseModel
 
-from ee.onyx.server.query_and_chat.models import SendSearchQueryRequest
+from loge.server.query_and_chat.models import SendSearchQueryRequest
 from onyx.configs.constants import DocumentSource
 from onyx.context.search.models import BaseFilters
 

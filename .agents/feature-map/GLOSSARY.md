@@ -94,7 +94,7 @@ sub-loop (the deep research agent, the coding agent), or the AI assistant genera
 | ACL | The access control list stored on each indexed document, compiled into every search query as a filter. |
 | External permissions | Permissions pulled from the source system, as opposed to Onyx-native groups. See [[permission-sync]]. |
 | Curator | A user-group-scoped admin role. |
-| CE / EE | Community Edition (MIT, `backend/onyx/`) and Enterprise Edition (`backend/ee/onyx/`, mirroring the CE layout). EE code is reached from CE through `fetch_versioned_implementation` and `fetch_ee_implementation_or_noop`. |
+| CE / EE | Community Edition (MIT, `backend/onyx/`) and Enterprise Edition (`backend/loge/`, mirroring the CE layout). EE code is reached from CE through `fetch_versioned_implementation` and `fetch_ee_implementation_or_noop`. |
 
 ## Chat internals
 

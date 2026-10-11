@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.usage_export import get_empty_chat_messages_entries__paginated
+from loge.db.usage_export import get_empty_chat_messages_entries__paginated
 from onyx.configs.constants import MessageType
 from onyx.db.chat import (
     create_chat_session,

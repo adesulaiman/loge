@@ -46,42 +46,47 @@ export default function WelcomeMessage({
       <Section
         data-testid="incognito-intro"
         flexDirection="column"
-        alignItems="start"
+        alignItems="center"
         gap={0.5}
         width="fit"
       >
         <SvgEyeClosed size={32} className="text-text-04" />
-        <Text as="p" dir="auto" headingH2>
+        <Text as="p" dir="auto" headingH2 className="text-center">
           {t("incognito.title")}
         </Text>
       </Section>
     );
   } else if (isDefaultAgent) {
     content = (
-      <Section
-        data-testid="onyx-logo"
-        flexDirection="column"
-        alignItems="start"
-        gap={2}
-        width="fit"
-      >
-        <FoldableLogo folded size={32} />
-        <Text as="p" dir="auto" headingH2>
-          {greeting}
-        </Text>
-      </Section>
+      <div className="loge-rise flex flex-col items-center gap-2">
+        <FoldableLogo size={40} />
+        <Section
+          data-testid="onyx-logo"
+          flexDirection="column"
+          alignItems="center"
+          gap={1}
+          width="fit"
+        >
+          <Text as="p" dir="auto" headingH2 className="text-center">
+            {greeting}
+          </Text>
+          <Text as="p" dir="auto" secondaryBody text03 className="text-center">
+            {t("greeting.subtitle")}
+          </Text>
+        </Section>
+      </div>
     );
   } else if (agent) {
     content = (
       <Section
         data-testid="agent-name-display"
         flexDirection="column"
-        alignItems="start"
+        alignItems="center"
         gap={2}
         width="fit"
       >
         <AgentAvatar agent={agent} size={36} />
-        <Text as="p" dir="auto" headingH2>
+        <Text as="p" dir="auto" headingH2 className="text-center">
           {agent.name}
         </Text>
       </Section>

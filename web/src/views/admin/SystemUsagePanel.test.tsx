@@ -8,7 +8,7 @@ jest.mock("@/lib/usage/hooks", () => ({
 }));
 
 jest.mock("@/lib/settings/hooks", () => ({
-  useSettings: () => ({ appName: "Onyx" }),
+  useSettings: () => ({ appName: "Loge" }),
 }));
 
 const mockUseSystemUsage = useSystemUsage as jest.MockedFunction<

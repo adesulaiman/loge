@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Onyx",
+  "name": "Loge",
   "version": "1.2",
-  "description": "Onyx lets you research, create, and automate with LLMs powered by your team's unique knowledge",
+  "description": "Loge lets you research, create, and automate with LLMs powered by your team's unique knowledge",
   "permissions": ["sidePanel", "storage", "activeTab", "tabs"],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -35,7 +35,7 @@
         "default": "Ctrl+Shift+O",
         "mac": "Command+Shift+O"
       },
-      "description": "Toggle Onyx New Tab Override"
+      "description": "Toggle Loge New Tab Override"
     },
     "openSidePanel": {
       "suggested_key": {
@@ -43,7 +43,7 @@
         "windows": "Alt+O",
         "mac": "MacCtrl+O"
       },
-      "description": "Open Onyx Side Panel"
+      "description": "Open Loge Side Panel"
     }
   },
   "side_panel": {

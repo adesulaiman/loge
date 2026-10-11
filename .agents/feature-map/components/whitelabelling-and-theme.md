@@ -10,8 +10,8 @@
 **Edition:** EE. Reading and rendering the resulting settings is CE code
 (`useSettings`, `Logo`), but writing them and the admin page itself are EE-only.
 **Owns:**
-`backend/ee/onyx/server/enterprise_settings/` (`api.py`, `models.py`,
-`store.py`), `web/src/app/ee/admin/theme/` (`page.tsx`,
+`backend/loge/server/enterprise_settings/` (`api.py`, `models.py`,
+`store.py`), `web/src/app/admin/theme/` (`page.tsx`,
 `AppearanceThemeSettings.tsx`, `Preview.tsx`), `web/src/lib/app/components.tsx:Logo`,
 `web/src/lib/settings/hooks.ts`
 
@@ -37,7 +37,7 @@ default rather than rendering broken or blank.
 ## 2. Surfaces
 
 ### Admin endpoints (router prefix `/admin/enterprise-settings`,
-`backend/ee/onyx/server/enterprise_settings/api.py`)
+`backend/loge/server/enterprise_settings/api.py`)
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
@@ -47,7 +47,7 @@ default rather than rendering broken or blank.
 | PUT | `/admin/enterprise-settings/custom-analytics-script` | `upload_custom_analytics_script` | Requires `CUSTOM_ANALYTICS_SECRET_KEY` to match; unrelated to visual branding but lives in the same store. |
 
 ### Public endpoints (router prefix `/enterprise-settings`,
-`backend/ee/onyx/server/enterprise_settings/api.py`, **no auth**)
+`backend/loge/server/enterprise_settings/api.py`, **no auth**)
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
@@ -61,21 +61,21 @@ These are intentionally public: the login page, the anonymous chat surface,
 and every pre-auth screen need the app name and logo before any session
 exists. The module docstring on `EnterpriseSettings` says so directly: "don't
 put anything sensitive in here, as this is accessible without auth"
-(`ee/onyx/server/enterprise_settings/models.py:EnterpriseSettings`).
+(`loge/server/enterprise_settings/models.py:EnterpriseSettings`).
 
 ### Frontend route
 
-`/admin/theme` is rewritten to `web/src/app/ee/admin/theme/page.tsx` by
+`/admin/theme` is rewritten to `web/src/app/admin/theme/page.tsx` by
 `web/src/proxy.ts:EE_ROUTES`, which lists `"/admin/theme"` explicitly. The
-`/ee` layout (`web/src/app/ee/layout.tsx`) then gates the page on
+`/ee` layout (`web/src/app/layout.tsx`) then gates the page on
 `ee_features_enabled` from `GET /settings`. The
 route additionally requires `Tier.BUSINESS` to be visible in the sidebar
 (`ADMIN_ROUTES.THEME.requiredTier`, `web/src/lib/admin-routes.ts`).
 
 ### Field-level char limits (both sides)
 
-`backend/ee/onyx/server/enterprise_settings/models.py:APPEARANCE_FIELD_MAX_LENGTHS`
-is the source of truth; `web/src/app/ee/admin/theme/page.tsx:CHAR_LIMITS`
+`backend/loge/server/enterprise_settings/models.py:APPEARANCE_FIELD_MAX_LENGTHS`
+is the source of truth; `web/src/app/admin/theme/page.tsx:CHAR_LIMITS`
 duplicates the same numbers for the frontend char counters, with an explicit
 comment that the two must be kept in sync and that
 `test_appearance_char_limits.py` enforces it.
@@ -85,13 +85,13 @@ comment that the two must be kept in sync and that
 ## 3. Data model
 
 - One KV blob, `KV_ENTERPRISE_SETTINGS_KEY`
-  (`ee/onyx/server/enterprise_settings/store.py:load_settings`/`store_settings`),
+  (`loge/server/enterprise_settings/store.py:load_settings`/`store_settings`),
   holding the serialized `EnterpriseSettings` pydantic model. No relational
   table. The KV store is the same tenant-scoped mechanism CE's own settings
   use (`onyx/server/settings/store.py:KV_SETTINGS_KEY`), just a different key
   and a different (EE-only) model.
 - Brandable fields, all on `EnterpriseSettings`
-  (`ee/onyx/server/enterprise_settings/models.py`): `application_name`,
+  (`loge/server/enterprise_settings/models.py`): `application_name`,
   `use_custom_logo`, `use_custom_logotype`, `logo_display_style`
   (`LogoDisplayStyle`: `logo_and_name` / `logo_only` / `name_only`),
   `custom_nav_items` (list of `NavigationItem`), `two_lines_for_chat_header`,
@@ -107,14 +107,14 @@ comment that the two must be kept in sync and that
 - Logo bytes are not in this blob. They live in the file store under two
   fixed, tenant-scoped file ids: `_LOGO_FILENAME = "__logo__"` and
   `_LOGOTYPE_FILENAME = "__logotype__"`
-  (`ee/onyx/server/enterprise_settings/store.py`), written via
+  (`loge/server/enterprise_settings/store.py`), written via
   `get_default_file_store().save_file(..., file_origin=FileOrigin.OTHER)`. See
   [[file-store-and-user-files]] for the store abstraction itself; this
   component only calls it.
 - The system announcement banner (`system_announcement_*` fields on the theme
   page's Formik form) is **not** part of `EnterpriseSettings` at all: it is a
   separate resource fetched via `SWR_KEYS.adminBanner` and mutated through
-  `/api/admin/banner` (`web/src/app/ee/admin/theme/page.tsx:mutateAdminBanner`).
+  `/api/admin/banner` (`web/src/app/admin/theme/page.tsx:mutateAdminBanner`).
   It is documented here because the theme page is where an admin edits it,
   but its storage and delivery (including the notification-bell integration,
   `invalidateNotificationCaches`) belong to [[notifications]], not this
@@ -127,7 +127,7 @@ comment that the two must be kept in sync and that
 ### 4.1 Save flow
 
 ```
-ThemePage (web/src/app/ee/admin/theme/page.tsx)
+ThemePage (web/src/app/admin/theme/page.tsx)
   Formik onSubmit
     if a new logo file was selected:
       PUT /api/admin/enterprise-settings/logo (multipart)   -> put_logo -> upload_logo
@@ -191,11 +191,11 @@ raster, never as `image/svg+xml` or `text/html`.
 
 ### 4.4 Reset to stock branding
 
-`ee/onyx/server/enterprise_settings/store.py:reset_settings` stores a default
+`loge/server/enterprise_settings/store.py:reset_settings` stores a default
 `EnterpriseSettings`, deletes the `KV_CUSTOM_ANALYTICS_SCRIPT_KEY` entry, and
 deletes the logo and logotype files. A missing script or file is not an error.
 No endpoint in this component calls it. The Community downgrade calls it
-(`ee/onyx/server/license/api.py:downgrade_to_community`, see [[billing]] §4.5).
+(`loge/server/license/api.py:downgrade_to_community`, see [[billing]] §4.5).
 
 ---
 
@@ -213,7 +213,7 @@ No endpoint in this component calls it. The Community downgrade calls it
    (4096x4096) bounds the decoded raster, checked from the header before a
    full decode, specifically because a small, highly compressed file can
    still decode to a much larger bitmap
-   (`ee/onyx/server/enterprise_settings/store.py:sniff_logo_mime_type`
+   (`loge/server/enterprise_settings/store.py:sniff_logo_mime_type`
    comment). Any change to logo handling must keep both bounds; removing the
    pixel check re-opens a decompression-bomb path even with the byte cap
    intact.
@@ -247,7 +247,7 @@ No endpoint in this component calls it. The Community downgrade calls it
 7. **`custom_nav_items` is round-tripped, not editable, in the current
    `/admin/theme` UI.** The Formik submit passes
    `enterpriseSettings?.custom_nav_items || []` straight through unchanged
-   (`web/src/app/ee/admin/theme/page.tsx`); there is no form control for it.
+   (`web/src/app/admin/theme/page.tsx`); there is no form control for it.
    A change to the save payload that drops this field would silently erase
    any `custom_nav_items` set through another path (e.g. a direct API call).
 
@@ -291,11 +291,11 @@ No endpoint in this component calls it. The Community downgrade calls it
 
 | If your change... | Also check |
 |---|---|
-| adds a new brandable field to `EnterpriseSettings` | whether it needs a length cap in both `APPEARANCE_FIELD_MAX_LENGTHS` and `web/src/app/ee/admin/theme/page.tsx:CHAR_LIMITS`; `test_appearance_char_limits.py` |
+| adds a new brandable field to `EnterpriseSettings` | whether it needs a length cap in both `APPEARANCE_FIELD_MAX_LENGTHS` and `web/src/app/admin/theme/page.tsx:CHAR_LIMITS`; `test_appearance_char_limits.py` |
 | changes `ALLOWED_LOGO_MIME_TYPES`, `MAX_LOGO_SIZE_BYTES`, or `MAX_LOGO_PIXELS` | `sniff_logo_mime_type` and `_logo_response`'s `resolve_inline_disposition` call, both of which assume the allowlist stays raster-only |
 | changes which fields are Enterprise-tier-gated in `admin_ee_put_settings` | the frontend's own disabled-state logic in `AppearanceThemeSettings.tsx` must match, or the UI will show an editable control that 402s on save |
 | changes the public `/enterprise-settings*` routes to require auth | every pre-auth surface that reads branding before a session exists (login page, anonymous chat); this is a deliberate design point, not an oversight (§5 point 6) |
-| changes `web/src/proxy.ts:EE_ROUTES` | whether `/admin/theme` still rewrites to `web/src/app/ee/admin/theme/`; removing it from the list 404s the route entirely rather than falling back to a CE page (there is no `web/src/app/admin/theme/`) |
+| changes `web/src/proxy.ts:EE_ROUTES` | whether `/admin/theme` still rewrites to `web/src/app/admin/theme/`; removing it from the list 404s the route entirely rather than falling back to a CE page (there is no `web/src/app/admin/theme/`) |
 | changes the system announcement banner's storage or delivery | this is [[notifications]]'s surface, not this component's; do not duplicate its contract here |
 
 ---
@@ -305,10 +305,10 @@ No endpoint in this component calls it. The Community downgrade calls it
 ### Tests
 
 ```bash
-cd backend && uv run pytest tests/unit/ee/onyx/server/enterprise_settings/test_logo_upload.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/enterprise_settings/test_logo_serving.py
+cd backend && uv run pytest tests/unit/loge/server/enterprise_settings/test_logo_upload.py
+cd backend && uv run pytest tests/unit/loge/server/enterprise_settings/test_logo_serving.py
 cd backend && uv run pytest tests/unit/onyx/server/test_appearance_char_limits.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/server/enterprise_settings/test_custom_analytics_script.py
+cd backend && uv run pytest tests/external_dependency_unit/loge/server/enterprise_settings/test_custom_analytics_script.py
 ```
 
 Playwright e2e:
@@ -346,15 +346,15 @@ exists for logo upload specifically.
 
 ## 9. Footguns
 
-- **`web/src/app/ee/admin/theme/` is the live page.** `web/src/proxy.ts:EE_ROUTES`
+- **`web/src/app/admin/theme/` is the live page.** `web/src/proxy.ts:EE_ROUTES`
   lists `"/admin/theme"` and rewrites it to `/ee/admin/theme`, and there is no
   `web/src/app/admin/theme/` to shadow it. A directory under `ee/admin/` that is
   not in `EE_ROUTES` is unreachable. Check `EE_ROUTES` and whether a CE-tree
   sibling exists before you decide which copy of an admin surface runs.
 - **The rewrite always fires. The license gate is in the `/ee` layout.**
-  `web/src/app/ee/layout.tsx` fetches `/settings`. When `ee_features_enabled`
+  `web/src/app/layout.tsx` fetches `/settings`. When `ee_features_enabled`
   is false and the status is not `gated_access`, it renders
-  `web/src/app/ee/EEFeatureRedirect.tsx`, which shows a toast and sends the
+  `web/src/app/EEFeatureRedirect.tsx`, which shows a toast and sends the
   user to `/app`. There is no degraded CE version of `/admin/theme`. If the
   settings fetch fails, the layout renders the page (fail open).
 - **`createLogoIcon` is a false lead for "where is the custom logo

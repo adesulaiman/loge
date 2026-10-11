@@ -93,7 +93,7 @@ export function SlackChannelChart({ timeRange }: TimeRangeProps) {
   const t = useTranslations("admin.analytics");
   const { data, isLoading, error } = useOnyxBotAnalytics(timeRange);
 
-  useLoggedChartError("OnyxBot", error);
+  useLoggedChartError("LogeBot", error);
 
   return (
     <AnalyticsChart

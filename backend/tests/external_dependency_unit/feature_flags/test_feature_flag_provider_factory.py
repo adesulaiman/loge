@@ -10,8 +10,8 @@ from uuid import UUID
 
 import pytest
 
-from ee.onyx.feature_flags import posthog_provider as posthog_provider_module
-from ee.onyx.feature_flags.posthog_provider import PostHogFeatureFlagProvider
+from loge.feature_flags import posthog_provider as posthog_provider_module
+from loge.feature_flags.posthog_provider import PostHogFeatureFlagProvider
 from onyx.feature_flags.factory import get_default_feature_flag_provider
 from onyx.feature_flags.interface import FeatureFlagProvider, NoOpFeatureFlagProvider
 

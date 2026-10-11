@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from ee.onyx.external_permissions.onedrive.permission_mapper import (
+from loge.external_permissions.onedrive.permission_mapper import (
     map_onedrive_permissions,
 )
 from onyx.access.utils import build_ext_group_name_for_onyx

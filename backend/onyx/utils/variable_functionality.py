@@ -29,19 +29,31 @@ class OnyxVersion:
         self._is_ee = False
 
     def is_ee_version(self) -> bool:
+        """True when the full Loge feature package (`loge`) is loaded."""
         return self._is_ee
 
 
 global_version = OnyxVersion()
 
 
+def _full_feature_module_name(module: str) -> str:
+    """Map a CE module path (`onyx.*`) to the full-feature package (`loge.*`)."""
+    if module == "onyx":
+        return "loge"
+    if module.startswith("onyx."):
+        return "loge." + module.removeprefix("onyx.")
+    return module
+
+
 def is_ee_available() -> bool:
-    """Whether this build ships the Enterprise Edition code. The MIT-only mirror
-    strips `ee.onyx` and keeps a bare `ee` package."""
+    """Whether this build ships the full Loge feature package.
+
+    Requires `loge.main` (not a bare `loge` stub) so MIT-only mirrors that leave
+    an empty `backend/loge/__init__.py` still run as core-only.
+    """
     try:
-        spec: ModuleSpec | None = importlib.util.find_spec("ee.onyx")
+        spec: ModuleSpec | None = importlib.util.find_spec("loge.main")
     except ModuleNotFoundError:
-        # No `ee` package at all.
         return False
     # A leftover directory with no `__init__.py` resolves as a namespace
     # package, which has no origin.
@@ -49,14 +61,13 @@ def is_ee_available() -> bool:
 
 
 def set_is_ee_if_available() -> None:
-    """Loads the Enterprise Edition code when the build ships it. Loading
-    unlocks nothing: every paid feature is gated on the license, so a
-    deployment with no license behaves as Community Edition."""
+    """Load full Loge features when the `loge` package is present. Loading
+    unlocks nothing: paid features stay gated on the license."""
     if global_version.is_ee_version() or not is_ee_available():
         return
 
     logger.notice(
-        "Enterprise Edition code is loaded. Paid features stay locked until a "
+        "Loge full feature package is loaded. Paid features stay locked until a "
         "valid license is applied."
     )
     global_version.set_ee()
@@ -66,30 +77,13 @@ def set_is_ee_if_available() -> None:
 def fetch_versioned_implementation(module: str, attribute: str) -> Any:
     """
     Fetches a versioned implementation of a specified attribute from a given module.
-    This function first checks if the application is running in an Enterprise Edition (EE)
-    context. If so, it attempts to import the attribute from the EE-specific module.
-    If the module or attribute is not found, it falls back to the default module or
-    raises the appropriate exception depending on the context.
-
-    Args:
-        module (str): The name of the module from which to fetch the attribute.
-        attribute (str): The name of the attribute to fetch from the module.
-
-    Returns:
-        Any: The fetched implementation of the attribute.
-
-    Raises:
-        ModuleNotFoundError: If the module cannot be found and the error is not related to
-                             the Enterprise Edition fallback logic.
-
-    Logs:
-        Logs debug information about the fetching process and warnings if the versioned
-        implementation cannot be found or loaded.
+    When the full Loge feature package is loaded, prefer `loge.*` over `onyx.*`.
+    If the full-feature symbol is missing, fall back to the CE module.
     """
     logger.debug("Fetching versioned implementation for %s.%s", module, attribute)
     is_ee = global_version.is_ee_version()
 
-    module_full = f"ee.{module}" if is_ee else module
+    module_full = _full_feature_module_name(module) if is_ee else module
     try:
         return getattr(  # ods: ignore[getattr]
             importlib.import_module(module_full), attribute
@@ -103,15 +97,11 @@ def fetch_versioned_implementation(module: str, attribute: str) -> Any:
         )
 
         if is_ee:
-            if "ee.onyx" not in str(e):
-                # If it's a non Onyx related import failure, this is likely because
-                # a dependent library has not been installed. Should raise this failure
-                # instead of letting the server start up
+            if "loge" not in str(e):
+                # Non-loge import failure: likely a missing dependency. Raise.
                 raise e
 
-            # Use the MIT version as a fallback, this allows us to develop MIT
-            # versions independently and later add additional EE functionality
-            # similar to feature flagging
+            # Fall back to the CE module when a loge override is absent.
             return getattr(  # ods: ignore[getattr]
                 importlib.import_module(module), attribute
             )
@@ -129,14 +119,6 @@ def fetch_versioned_implementation_with_fallback(
     Attempts to fetch a versioned implementation of a specified attribute from a given module.
     If the attempt fails (e.g., due to an import error or missing attribute), the function logs
     a warning and returns the provided fallback implementation.
-
-    Args:
-        module (str): The name of the module from which to fetch the attribute.
-        attribute (str): The name of the attribute to fetch from the module.
-        fallback (T): The fallback implementation to return if fetching the attribute fails.
-
-    Returns:
-        T: The fetched implementation if successful, otherwise the provided fallback.
     """
     try:
         return fetch_versioned_implementation(module, attribute)
@@ -147,14 +129,6 @@ def fetch_versioned_implementation_with_fallback(
 def noop_fallback(*args: Any, **kwargs: Any) -> None:
     """
     A no-op (no operation) fallback function that accepts any arguments but does nothing.
-    This is often used as a default or placeholder callback function.
-
-    Args:
-        *args (Any): Positional arguments, which are ignored.
-        **kwargs (Any): Keyword arguments, which are ignored.
-
-    Returns:
-        None
     """
 
 
@@ -162,18 +136,8 @@ def fetch_ee_implementation_or_noop(
     module: str, attribute: str, noop_return_value: Any = None
 ) -> Any:
     """
-    Fetches an EE implementation if EE is enabled, otherwise returns a no-op function.
-    Raises an exception if EE is enabled but the fetch fails.
-
-    Args:
-        module (str): The name of the module from which to fetch the attribute.
-        attribute (str): The name of the attribute to fetch from the module.
-
-    Returns:
-        Any: The fetched EE implementation if successful and EE is enabled, otherwise a no-op function.
-
-    Raises:
-        Exception: If EE is enabled but the fetch fails.
+    Fetches a full-feature implementation if loaded, otherwise returns a no-op function.
+    Raises an exception if full features are loaded but the fetch fails.
     """
     if not global_version.is_ee_version():
         if inspect.iscoroutinefunction(noop_return_value):

@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 import pytest
 
-from ee.onyx.external_permissions.sharepoint.permission_utils import (
+from loge.external_permissions.sharepoint.permission_utils import (
     GET_SHAREPOINT_LIST_ITEM_ID_LABEL,
 )
 from onyx.access.models import ExternalAccess
@@ -652,7 +652,7 @@ def test_sharepoint_connector_hierarchy_node_permissions(
             mock_store_image,
         ),
         patch(
-            "ee.onyx.external_permissions.sharepoint.permission_utils.sleep_and_retry",
+            "loge.external_permissions.sharepoint.permission_utils.sleep_and_retry",
             wraps=sleep_and_retry,
         ) as mock_permission_retry,
         patch(

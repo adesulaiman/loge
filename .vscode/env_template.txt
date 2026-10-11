@@ -13,6 +13,12 @@ AUTH_TYPE=basic
 USER_AUTH_SECRET=""
 DEV_MODE=true
 
+# Match the port used by: uvicorn model_server.main:app --port 9001
+MODEL_SERVER_HOST=localhost
+MODEL_SERVER_PORT=9001
+INDEXING_MODEL_SERVER_HOST=localhost
+INDEXING_MODEL_SERVER_PORT=9001
+
 
 # Always keep these on for Dev.
 # Logs model prompts, reasoning, and answer to stdout.

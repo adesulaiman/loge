@@ -5,9 +5,9 @@ schema, and fail on any difference so no snapshot ships that the chain would not
 
 import sys
 
-from ee.onyx.db.tenant_snapshot import check_snapshot_parity
-from ee.onyx.db.tenant_snapshot import get_head_revision
-from ee.onyx.db.tenant_snapshot import get_snapshot
+from loge.db.tenant_snapshot import check_snapshot_parity
+from loge.db.tenant_snapshot import get_head_revision
+from loge.db.tenant_snapshot import get_snapshot
 from onyx.db.engine.shard_registry import get_shard_specs
 from onyx.db.engine.sql_engine import SqlEngine
 

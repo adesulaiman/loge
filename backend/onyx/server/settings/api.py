@@ -81,7 +81,7 @@ def admin_patch_settings(
     db_session: Session = Depends(get_session),
 ) -> Settings:
     if global_version.is_ee_version():
-        from ee.onyx.utils.tier import get_tier
+        from loge.utils.tier import get_tier
 
         current_tier = get_tier()
     else:

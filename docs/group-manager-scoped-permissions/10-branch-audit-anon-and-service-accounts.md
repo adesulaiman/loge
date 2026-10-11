@@ -121,7 +121,7 @@ anonymous visitor can read or write:
   latent trap for the next feature that checks `permissions.includes(...)` before rendering a chat
   affordance. Fix: pass `effective_permissions=["basic", ...]` (or the resolved set) into the `UserInfo`
   constructor.
-- **INFO — `document_set._add_user_filters` and `ee/onyx/db/token_limit.py`'s anonymous carve-outs were
+- **INFO — `document_set._add_user_filters` and `loge/db/token_limit.py`'s anonymous carve-outs were
   deleted without replacement**, and now fail closed (empty result) for anonymous on the editable path.
   Currently unreachable (no anonymous-facing route calls the editable path), recorded for completeness.
 
@@ -165,8 +165,8 @@ mechanism. **Not a regression** for the groupless case itself.
   keys to the `BASIC` role, which included `read:search`, `generate:image`, `use:llm_gateway`. This is a
   genuine CE regression, not an artifact of the groupless case being intentionally narrow.
 - **LOW — `is_limited_user`'s `SERVICE_ACCOUNT` branch is now dead code.** Every group (including any
-  admin-created one) auto-grants `BASIC_ACCESS` on creation (`ee/onyx/db/user_group.py:509`,
-  `ee/onyx/db/scim.py:998`), and `basic` is non-toggleable — so a service account with ≥1 group can never
+  admin-created one) auto-grants `BASIC_ACCESS` on creation (`loge/db/user_group.py:509`,
+  `loge/db/scim.py:998`), and `basic` is non-toggleable — so a service account with ≥1 group can never
   have empty `effective_permissions`. The `not user.effective_permissions` check only ever fires for the
   zero-group case, which is already handled by `account_derived_permissions`. Docstring says "no group
   membership" as the trigger; code says "and permissions ended up empty," which given the auto-grant is
@@ -179,7 +179,7 @@ mechanism. **Not a regression** for the groupless case itself.
   (`backend/onyx/db/users.py:796-798`), which strips any `is_manager` edge. A service account made a
   group manager loses that status silently the next time its key is edited (rename, group change) via
   `update_api_key`. SCIM's group-sync path already diffs instead of delete-all for this reason
-  (`ee/onyx/db/scim.py`); `set_user_groups__no_commit` should do the same.
+  (`loge/db/scim.py`); `set_user_groups__no_commit` should do the same.
 
 ### 3.3 CRITICAL — unrelated to either question, found and live-confirmed during the sweep
 
@@ -189,8 +189,8 @@ to the seeded Admin group and become a full admin.**
 `assert_manages_group` → `manages_group` (`backend/onyx/auth/scoped_permissions.py:108-127`)
 short-circuits `True` for **any** GLOBAL `MANAGE_USER_GROUPS` holder against **any** `group_id`, including
 the seeded Admin default group — no `is_default` guard, no `FULL_ADMIN_PANEL_ACCESS` requirement. This is
-the GATE 2 for `POST /admin/user-group/{id}/add-users` (`backend/ee/onyx/server/user_group/api.py:304-323`
-→ `add_users_to_user_group`, `backend/ee/onyx/db/user_group.py:561-604`) and for
+the GATE 2 for `POST /admin/user-group/{id}/add-users` (`backend/loge/server/user_group/api.py:304-323`
+→ `add_users_to_user_group`, `backend/loge/db/user_group.py:561-604`) and for
 `PATCH /admin/user-group/{id}` (`api.py:280-301` → `update_user_group`, `user_group.py:696`). Sibling
 routes (`rename`, `delete`) *do* carry an explicit `is_default` check (`api.py:236,334`) — this one
 doesn't.
@@ -226,7 +226,7 @@ edit that touches a default group.
   non-admins lose agent creation on upgrade until an admin manually grants "Create Agents" per group.
 - **Community Edition: no remaining mechanism to promote or demote an admin.** `PATCH /manage/set-user-role`
   is deleted; the only replacement (adding a user to the Admin group via
-  `POST /manage/admin/user-group/{id}/add-users`) is registered only by `ee/onyx/main.py` — absent in CE
+  `POST /manage/admin/user-group/{id}/add-users`) is registered only by `loge/main.py` — absent in CE
   builds. The lone CE admin is permanently whoever registered first.
 - **`MANAGE_LLMS` now implies `READ_USERS`, and `GET /manage/users` has `allow_scope=True` with no GATE 2**
   (`backend/onyx/server/manage/users.py:357-371` — the handler calls `get_all_users()` unfiltered and

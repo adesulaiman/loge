@@ -20,13 +20,13 @@ import pytest
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import QueuePool
 
-from ee.onyx.background.celery.tasks.doc_permission_syncing import tasks as perm_tasks
-from ee.onyx.external_permissions.perm_sync_types import (
+from loge.background.celery.tasks.doc_permission_syncing import tasks as perm_tasks
+from loge.external_permissions.perm_sync_types import (
     DocSyncFuncType,
     FetchAllDocumentsFunction,
     FetchAllDocumentsIdsFunction,
 )
-from ee.onyx.external_permissions.sync_params import DocSyncConfig, SyncConfig
+from loge.external_permissions.sync_params import DocSyncConfig, SyncConfig
 from onyx.access.models import (
     DocExternalAccess,
     ElementExternalAccess,

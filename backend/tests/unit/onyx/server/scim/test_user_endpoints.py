@@ -8,8 +8,8 @@ from uuid import uuid4
 from fastapi import Response
 from sqlalchemy.exc import IntegrityError
 
-from ee.onyx.db.license import seat_lock_id_for_tenant
-from ee.onyx.server.scim.api import (
+from loge.db.license import seat_lock_id_for_tenant
+from loge.server.scim.api import (
     _check_seat_availability,
     _scim_name_to_str,
     create_user,
@@ -19,7 +19,7 @@ from ee.onyx.server.scim.api import (
     patch_user,
     replace_user,
 )
-from ee.onyx.server.scim.models import (
+from loge.server.scim.models import (
     ScimEmail,
     ScimMappingFields,
     ScimName,
@@ -28,8 +28,8 @@ from ee.onyx.server.scim.models import (
     ScimPatchRequest,
     ScimUserResource,
 )
-from ee.onyx.server.scim.patch import ScimPatchError
-from ee.onyx.server.scim.providers.base import ScimProvider
+from loge.server.scim.patch import ScimPatchError
+from loge.server.scim.providers.base import ScimProvider
 from onyx.db.enums import AccountType, Permission
 from tests.unit.onyx.server.scim.conftest import (
     assert_scim_error,
@@ -199,7 +199,7 @@ class TestGetUser:
 class TestCreateUser:
     """Tests for POST /scim/v2/Users."""
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_success(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -223,7 +223,7 @@ class TestCreateUser:
         mock_dal.add_user.assert_called_once()
         mock_dal.commit.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_missing_external_id_still_creates_mapping(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -273,7 +273,7 @@ class TestCreateUser:
         assert_scim_error(result, 409)
         mock_dal.add_user.assert_not_called()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_duplicate_scim_managed_email_returns_409(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -299,7 +299,7 @@ class TestCreateUser:
 
         assert_scim_error(result, 409)
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_existing_user_without_mapping_gets_linked(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -336,8 +336,8 @@ class TestCreateUser:
         mock_dal.create_user_mapping.assert_called_once()
         mock_dal.commit.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit")
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api.assign_user_to_default_groups__no_commit")
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_adopting_shadow_ext_perm_user_promotes_to_standard(
         self,
         mock_seats: MagicMock,
@@ -385,7 +385,7 @@ class TestCreateUser:
         mock_dal.create_user_mapping.assert_called_once()
         mock_dal.commit.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_adopting_shadow_ext_perm_user_respects_seat_limit(
         self,
         mock_seats: MagicMock,
@@ -416,10 +416,10 @@ class TestCreateUser:
         mock_dal.update_user.assert_not_called()
 
     @patch(
-        "ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit",
+        "loge.server.scim.api.assign_user_to_default_groups__no_commit",
         side_effect=RuntimeError("Default group 'Basic' not found"),
     )
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_promotion_default_group_failure_returns_500(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -450,7 +450,7 @@ class TestCreateUser:
         mock_dal.rollback.assert_called_once()
         mock_dal.create_user_mapping.assert_not_called()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_integrity_error_returns_409(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -473,9 +473,9 @@ class TestCreateUser:
         assert_scim_error(result, 409)
         mock_dal.rollback.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.is_unique_violation", return_value=True)
-    @patch("ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit")
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api.is_unique_violation", return_value=True)
+    @patch("loge.server.scim.api.assign_user_to_default_groups__no_commit")
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_assign_default_groups_email_integrity_error_returns_409(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -503,9 +503,9 @@ class TestCreateUser:
         mock_dal.rollback.assert_called_once()
         mock_dal.commit.assert_not_called()
 
-    @patch("ee.onyx.server.scim.api.is_unique_violation", return_value=False)
-    @patch("ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit")
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api.is_unique_violation", return_value=False)
+    @patch("loge.server.scim.api.assign_user_to_default_groups__no_commit")
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_assign_default_groups_other_integrity_error_returns_500(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -533,7 +533,7 @@ class TestCreateUser:
         mock_dal.rollback.assert_called_once()
         mock_dal.commit.assert_not_called()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_seat_limit_returns_403(
         self,
         mock_seats: MagicMock,
@@ -554,7 +554,7 @@ class TestCreateUser:
 
         assert_scim_error(result, 403)
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_creates_external_id_mapping(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -626,7 +626,7 @@ class TestReplaceUser:
 
         assert_scim_error(result, 404)
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_reactivation_checks_seats(
         self,
         mock_seats: MagicMock,
@@ -651,8 +651,8 @@ class TestReplaceUser:
         assert_scim_error(result, 403)
         mock_seats.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit")
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api.assign_user_to_default_groups__no_commit")
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_promotes_already_active_shadow_user(
         self,
         mock_seats: MagicMock,
@@ -683,7 +683,7 @@ class TestReplaceUser:
         assert kwargs["promote_to_standard"] is True
         mock_assign.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_promotion_respects_seat_limit(
         self,
         mock_seats: MagicMock,
@@ -773,8 +773,8 @@ class TestPatchUser:
         parse_scim_user(result)
         mock_dal.update_user.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.assign_user_to_default_groups__no_commit")
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api.assign_user_to_default_groups__no_commit")
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_promotes_already_active_shadow_user(
         self,
         mock_seats: MagicMock,
@@ -873,7 +873,7 @@ class TestPatchUser:
         call_kwargs = mock_dal.update_user.call_args
         assert call_kwargs[1]["personal_name"] == "New Display Name"
 
-    @patch("ee.onyx.server.scim.api.apply_user_patch")
+    @patch("loge.server.scim.api.apply_user_patch")
     def test_patch_error_returns_error_response(
         self,
         mock_apply: MagicMock,
@@ -996,7 +996,7 @@ class TestScimNameToStr:
 class TestEmailCasePreservation:
     """Tests verifying email case is preserved through SCIM endpoints."""
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_create_preserves_username_case(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -1054,9 +1054,9 @@ class TestEmailCasePreservation:
 class TestSeatLock:
     """Tests for the advisory lock in _check_seat_availability."""
 
-    @patch("ee.onyx.server.scim.api.get_current_tenant_id", return_value="tenant_abc")
-    @patch("ee.onyx.server.scim.api.check_seat_availability")
-    @patch("ee.onyx.server.scim.api.acquire_seat_lock")
+    @patch("loge.server.scim.api.get_current_tenant_id", return_value="tenant_abc")
+    @patch("loge.server.scim.api.check_seat_availability")
+    @patch("loge.server.scim.api.acquire_seat_lock")
     def test_acquires_advisory_lock_before_checking(
         self,
         mock_acquire: MagicMock,
@@ -1493,7 +1493,7 @@ class TestUsernameDecoupling:
         provider: ScimProvider,
     ) -> None:
         with patch(
-            "ee.onyx.server.scim.api._check_seat_availability", return_value=None
+            "loge.server.scim.api._check_seat_availability", return_value=None
         ):
             result = create_user(
                 user_resource=make_scim_user(
@@ -1667,7 +1667,7 @@ class TestEmailCollisionResolution:
         mock_dal.reassign_user_mapping.assert_called_once_with(stale_mapping, clean.id)
         mock_dal.deactivate_user.assert_called_once_with(stale)
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_put_adoption_swap_is_seat_neutral(
         self,
         mock_seats: MagicMock,
@@ -1704,7 +1704,7 @@ class TestEmailCollisionResolution:
         assert resource.id == str(clean.id)
         mock_seats.assert_not_called()
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability")
+    @patch("loge.server.scim.api._check_seat_availability")
     def test_put_adoption_of_ext_perm_source_still_checks_seats(
         self,
         mock_seats: MagicMock,
@@ -1860,7 +1860,7 @@ class TestEmailCollisionResolution:
         assert resource.id == str(clean.id)
         mock_dal.deactivate_user.assert_called_once_with(stale)
 
-    @patch("ee.onyx.server.scim.api.is_unique_violation", return_value=True)
+    @patch("loge.server.scim.api.is_unique_violation", return_value=True)
     def test_put_rename_reconcile_race_returns_409(
         self,
         mock_is_unique: MagicMock,  # noqa: ARG002
@@ -1887,7 +1887,7 @@ class TestEmailCollisionResolution:
 
         assert_scim_error(result, 409)
 
-    @patch("ee.onyx.server.scim.api.is_unique_violation", return_value=True)
+    @patch("loge.server.scim.api.is_unique_violation", return_value=True)
     def test_put_rename_commit_race_returns_409(
         self,
         mock_is_unique: MagicMock,  # noqa: ARG002

@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from ee.onyx.connectors.capability_checks import get_perm_sync_capability_checks
+from loge.connectors.capability_checks import get_perm_sync_capability_checks
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.capability_checks.form_state import FormState
 from onyx.connectors.capability_checks.models import (

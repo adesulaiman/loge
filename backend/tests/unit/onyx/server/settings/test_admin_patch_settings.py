@@ -41,7 +41,7 @@ def _patch_settings(
     monkeypatch.setattr(settings_api, "settings_write_lock", _noop_lock)
     monkeypatch.setattr(settings_api.global_version, "is_ee_version", lambda: ee)
     if ee:
-        import ee.onyx.utils.tier as tier_module
+        import loge.utils.tier as tier_module
 
         monkeypatch.setattr(tier_module, "get_tier", lambda: tier)
     settings_api.admin_patch_settings(

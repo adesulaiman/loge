@@ -31,6 +31,15 @@ from onyx.connectors.github.rate_limit_utils import (
     BoundedGithubRetry,
     sleep_after_rate_limit_exception,
 )
+from onyx.connectors.cross_connector_utils.git_indexable_files import (
+    BRANCH_MODE_ALL,
+    BRANCH_MODE_SINGLE,
+    INDEXABLE_FILE_EXTENSIONS,
+    INDEXABLE_FILENAMES,
+    MAX_FILE_SIZE_BYTES,
+    PATH_DENYLIST,
+    is_indexable_path,
+)
 from onyx.connectors.github.utils import (
     deserialize_repository,
     get_external_access_permission,
@@ -70,46 +79,11 @@ _MAX_NUM_RATE_LIMIT_RETRIES = 5
 ONE_DAY = timedelta(days=1)
 SLIM_BATCH_SIZE = 100
 
-# Prose document extensions eligible for document indexing. Intentionally
-# limited to human-readable docs — source code as well as data/config/log
-# formats (.json, .csv, .tsv, .xml, .yml, .yaml, .sql, .log, .conf) are
-# excluded, as they are rarely useful to search as documents.
-GITHUB_INDEXABLE_FILE_EXTENSIONS = {
-    ".md",
-    ".mdx",
-    ".markdown",
-    ".rst",
-    ".txt",
-}
-# Common documentation files that conventionally have no extension. Matched
-# case-insensitively against the file's basename (stem before any extension).
-GITHUB_INDEXABLE_FILENAMES = {
-    "readme",
-    "license",
-    "licence",
-    "changelog",
-    "contributing",
-    "authors",
-    "notice",
-    "copying",
-    "install",
-    "maintainers",
-    "codeowners",
-    "security",
-    "support",
-}
-# Path segments whose presence anywhere in a file's path excludes it.
-GITHUB_PATH_DENYLIST = {
-    ".git",
-    "node_modules",
-    "vendor",
-    "dist",
-    "build",
-    ".venv",
-    "__pycache__",
-}
-# Skip files larger than this (checked against the git tree size before fetching).
-GITHUB_MAX_FILE_SIZE_BYTES = 1_000_000
+# Re-export shared tip-indexing filters for callers/tests that import these names.
+GITHUB_INDEXABLE_FILE_EXTENSIONS = INDEXABLE_FILE_EXTENSIONS
+GITHUB_INDEXABLE_FILENAMES = INDEXABLE_FILENAMES
+GITHUB_PATH_DENYLIST = PATH_DENYLIST
+GITHUB_MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_BYTES
 # Number of files emitted per checkpoint batch in the FILES stage.
 FILE_BATCH_SIZE = 100
 
@@ -118,29 +92,8 @@ _GITHUB_EMPTY_REPOSITORY_TREE_MESSAGE = "Git Repository is empty."
 
 
 def _is_indexable_path(path: str, size: int | None) -> bool:
-    """Pure predicate: should this repo file be indexed?
-
-    Filters on a max size and path-segment denylist, then matches either a
-    document extension (.md, .txt, ...) or a conventional extensionless
-    document basename (README, LICENSE, ...).
-    """
-    if size is not None and size > GITHUB_MAX_FILE_SIZE_BYTES:
-        return False
-
-    segments = set(path.split("/"))
-    if segments & GITHUB_PATH_DENYLIST:
-        return False
-
-    basename = path.rsplit("/", 1)[-1]
-    _, extension = os.path.splitext(basename)
-    if extension.lower() in GITHUB_INDEXABLE_FILE_EXTENSIONS:
-        return True
-
-    # Extensionless docs like README / LICENSE (basename has no extension).
-    if not extension and basename.lower() in GITHUB_INDEXABLE_FILENAMES:
-        return True
-
-    return False
+    """Whether a path at a branch tip should be indexed."""
+    return is_indexable_path(path, size)
 
 
 # Cases
@@ -578,6 +531,9 @@ class GithubConnectorCheckpoint(ConnectorCheckpoint):
     # Branch file_paths was listed from; a resumed checkpoint whose branch no
     # longer matches (connector edited, default branch changed) is re-listed.
     file_paths_branch: str | None = None
+    # Remaining branch tips to index after the current file_paths_branch.
+    # None means branches have not been resolved yet for this repo.
+    pending_file_branches: list[str] | None = None
 
     # Used for the fallback cursor-based pagination strategy
     num_retrieved: int
@@ -585,14 +541,15 @@ class GithubConnectorCheckpoint(ConnectorCheckpoint):
 
     def reset(self) -> None:
         """
-        Resets curr_page, num_retrieved, cursor_url, file_paths, and
-        file_paths_branch to their initial values (0, 0, None, None, None)
+        Resets curr_page, num_retrieved, cursor_url, file_paths,
+        file_paths_branch, and pending_file_branches.
         """
         self.curr_page = 0
         self.num_retrieved = 0
         self.cursor_url = None
         self.file_paths = None
         self.file_paths_branch = None
+        self.pending_file_branches = None
 
 
 def make_cursor_url_callback(
@@ -618,9 +575,10 @@ class GithubConnector(
         repo_owner: str,
         repositories: str | None = None,
         state_filter: str = "all",
-        include_prs: bool = True,
+        include_prs: bool = False,
         include_issues: bool = False,
-        include_files: bool = False,
+        include_files: bool = True,
+        branch_mode: str = BRANCH_MODE_SINGLE,
         branch: str | None = None,
     ) -> None:
         self.repo_owner = repo_owner
@@ -630,7 +588,11 @@ class GithubConnector(
         self.include_prs = include_prs
         self.include_issues = include_issues
         self.include_files = include_files
-        # Branch to index files from; None means each repo's default branch.
+        mode = (branch_mode or BRANCH_MODE_SINGLE).strip().lower()
+        self.branch_mode = (
+            BRANCH_MODE_ALL if mode == BRANCH_MODE_ALL else BRANCH_MODE_SINGLE
+        )
+        # Used when branch_mode is single; None means each repo's default branch.
         self.branch = (branch or "").strip() or None
         self.github_client: Github | None = None
 
@@ -766,13 +728,22 @@ class GithubConnector(
             state=self.state_filter, sort="updated", direction="desc"
         )
 
-    def _resolve_branch(self, repo: Repository.Repository) -> str:
-        return self.branch or repo.default_branch
+    def _resolve_branches(self, repo: Repository.Repository) -> list[str]:
+        """Branch tips to index for file knowledge. Never walks commit history."""
+        if self.branch_mode == BRANCH_MODE_ALL:
+            names = sorted({branch.name for branch in repo.get_branches()})
+            if names:
+                return names
+            return [repo.default_branch] if repo.default_branch else []
+        return [self.branch or repo.default_branch]
 
     def _list_indexable_files(
-        self, repo: Repository.Repository, attempt_num: int = 0
+        self,
+        repo: Repository.Repository,
+        branch: str,
+        attempt_num: int = 0,
     ) -> tuple[list[str], bool]:
-        """Resolve the configured (or default) branch tree and return indexable file paths.
+        """Resolve one branch tip tree and return indexable file paths.
 
         Returns (sorted paths, truncated) where `truncated` is True when GitHub
         capped the recursive tree (>100k entries or >7MB), meaning some files
@@ -785,13 +756,14 @@ class GithubConnector(
             )
         assert self.github_client is not None  # for type-checking
         try:
-            git_tree = repo.get_git_tree(self._resolve_branch(repo), recursive=True)
+            git_tree = repo.get_git_tree(branch, recursive=True)
             truncated = bool(git_tree.raw_data.get("truncated"))
             if truncated:
                 logger.error(
-                    "Git tree for repo %s was truncated by GitHub; "
+                    "Git tree for repo %s branch %s was truncated by GitHub; "
                     "some files will not be indexed",
                     repo.full_name,
+                    branch,
                 )
             paths = [
                 element.path
@@ -803,11 +775,11 @@ class GithubConnector(
             return paths, truncated
         except RateLimitExceededException:
             sleep_after_rate_limit_exception(self.github_client)
-            return self._list_indexable_files(repo, attempt_num + 1)
+            return self._list_indexable_files(repo, branch, attempt_num + 1)
         except GithubException as e:
-            if e.status == 404 and self.branch:
+            if e.status == 404 and self.branch_mode == BRANCH_MODE_SINGLE:
                 raise ConnectorValidationError(
-                    f"Branch '{self.branch}' not found in repository "
+                    f"Branch '{branch}' not found in repository "
                     f"{repo.full_name}. Leave the branch setting blank to use "
                     f"the repository's default branch."
                 ) from e
@@ -819,6 +791,13 @@ class GithubConnector(
                 e.status == _GITHUB_EMPTY_REPOSITORY_TREE_STATUS
                 and error_message == _GITHUB_EMPTY_REPOSITORY_TREE_MESSAGE
             ):
+                if e.status == 404:
+                    logger.warning(
+                        "Skipping missing branch %s in repo %s",
+                        branch,
+                        repo.full_name,
+                    )
+                    return [], False
                 raise
 
             logger.info(
@@ -828,7 +807,11 @@ class GithubConnector(
             return [], False
 
     def _fetch_file_content(
-        self, repo: Repository.Repository, path: str, attempt_num: int = 0
+        self,
+        repo: Repository.Repository,
+        path: str,
+        branch: str,
+        attempt_num: int = 0,
     ) -> bytes:
         if attempt_num > _MAX_NUM_RATE_LIMIT_RETRIES:
             raise RuntimeError(
@@ -837,7 +820,7 @@ class GithubConnector(
             )
         assert self.github_client is not None  # for type-checking
         try:
-            content = repo.get_contents(path, ref=self._resolve_branch(repo))
+            content = repo.get_contents(path, ref=branch)
             if isinstance(content, list):
                 raise ValueError(f"Expected a file at {path}, got a directory")
             if content.decoded_content is None:
@@ -848,7 +831,59 @@ class GithubConnector(
             return content.decoded_content
         except RateLimitExceededException:
             sleep_after_rate_limit_exception(self.github_client)
-            return self._fetch_file_content(repo, path, attempt_num + 1)
+            return self._fetch_file_content(repo, path, branch, attempt_num + 1)
+
+    def _begin_file_branch(
+        self,
+        repo: Repository.Repository,
+        checkpoint: GithubConnectorCheckpoint,
+        branch: str,
+        start: datetime | None,
+        is_slim: bool,
+        skip_freshness_gate: bool,
+    ) -> Generator[Document | ConnectorFailure, None, None]:
+        """List indexable paths for one branch tip into the checkpoint."""
+        pushed_at = (
+            repo.pushed_at.replace(tzinfo=timezone.utc) if repo.pushed_at else None
+        )
+        if (
+            not skip_freshness_gate
+            and start is not None
+            and pushed_at is not None
+            and pushed_at < start
+        ):
+            logger.info(
+                "Skipping files for repo %s branch %s (pushed_at < start)",
+                repo.name,
+                branch,
+            )
+            checkpoint.file_paths = []
+            checkpoint.file_paths_branch = branch
+            checkpoint.curr_page = 0
+            return
+
+        logger.info("Listing files for repo %s branch %s", repo.name, branch)
+        paths, truncated = self._list_indexable_files(repo, branch)
+        checkpoint.file_paths = paths
+        checkpoint.file_paths_branch = branch
+        checkpoint.curr_page = 0
+        logger.info(
+            "Found %s indexable files for repo %s branch %s",
+            len(paths),
+            repo.name,
+            branch,
+        )
+        if truncated and not is_slim:
+            yield ConnectorFailure(
+                failed_entity=EntityFailure(
+                    entity_id=f"{repo.full_name}:{branch}:files",
+                ),
+                failure_message=(
+                    f"GitHub truncated the file tree for "
+                    f"{repo.full_name} on branch {branch}; some files could "
+                    f"not be enumerated and were not indexed."
+                ),
+            )
 
     def _fetch_repo_files(
         self,
@@ -858,62 +893,64 @@ class GithubConnector(
         is_slim: bool,
         repo_external_access: ExternalAccess | None,
     ) -> Generator[Document | ConnectorFailure, None, bool]:
-        """Emit one batch of indexable documents for `repo`, advancing the checkpoint.
+        """Emit one batch of tip-tree documents for `repo`, advancing the checkpoint.
 
-        On first entry for a repo (file_paths is None) it resolves and caches the
-        filtered file list, applying the pushed_at gate and surfacing tree
-        truncation as a failure. Returns True if more file batches remain (the
-        caller should return the checkpoint to resume), False once drained.
+        Indexes the configured branch tip, or every branch tip when
+        branch_mode is all. Never walks commit history. Returns True if more
+        file batches or branches remain.
         """
-        branch = self._resolve_branch(repo)
-        branch_changed = (
-            checkpoint.file_paths is not None and checkpoint.file_paths_branch != branch
-        )
-        if branch_changed:
-            # The cached listing came from a different branch (resumed
-            # checkpoint after a connector edit or default-branch change) —
-            # discard it so paths and content come from the same branch.
-            checkpoint.file_paths = None
-            checkpoint.file_paths_branch = None
-            checkpoint.curr_page = 0
+        branch_setting_changed = False
+        if self.branch_mode == BRANCH_MODE_SINGLE:
+            expected_branch = self.branch or repo.default_branch
+            if (
+                checkpoint.file_paths_branch is not None
+                and checkpoint.file_paths_branch != expected_branch
+            ):
+                # Connector branch setting changed since this checkpoint.
+                branch_setting_changed = True
+                checkpoint.file_paths = None
+                checkpoint.file_paths_branch = None
+                checkpoint.pending_file_branches = None
+                checkpoint.curr_page = 0
+
+        starting_branch_list = False
+        if checkpoint.pending_file_branches is None:
+            if checkpoint.file_paths is not None:
+                # Resumed mid-branch: finish the current tip only.
+                checkpoint.pending_file_branches = []
+            else:
+                checkpoint.pending_file_branches = self._resolve_branches(repo)
+                starting_branch_list = True
 
         if checkpoint.file_paths is None:
-            pushed_at = (
-                repo.pushed_at.replace(tzinfo=timezone.utc) if repo.pushed_at else None
-            )
-            # After a branch change the new branch was never indexed, so the
-            # pushed_at freshness gate must not skip the re-listing.
-            if (
-                not branch_changed
-                and start is not None
-                and pushed_at is not None
-                and pushed_at < start
-            ):
-                # Nothing changed in this repo since the last poll — skip.
-                logger.info("Skipping files for repo %s (pushed_at < start)", repo.name)
+            if not checkpoint.pending_file_branches:
                 checkpoint.file_paths = []
-                checkpoint.file_paths_branch = branch
-            else:
-                logger.info("Listing files for repo: %s", repo.name)
-                paths, truncated = self._list_indexable_files(repo)
-                checkpoint.file_paths = paths
-                checkpoint.file_paths_branch = branch
-                logger.info(
-                    "Found %s indexable files for repo: %s", len(paths), repo.name
-                )
-                # Surface truncation as a failure so the incomplete index is
-                # visible in the connector UI, not just buried in logs.
-                if truncated and not is_slim:
-                    yield ConnectorFailure(
-                        failed_entity=EntityFailure(
-                            entity_id=f"{repo.full_name}:files",
-                        ),
-                        failure_message=(
-                            f"GitHub truncated the file tree for "
-                            f"{repo.full_name}; some files could not be "
-                            f"enumerated and were not indexed."
-                        ),
-                    )
+                return False
+            branch = checkpoint.pending_file_branches.pop(0)
+            yield from self._begin_file_branch(
+                repo,
+                checkpoint,
+                branch,
+                start,
+                is_slim,
+                # Skip freshness when the tip was never indexed yet (branch
+                # change) or when continuing to a later tip in the same poll.
+                skip_freshness_gate=branch_setting_changed or not starting_branch_list,
+            )
+            # Freshness skip empties the listing; drop remaining tips too.
+            if (
+                starting_branch_list
+                and checkpoint.file_paths == []
+                and start is not None
+                and repo.pushed_at is not None
+                and repo.pushed_at.replace(tzinfo=timezone.utc) < start
+            ):
+                checkpoint.pending_file_branches = []
+                return False
+
+        branch = checkpoint.file_paths_branch
+        if branch is None or checkpoint.file_paths is None:
+            return False
 
         file_paths = checkpoint.file_paths
         page = checkpoint.curr_page
@@ -933,7 +970,7 @@ class GithubConnector(
                 )
                 continue
             try:
-                raw = self._fetch_file_content(repo, path)
+                raw = self._fetch_file_content(repo, path, branch)
                 content_text = _decode_file_content(raw)
                 if content_text is None:
                     yield ConnectorFailure(
@@ -960,8 +997,27 @@ class GithubConnector(
                 )
                 continue
 
-        # True if more file batches remain for this repo.
-        return (page + 1) * FILE_BATCH_SIZE < len(file_paths)
+        more_on_branch = (page + 1) * FILE_BATCH_SIZE < len(file_paths)
+        if more_on_branch:
+            return True
+
+        # Current branch tip drained — open the next tip if any.
+        if checkpoint.pending_file_branches:
+            next_branch = checkpoint.pending_file_branches.pop(0)
+            checkpoint.file_paths = None
+            yield from self._begin_file_branch(
+                repo,
+                checkpoint,
+                next_branch,
+                start,
+                is_slim,
+                # Later tips in the same poll still need listing even when the
+                # repo-level pushed_at gate already passed for the first tip.
+                skip_freshness_gate=True,
+            )
+            return True
+
+        return False
 
     def _fetch_from_github(
         self,

@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from ee.onyx.db.usage_export import get_usage_report_data
+from loge.db.usage_export import get_usage_report_data
 from onyx.configs.constants import FileOrigin
 from onyx.connectors.models import (
     DocumentBase,
@@ -47,7 +47,7 @@ def test_usage_report_requires_report_origin_and_zip_type(
     record = FileRecord(file_origin=origin, file_type=file_type)
     file_store.has_file.side_effect = has_file
     with patch(
-        "ee.onyx.db.usage_export.get_default_file_store", return_value=file_store
+        "loge.db.usage_export.get_default_file_store", return_value=file_store
     ):
         with pytest.raises(ValueError, match="not found"):
             get_usage_report_data("report.zip")

@@ -59,7 +59,9 @@ function OpenRouterModalInternals({
     if (error) {
       throw new Error(error);
     }
-    formikProps.setValues(withFetchedModels(fetched));
+    formikProps.setValues(
+      withFetchedModels(fetched, { defaultNewVisible: true })
+    );
   };
 
   return (

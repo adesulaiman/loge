@@ -403,9 +403,12 @@ export const RenderField: FC<RenderFieldProps> = ({
             disabled={disabled}
             options={[
               {
+                // Wire `value` (API token), show `name` (label). Using the
+                // label as the form value breaks selects where they differ
+                // (e.g. branch_mode: "One branch…" vs "single").
                 options: (field.options ?? []).map(
-                  (option: { name: string }) => ({
-                    value: option.name,
+                  (option: { name: string; value: string }) => ({
+                    value: option.value,
                     title: option.name,
                   })
                 ),

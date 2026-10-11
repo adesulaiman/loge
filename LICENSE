@@ -1,13 +1,21 @@
 Copyright (c) 2023-present DanswerAI, Inc.
+Copyright (c) 2026-present Loge contributors.
 
 Portions of this software are licensed as follows:
 
-- All content that resides under "ee" directories of this repository is licensed under the Onyx Enterprise License. Each ee directory contains an identical copy of this license at its root:
-  - backend/ee/LICENSE
-  - web/src/app/ee/LICENSE
-  - web/src/ee/LICENSE
-- All third party components incorporated into the Onyx Software are licensed under the original license provided by the owner of the applicable component.
-- Content outside of the above mentioned directories or restrictions above is available under the "MIT Expat" license as defined below.
+- Content that resides under the following directories is licensed under the
+  Onyx Enterprise License (proprietary, copyright DanswerAI, Inc.). Each of
+  these directories contains a copy of that license at its root:
+  - backend/loge/LICENSE
+  - web/src/loge/LICENSE
+- All third party components incorporated into this software are licensed under
+  the original license provided by the owner of the applicable component.
+- Content outside of the above mentioned directories or restrictions above is
+  available under the "MIT Expat" license as defined below.
+
+This Loge fork keeps former Enterprise Edition functionality for private /
+self-hosted use. Relocating that code out of directories named "ee" does not
+change its Enterprise License. Do not treat backend/loge or web/src/loge as MIT.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

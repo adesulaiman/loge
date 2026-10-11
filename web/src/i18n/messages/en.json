@@ -1,8 +1,8 @@
 {
   "mcpOAuth": {
     "consent": {
-      "title": "Connect to Onyx",
-      "request": "Allow {clientName} to search Onyx?",
+      "title": "Connect to Loge",
+      "request": "Allow {clientName} to search Loge?",
       "account": "Signed in as {email}",
       "workspace": "Workspace: {workspaceName}",
       "appAddress": "App address: {origin}",
@@ -16,13 +16,13 @@
       "signInRequired": "Sign in to authorize this app.",
       "signIn": "Sign in",
       "forbidden": "You cannot authorize this app. Contact your workspace administrator.",
-      "loadFailed": "Onyx could not load this request. Try again.",
+      "loadFailed": "Loge could not load this request. Try again.",
       "retry": "Try again"
     },
     "connections": {
       "cancel": "Cancel",
       "title": "Connected apps",
-      "description": "Apps you have allowed to search Onyx.",
+      "description": "Apps you have allowed to search Loge.",
       "empty": "No connected apps.",
       "loading": "Loading connected apps...",
       "expires": "Expires {date}",
@@ -32,7 +32,7 @@
       "failed": "Could not disconnect the app. Try again.",
       "loadFailed": "Could not load connected apps.",
       "confirmTitle": "Disconnect {clientName}?",
-      "confirmDescription": "This app will lose access to Onyx. You can connect it again later."
+      "confirmDescription": "This app will lose access to Loge. You can connect it again later."
     }
   },
   "accountPopover": {
@@ -1319,8 +1319,8 @@
       },
       "slackChannelChart": {
         "description": "Total Queries vs Auto Resolved",
-        "empty": "No OnyxBot activity in this workspace for the selected time range.",
-        "error": "Failed to fetch OnyxBot data.",
+        "empty": "No LogeBot activity in this workspace for the selected time range.",
+        "error": "Failed to fetch LogeBot data.",
         "series": {
           "autoResolved": {
             "label": "Automatically Resolved"
@@ -1560,7 +1560,7 @@
           "label": "License key expired"
         },
         "keyField": {
-          "description": "Paste or attach your license key file you received from Onyx.",
+          "description": "Paste or attach your license key file you received from Loge.",
           "title": "License Key"
         },
         "updateKey": {
@@ -2623,7 +2623,7 @@
         },
         "organizationLinks": {
           "label": "Treat organization links as public",
-          "description": "Treat files shared through an organization-wide link as visible to all Onyx users."
+          "description": "Treat files shared through an organization-wide link as visible to all Loge users."
         },
         "authorityHost": {
           "label": "Authority Host",
@@ -3184,7 +3184,7 @@
         "title": "No users found"
       },
       "header": {
-        "description": "Control who can use Craft, Onyx's agentic app builder.",
+        "description": "Control who can use Craft, Loge's agentic app builder.",
         "title": "Access"
       },
       "perUserAccess": {
@@ -3215,7 +3215,7 @@
         }
       },
       "unavailable": {
-        "description": "Craft is enabled per deployment by Onyx. Contact your Onyx representative to get access.",
+        "description": "Craft is enabled per deployment by Loge. Contact your Loge representative to get access.",
         "title": "Craft isn't available on this deployment"
       },
       "usersLoadError": {
@@ -3301,7 +3301,7 @@
         "label": "Try in Craft"
       },
       "unavailable": {
-        "description": "Craft is enabled per deployment by Onyx. Contact your Onyx representative to get access.",
+        "description": "Craft is enabled per deployment by Loge. Contact your Loge representative to get access.",
         "title": "Craft isn't available on this deployment"
       }
     },
@@ -3351,6 +3351,10 @@
         },
         "submitError": {
           "toast": "Error submitting credential"
+        },
+        "name": {
+          "label": "Name (optional):",
+          "placeholder": "e.g. Production account"
         }
       },
       "delete": {
@@ -4054,7 +4058,7 @@
         "title": "Export logs"
       },
       "header": {
-        "description": "Download a zip of server log files to attach to an Onyx support thread."
+        "description": "Download a zip of server log files to attach to a Loge support thread."
       },
       "receipt": {
         "duplicateHost": {
@@ -4169,7 +4173,7 @@
         "noCustomSkills": "no custom skills",
         "orgCredentialsSet": "org credentials set",
         "perUserCredentials": "per-user credentials",
-        "providedByOnyx": "provided by Onyx",
+        "providedByOnyx": "provided by Loge",
         "tools": "{count, plural, one {# tool} other {# tools}}",
         "upstreamPatterns": "{count, plural, one {# upstream pattern} other {# upstream patterns}}"
       },
@@ -4599,7 +4603,7 @@
           "placeholder": "Cost limit",
           "unit": "(USD)"
         },
-        "disabledTooltip": "Token rate limits are available on the [Enterprise version of Onyx](/admin/billing) only.",
+        "disabledTooltip": "Token rate limits are available on the [Enterprise version of Loge](/admin/billing) only.",
         "section": {
           "description": "Limit number of tokens this group can use within a given time period.",
           "title": "Token Rate Limit"
@@ -5172,7 +5176,7 @@
         }
       },
       "cloudDisabled": {
-        "tooltip": "This setting is managed by Onyx Cloud."
+        "tooltip": "This setting is managed by Loge Cloud."
       },
       "contextualModel": {
         "description": "This model will be used to generate context for chunks.",
@@ -5186,7 +5190,7 @@
       },
       "embeddingModel": {
         "cloudManaged": {
-          "title": "Embedding model and settings are managed by Onyx Cloud."
+          "title": "Embedding model and settings are managed by Loge Cloud."
         },
         "description": "{appName} uses this model to encode documents for search and retrieval.",
         "title": "Embedding Model"
@@ -6258,7 +6262,7 @@
         },
         "requestSentBody": "Your join request has been sent. You can explore as your own team while waiting for an admin of {domain} to approve your request.",
         "tryOnyxButton": {
-          "label": "Try Onyx while waiting"
+          "label": "Try Loge while waiting"
         }
       },
       "newTenant": {
@@ -7069,7 +7073,7 @@
         }
       },
       "liteModeNotice": {
-        "description": "This deployment runs Onyx Lite, which has no vector database — connectors and document indexing are disabled, and nothing is indexed. To connect data sources and index documents, deploy Onyx in **Standard mode**. See the [deployment guide]({docsUrl}) to get started.",
+        "description": "This deployment runs Loge Lite, which has no vector database — connectors and document indexing are disabled, and nothing is indexed. To connect data sources and index documents, deploy Loge in **Standard mode**. See the [deployment guide]({docsUrl}) to get started.",
         "title": "Indexing is unavailable in Lite mode"
       },
       "providerCard": {
@@ -7095,10 +7099,10 @@
     "slackBots": {
       "channelConfig": {
         "createError": {
-          "toast": "Error creating OnyxBot config - {error}"
+          "toast": "Error creating LogeBot config - {error}"
         },
         "updateError": {
-          "toast": "Error updating OnyxBot config - {error}"
+          "toast": "Error updating LogeBot config - {error}"
         }
       },
       "channels": {
@@ -7216,16 +7220,16 @@
         },
         "disableDefault": {
           "label": "Disable Default Configuration",
-          "warning": "Warning: Disabling the default configuration means OnyxBot won't respond in Slack channels unless they are explicitly configured. Additionally, OnyxBot will not respond to DMs."
+          "warning": "Warning: Disabling the default configuration means LogeBot won't respond in Slack channels unless they are explicitly configured. Additionally, LogeBot will not respond to DMs."
         },
         "documentSets": {
           "autoSyncedDisabled": {
-            "tooltip": "Unable to use this document set because it contains a connector with auto-sync permissions. OnyxBot's responses in this channel are visible to all Slack users, so mirroring the asker's permissions could inadvertently expose private information."
+            "tooltip": "Unable to use this document set because it contains a connector with auto-sync permissions. LogeBot's responses in this channel are visible to all Slack users, so mirroring the asker's permissions could inadvertently expose private information."
           },
           "autoSyncedNote": {
             "text": "These document sets cannot be attached as they have auto-synced docs:"
           },
-          "description": "Select the document sets OnyxBot will use while answering questions in Slack.",
+          "description": "Select the document sets LogeBot will use while answering questions in Slack.",
           "hideUnselectableButton": {
             "label": "Hide un-selectable document sets"
           },
@@ -7250,12 +7254,12 @@
         },
         "isEphemeral": {
           "label": "Respond to user in a private (ephemeral) message",
-          "tooltip": "If set, OnyxBot will respond only to the user in a private (ephemeral) message. If you also chose 'Search' Agent above, selecting this option will make documents that are private to the user available for their queries."
+          "tooltip": "If set, LogeBot will respond only to the user in a private (ephemeral) message. If you also chose 'Search' Agent above, selecting this option will make documents that are private to the user available for their queries."
         },
         "knowledgeSource": {
           "allPublic": {
             "label": "All Public Knowledge",
-            "sublabel": "Let OnyxBot respond based on information from all public connectors"
+            "sublabel": "Let LogeBot respond based on information from all public connectors"
           },
           "documentSets": {
             "label": "Specific Document Sets",
@@ -7272,7 +7276,7 @@
           }
         },
         "nonSearchAgent": {
-          "description": "Select the non-search agent OnyxBot will use while answering questions in Slack."
+          "description": "Select the non-search agent LogeBot will use while answering questions in Slack."
         },
         "privacyAlert": {
           "connectors": {
@@ -7283,7 +7287,7 @@
         },
         "questionmarkPrefilter": {
           "label": "Only respond to questions",
-          "tooltip": "If set, OnyxBot will only respond to messages that contain a question mark"
+          "tooltip": "If set, LogeBot will only respond to messages that contain a question mark"
         },
         "removedDocumentSets": {
           "toast": "We removed one or more document sets from your selection because they are no longer valid. Please review and update your configuration."
@@ -7293,15 +7297,15 @@
             "tooltip": "Disabled while 'Respond to user in a private (ephemeral) message' is on — ephemeral responses target a single user only."
           },
           "label": "(Optional) Respond to Certain Users / Groups",
-          "subtext": "If specified, only these users / groups can invoke OnyxBot in this channel, and responses are visible only to them."
+          "subtext": "If specified, only these users / groups can invoke LogeBot in this channel, and responses are visible only to them."
         },
         "respondTagOnly": {
-          "label": "Respond to @OnyxBot Only",
-          "tooltip": "If set, OnyxBot will only respond when directly tagged"
+          "label": "Respond to @LogeBot Only",
+          "tooltip": "If set, LogeBot will only respond when directly tagged"
         },
         "respondToBots": {
           "label": "Respond to Bot messages",
-          "tooltip": "If not set, OnyxBot will always ignore messages from Bots"
+          "tooltip": "If not set, LogeBot will always ignore messages from Bots"
         },
         "responseType": {
           "detailed": {
@@ -7311,10 +7315,10 @@
           "standard": {
             "label": "Standard"
           },
-          "tooltip": "Controls the format of OnyxBot's responses."
+          "tooltip": "Controls the format of LogeBot's responses."
         },
         "searchAgent": {
-          "description": "Select the search-enabled agent OnyxBot will use while answering questions in Slack."
+          "description": "Select the search-enabled agent LogeBot will use while answering questions in Slack."
         },
         "searchConfig": {
           "section": {
@@ -7330,7 +7334,7 @@
           "section": {
             "prompt": "Configure Still Need Help Button"
           },
-          "tooltip": "OnyxBot's response will include a button at the bottom of the response that asks the user if they still need help."
+          "tooltip": "LogeBot's response will include a button at the bottom of the response that asks the user if they still need help."
         },
         "syncEnabledAgents": {
           "hideButton": {
@@ -7351,17 +7355,17 @@
       },
       "intro": {
         "autoAnswer": {
-          "item": "Setup OnyxBot to automatically answer questions in certain channels."
+          "item": "Setup LogeBot to automatically answer questions in certain channels."
         },
         "description": "Setup Slack bots that connect to {appName}. Once setup, you will be able to ask questions to {appName} directly from Slack. Additionally, you can:",
         "directMessage": {
-          "item": "Directly message OnyxBot to search just as you would in the web UI."
+          "item": "Directly message LogeBot to search just as you would in the web UI."
         },
         "docsPrompt": {
-          "text": "Follow the <link>guide</link> found in the Onyx documentation to get started!"
+          "text": "Follow the <link>guide</link> found in the Loge documentation to get started!"
         },
         "documentSets": {
-          "item": "Choose which document sets OnyxBot should answer from, depending on the channel the question is being asked."
+          "item": "Choose which document sets LogeBot should answer from, depending on the channel the question is being asked."
         }
       },
       "list": {
@@ -7379,7 +7383,7 @@
       },
       "newChannel": {
         "header": {
-          "title": "Configure OnyxBot for Slack Channel"
+          "title": "Configure LogeBot for Slack Channel"
         }
       },
       "table": {
@@ -7874,7 +7878,7 @@
         "label": "Pop-up Notice at First Visit"
       },
       "appName": {
-        "description": "This name will show across the app and replace \"Onyx\" in the UI.",
+        "description": "This name will show across the app and replace \"Loge\" in the UI.",
         "label": "Application Display Name"
       },
       "chatFooter": {
@@ -7900,7 +7904,7 @@
         "label": "Greeting Message"
       },
       "helpLink": {
-        "description": "Add a custom help link in the user menu in addition to the Onyx documentation.",
+        "description": "Add a custom help link in the user menu in addition to the Loge documentation.",
         "enterpriseTooltip": "Custom help link is an Enterprise Plan feature.",
         "label": "Custom Help Link"
       },
@@ -9463,7 +9467,7 @@
         "label": "Create New Organization"
       },
       "createTeamOption": {
-        "text": "Create a new Onyx team"
+        "text": "Create a new Loge team"
       },
       "differentEmailPrompt": {
         "text": "Have an account with a different email?"
@@ -9472,10 +9476,10 @@
         "title": "Account Not Found"
       },
       "inviteOption": {
-        "text": "Be invited to an existing Onyx team"
+        "text": "Be invited to an existing Loge team"
       },
       "notFound": {
-        "description": "We couldn't find your account in our records. To access Onyx, you need to either:"
+        "description": "We couldn't find your account in our records. To access Loge, you need to either:"
       },
       "signInLink": {
         "label": "Sign in"
@@ -9544,7 +9548,7 @@
         "description": "Account access restrictions or permissions"
       },
       "cloudSupportPrompt": {
-        "text": "If you continue to experience problems, please reach out to the Onyx team at <link>support@onyx.app</link>"
+        "text": "If you continue to experience problems, please reach out to the Loge team at <link>support@onyx.app</link>"
       },
       "code": {
         "accessDenied": "Access was denied by your identity provider.",
@@ -11492,7 +11496,8 @@
     "welcome": {
       "greeting": {
         "helpText": "How can I help?",
-        "startText": "Let's get started."
+        "startText": "Let's get started.",
+        "subtitle": "Search your team's private knowledge. Every answer shows its sources."
       },
       "incognito": {
         "title": "You're incognito"
@@ -11958,7 +11963,7 @@
         "alt": "Logo"
       },
       "poweredBy": {
-        "label": "Powered by Onyx"
+        "label": "Powered by Loge"
       }
     },
     "modelSelectors": {
@@ -12160,8 +12165,8 @@
             "label": "Name"
           }
         },
-        "managedDescription": "Provided by Onyx — configure what the agent may do.",
-        "managedNote": "This app is provided by Onyx — credentials are managed for you. Choose what the agent may do below. Users connect it from the Apps page.",
+        "managedDescription": "Provided by Loge — configure what the agent may do.",
+        "managedNote": "This app is provided by Loge — credentials are managed for you. Choose what the agent may do below. Users connect it from the Apps page.",
         "saveButton": "Save"
       },
       "customApp": {
@@ -12246,14 +12251,14 @@
           "startAuthFailed": "Failed to start authorization"
         },
         "header": {
-          "description": "Connect the tools Onyx Craft can use as context while it works.",
+          "description": "Connect the tools Loge Craft can use as context while it works.",
           "manageButton": "Manage apps",
           "searchPlaceholder": "Search apps...",
           "title": "Apps"
         },
         "kinds": {
           "app": {
-            "blurb": "Integrations Onyx supports directly. Each comes with skills that teach Craft how to use it — start here.",
+            "blurb": "Integrations Loge supports directly. Each comes with skills that teach Craft how to use it — start here.",
             "empty": "No apps are configured for your organization yet.",
             "emptyTitle": "No apps yet",
             "tabLabel": "Apps · {count}"
@@ -12634,7 +12639,7 @@
       },
       "llmLocked": {
         "backToChatButton": "Back to Chat",
-        "description": "Onyx Craft needs a model provider, and only admins can set one up. Ask your admin to connect Anthropic, OpenAI, or OpenRouter.",
+        "description": "Loge Craft needs a model provider, and only admins can set one up. Ask your admin to connect Anthropic, OpenAI, or OpenRouter.",
         "title": "An LLM provider is required"
       },
       "llmSetup": {
@@ -14220,10 +14225,10 @@
     },
     "adminSidebar": {
       "businessOrEnterpriseOnly": {
-        "tooltip": "This feature is available on the [Business or Enterprise version of Onyx](/admin/billing) only."
+        "tooltip": "This feature is available on the [Business or Enterprise version of Loge](/admin/billing) only."
       },
       "enterpriseOnly": {
-        "tooltip": "This feature is available on the [Enterprise version of Onyx](/admin/billing) only."
+        "tooltip": "This feature is available on the [Enterprise version of Loge](/admin/billing) only."
       },
       "exitAdminPanel": {
         "label": "Exit Admin Panel"
@@ -14867,7 +14872,7 @@
     "disk": "OpenSearch disk usage is at least 85% on a data node. Indexing may stop as the disk fills.",
     "jvmMemory": "OpenSearch JVM memory usage stayed above 85% across repeated checks. Search and indexing may fail.",
     "vectorMemory": "OpenSearch vector memory is nearly full or has reached its limit. Search and indexing may fail.",
-    "contact": "Contact your system administrator or the Onyx team at [support@onyx.app](mailto:support@onyx.app).",
+    "contact": "Contact your system administrator or the Loge team at [support@onyx.app](mailto:support@onyx.app).",
     "stale": "The latest check is unavailable. This warning reflects the last successful check; recovery has not been confirmed.",
     "dismiss": "Dismiss",
     "diskTitle": "Disk space",

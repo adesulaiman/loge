@@ -12,16 +12,16 @@ import pytest
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from ee.onyx.server.scim.api import ScimJSONResponse
-from ee.onyx.server.scim.models import (
+from loge.server.scim.api import ScimJSONResponse
+from loge.server.scim.models import (
     ScimGroupResource,
     ScimListResponse,
     ScimName,
     ScimUserResource,
 )
-from ee.onyx.server.scim.providers.base import ScimProvider
-from ee.onyx.server.scim.providers.entra import EntraProvider
-from ee.onyx.server.scim.providers.okta import OktaProvider
+from loge.server.scim.providers.base import ScimProvider
+from loge.server.scim.providers.entra import EntraProvider
+from loge.server.scim.providers.okta import OktaProvider
 from onyx.db.enums import AccountType
 from onyx.db.models import ScimToken, ScimUserMapping, User, UserGroup
 
@@ -53,7 +53,7 @@ def provider(request: pytest.FixtureRequest) -> ScimProvider:
 @pytest.fixture
 def mock_dal() -> Generator[MagicMock, None, None]:
     """Patch ScimDAL construction in api module and yield the mock instance."""
-    with patch("ee.onyx.server.scim.api.ScimDAL") as cls:
+    with patch("loge.server.scim.api.ScimDAL") as cls:
         dal = cls.return_value
         # User defaults
         dal.get_user.return_value = None

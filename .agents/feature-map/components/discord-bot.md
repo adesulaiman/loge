@@ -138,7 +138,7 @@ OnyxDiscordClient.on_message                                    client.py
    `chat_backend.py:handle_send_chat_message` throttle all of the tenant's Discord guilds together (one service key per tenant,
    `cache.py:DiscordCacheManager._api_keys`).
    The EE token check holds an API-key user to GLOBAL budgets only
-   (`ee/onyx/server/query_and_chat/token_limit.py:_check_token_rate_limits`), so a
+   (`loge/server/query_and_chat/token_limit.py:_check_token_rate_limits`), so a
    per-user or per-group budget never applies to Discord answers.
    Contrast [[slack-bot]], where each Slack sender is provisioned as their own
    Onyx user (`onyx/db/users.py:add_slack_user_if_not_exists`), so rate limits

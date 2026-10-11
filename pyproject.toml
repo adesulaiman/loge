@@ -364,11 +364,11 @@ known-first-party = ["onyx", "ee", "tests", "shared_configs", "model_server"]
 # number is the highest complexity in that file at the time. Remove an entry
 # once its functions are simplified. NOTE: the ignore is per file, so it also
 # hides new complex functions added to these files. Tracked in #2403.
-"backend/ee/onyx/background/celery/tasks/doc_permission_syncing/tasks.py" = ["C901"] # 21
-"backend/ee/onyx/external_permissions/google_drive/doc_sync.py" = ["C901"] # 21
-"backend/ee/onyx/server/gateway/anthropic_passthrough.py" = ["C901"] # 23
-"backend/ee/onyx/server/gateway/api.py" = ["C901"] # 27
-"backend/ee/onyx/server/gateway/openai_passthrough.py" = ["C901"] # 32
+"backend/loge/background/celery/tasks/doc_permission_syncing/tasks.py" = ["C901"] # 21
+"backend/loge/external_permissions/google_drive/doc_sync.py" = ["C901"] # 21
+"backend/loge/server/gateway/anthropic_passthrough.py" = ["C901"] # 23
+"backend/loge/server/gateway/api.py" = ["C901"] # 27
+"backend/loge/server/gateway/openai_passthrough.py" = ["C901"] # 32
 "backend/onyx/auth/users.py" = ["C901"] # 30
 "backend/onyx/background/celery/tasks/docfetching/tasks.py" = ["C901"] # 43
 "backend/onyx/background/celery/tasks/docprocessing/tasks.py" = ["C901"] # 24

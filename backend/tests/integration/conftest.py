@@ -44,11 +44,11 @@ from fastapi.testclient import TestClient  # noqa: E402
 # onyx.main's module body (line 706) already calls fetch_versioned_implementation
 # under set_is_ee_if_available(). If our fixture is the first to invoke
 # the dispatcher, the recursion goes:
-#   fixture -> fetch_versioned_implementation -> import ee.onyx.main
-#     -> ee.onyx.main line 53 `from onyx.main import get_application`
+#   fixture -> fetch_versioned_implementation -> import loge.main
+#     -> loge.main line 53 `from onyx.main import get_application`
 #     -> onyx.main line 706 calls fetch_versioned_implementation again
-#     -> tries to import ee.onyx.main (mid-init), AttributeError on get_application.
-# Letting onyx.main load first means ee.onyx.main's back-reference to
+#     -> tries to import loge.main (mid-init), AttributeError on get_application.
+# Letting onyx.main load first means loge.main's back-reference to
 # onyx.main.get_application (defined at line 429, before line 706) resolves cleanly.
 import onyx.main  # noqa: E402, F401
 from onyx.background.celery.apps.client import celery_app  # noqa: E402
@@ -306,7 +306,7 @@ def _test_client(
     _start_celery_workers: None,  # noqa: ARG001
 ) -> Generator[TestClient, None, None]:
     # In-process api_server. Use the versioned dispatcher so MT / EE
-    # builds get ee.onyx.main.get_application — that's the one that
+    # builds get loge.main.get_application — that's the one that
     # registers add_api_server_tenant_id_middleware (required to populate
     # CURRENT_TENANT_ID_CONTEXTVAR from the auth cookie in cloud mode).
     # `set_is_ee_if_available()` already ran at onyx.main module

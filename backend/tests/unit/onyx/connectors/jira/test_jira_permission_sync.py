@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.external_permissions.jira.doc_sync import jira_doc_sync
+from loge.external_permissions.jira.doc_sync import jira_doc_sync
 from onyx.connectors.jira.connector import JiraConnector
 from onyx.db.models import ConnectorCredentialPair
 from onyx.utils.sensitive import make_mock_sensitive_value

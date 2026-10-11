@@ -26,7 +26,7 @@ import httpx
 import pytest
 import redis
 
-from ee.onyx.server.license.models import LicenseMetadata, LicenseSource, PlanType
+from loge.server.license.models import LicenseMetadata, LicenseSource, PlanType
 from onyx.configs.app_configs import REDIS_DB_NUMBER, REDIS_HOST, REDIS_PORT
 from onyx.db.enums import AccountType
 from onyx.server.settings.models import ApplicationStatus

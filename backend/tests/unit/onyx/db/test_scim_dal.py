@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from ee.onyx.db.scim import ScimDAL
+from loge.db.scim import ScimDAL
 from onyx.db.enums import AccountType
 from onyx.db.models import ScimGroupMapping, ScimToken, ScimUserMapping, User
 from tests.unit.onyx.db.conftest import model_attrs
@@ -198,7 +198,7 @@ class TestScimDALUserRename:
     behind. The shared path locks and moves them.
     """
 
-    _RECONCILE = "ee.onyx.db.scim.reconcile_user_email__no_commit"
+    _RECONCILE = "loge.db.scim.reconcile_user_email__no_commit"
 
     def test_a_rename_delegates_to_the_locking_reconcile(
         self, scim_dal: ScimDAL, mock_db_session: MagicMock

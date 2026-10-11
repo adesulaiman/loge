@@ -15,7 +15,7 @@ from uuid import uuid4
 import pytest
 from fastapi import Response
 
-from ee.onyx.server.scim.api import (
+from loge.server.scim.api import (
     ScimJSONResponse,
     create_user,
     delete_user,
@@ -30,7 +30,7 @@ from ee.onyx.server.scim.api import (
     patch_user,
     replace_user,
 )
-from ee.onyx.server.scim.models import (
+from loge.server.scim.models import (
     SCIM_ENTERPRISE_USER_SCHEMA,
     SCIM_USER_SCHEMA,
     ScimEnterpriseExtension,
@@ -45,8 +45,8 @@ from ee.onyx.server.scim.models import (
     ScimPatchResourceValue,
     ScimUserResource,
 )
-from ee.onyx.server.scim.providers.base import ScimProvider
-from ee.onyx.server.scim.providers.entra import EntraProvider
+from loge.server.scim.providers.base import ScimProvider
+from loge.server.scim.providers.entra import EntraProvider
 from tests.unit.onyx.server.scim.conftest import (
     make_db_group,
     make_db_user,
@@ -118,7 +118,7 @@ class TestEntraServiceDiscovery:
 class TestEntraUserLifecycle:
     """Test user CRUD through Entra's lens: enterprise schemas, PascalCase ops."""
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_create_user_includes_enterprise_schema(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -141,7 +141,7 @@ class TestEntraUserLifecycle:
         assert SCIM_ENTERPRISE_USER_SCHEMA in resource.schemas
         assert SCIM_USER_SCHEMA in resource.schemas
 
-    @patch("ee.onyx.server.scim.api._check_seat_availability", return_value=None)
+    @patch("loge.server.scim.api._check_seat_availability", return_value=None)
     def test_create_user_with_enterprise_extension(
         self,
         mock_seats: MagicMock,  # noqa: ARG002
@@ -609,7 +609,7 @@ class TestEntraUserLifecycle:
         )
 
         with patch(
-            "ee.onyx.server.scim.api._check_seat_availability", return_value=None
+            "loge.server.scim.api._check_seat_availability", return_value=None
         ):
             result = create_user(
                 user_resource=resource,
@@ -712,7 +712,7 @@ class TestEntraGroupLifecycle:
         assert "members" not in parsed
         assert parsed["displayName"] == "Engineering"
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_patch_group_add_members_with_pascal_case(
         self,
         mock_apply: MagicMock,
@@ -756,7 +756,7 @@ class TestEntraGroupLifecycle:
         parse_scim_group(result)
         mock_dal.upsert_group_members.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_patch_group_remove_member_with_pascal_case(
         self,
         mock_apply: MagicMock,

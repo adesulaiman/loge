@@ -162,12 +162,12 @@ highest-value resource types, exercised by the escalation integration suite (man
   | File | New/Modified | This PR's slice |
   |------|--------------|-----------------|
   | `backend/onyx/db/persona.py` | modified | filter + `update_persona_access` MIT twin gate + owner carve-out (§11.5) |
-  | `backend/ee/onyx/db/persona.py` | modified | `update_persona_access` EE gate (lockstep signature) |
+  | `backend/loge/db/persona.py` | modified | `update_persona_access` EE gate (lockstep signature) |
   | `backend/onyx/db/skill.py` | modified | scoped admin-list path + `replace_skill_grants` GATE 2 + is_public toggle gate (§11.2) |
   | `backend/onyx/server/features/skill/api.py` | modified | re-point off curator dep; `allow_scope=True` by verb (DELETE stays admin-only) |
   | `backend/onyx/server/features/{tool,mcp}/api.py` | modified | `allow_scope=True` (reach + create); manage (edit/toggle/auth) stays **owner-or-admin** — agent-mediated GATE 2 dropped per **D8** |
   | `backend/onyx/db/tools.py` | modified | `can_manage_own_tool` / `can_manage_mcp_server` owner-or-admin gates (D8); agent-mediated scope kept only for *view* |
-  | `backend/ee/onyx/db/token_limit.py` | modified | managed-scope on group token-limit writes |
+  | `backend/loge/db/token_limit.py` | modified | managed-scope on group token-limit writes |
   | `backend/onyx/server/.../persona api` | modified | `ADD_AGENTS, allow_scope=True` deps |
   | `backend/tests/integration/.../test_group_manager_agents.py` | new | agent + skill + action escalation + ADD_AGENTS-owner no-regression + PAT narrowing |
   | `backend/onyx/db/feedback.py` | unchanged | NO CHANGE — admin-only, not in bundle (§11.7) |
@@ -182,7 +182,7 @@ highest-value resource types, exercised by the escalation integration suite (man
 
 ## PR 5 — Manager assignment & group-membership scoping (backend complete)
 - **Goal:** let admins/in-group managers create managers, and scope membership edits; expose the flag to clients.
-- **Scope (in):** `make_group_manager`/`revoke_group_manager` (`ee/onyx/db/user_group.py`) + recompute trigger
+- **Scope (in):** `make_group_manager`/`revoke_group_manager` (`loge/db/user_group.py`) + recompute trigger
   (extend `recompute_user_permissions__no_commit(user_ids, db_session)` to set `is_group_manager` — §11.7);
   gates in `update_user_group`/`add_users_to_user_group` (`group_id ∈ managed`) **plus a per-cc_pair GATE 2 on
   `update_user_group`'s `cc_pair_ids` re-attach (§11.6 — else a manager attaches out-of-scope connectors)**;
@@ -196,8 +196,8 @@ highest-value resource types, exercised by the escalation integration suite (man
 - **Files:**
   | File | New/Modified | This PR's slice |
   |------|--------------|-----------------|
-  | `backend/ee/onyx/db/user_group.py` | modified | make/revoke + membership gates |
-  | `backend/ee/onyx/server/user_group/api.py` | modified | allow_scope deps + manager-assign endpoint |
+  | `backend/loge/db/user_group.py` | modified | make/revoke + membership gates |
+  | `backend/loge/server/user_group/api.py` | modified | allow_scope deps + manager-assign endpoint |
   | `backend/onyx/server/.../permissions api` | modified | `/me/permissions` adds `is_manager` |
   | `backend/tests/integration/.../test_group_manager_membership.py` | new | assign authz + membership scope |
 - **Est. size:** ~400 LOC
@@ -218,12 +218,12 @@ highest-value resource types, exercised by the escalation integration suite (man
   |------|--------------|-----------------|
   | `web/src/lib/.../usePermissions.ts` | modified | `is_manager` flag |
   | `web/src/.../hasPermission.ts` | modified | manager nav visibility |
-  | `web/src/app/ee/admin/groups/[groupId]/...` | modified | Make/Revoke Manager toggle |
+  | `web/src/app/admin/groups/[groupId]/...` | modified | Make/Revoke Manager toggle |
   | `web/tests/e2e/.../group-manager.spec.ts` | new | assign → scoped pages visible |
 - **Est. size:** ~370 LOC
 - **Depends on:** PR 5
 - **Feature-flag state:** N/A — final wiring; feature fully live after merge.
 - **Tests on merge:** Playwright — admin assigns a manager on the group page; that user sees the scoped admin
   pages and only their group's resources; non-managed pages/resources hidden.
-- **Drift checkpoint:** confirm the group-detail page location under `web/src/app/ee/admin/groups/[groupId]/` and
+- **Drift checkpoint:** confirm the group-detail page location under `web/src/app/admin/groups/[groupId]/` and
   whether an old "Make Curator" affordance still exists to replace rather than add beside.

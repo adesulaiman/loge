@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from ee.onyx.connectors import capability_checks as ee_capability_checks
+from loge.connectors import capability_checks as ee_capability_checks
 from onyx.configs.constants import DocumentSource
 from onyx.connectors import source_operations as source_operations_module
 from onyx.connectors.capabilities import CredentialCapability

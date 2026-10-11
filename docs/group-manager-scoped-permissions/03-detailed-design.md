@@ -254,7 +254,7 @@ them.
 ### 2.6 Manager assignment helpers (EE)
 
 ```python
-# backend/ee/onyx/db/user_group.py
+# backend/loge/db/user_group.py
 def make_group_manager(db_session: Session, user_id: UUID, group_id: int) -> None:
     """Flip is_manager=true on the (user, group) row. Row must exist (a manager is a member).
     Idempotent. Used by the migration backfill helper and the assignment UI."""
@@ -329,7 +329,7 @@ def within_managed_scope_clause(
 | `backend/onyx/db/skill.py:260` (`list_skills_for_admin`) | none — unfiltered `select(Skill)` | **NEW scoped admin-list path**, not an `_add_user_filters` edit: scope clause over `Skill__UserGroup` (`is_public.is_(False)`), fail-closed, taken only when the caller is `SCOPED`. **Do NOT touch `_add_user_visibility_filter` (`skill.py:85`)** — it has no editable/viewing split and feeds the agent RUNTIME injection path. (§11.2) |
 | `backend/onyx/db/feedback.py:46` | admin-only (`FULL_ADMIN_PANEL_ACCESS`) | **NO CHANGE** — not in the bundle. (§11.7) |
 | `backend/onyx/db/credentials.py:41` | owner-keyed (`Credential.user_id==user.id`) | **NO CHANGE** — credentials stay owner-scoped; document the deliberate no-op. |
-| `backend/ee/onyx/db/token_limit.py` | no `_add_user_filters`; direct group query | enforce managed-scope in the group-token-limit **write/endpoint** path. Minor. |
+| `backend/loge/db/token_limit.py` | no `_add_user_filters`; direct group query | enforce managed-scope in the group-token-limit **write/endpoint** path. Minor. |
 
 **Fail-closed:** `scoped_group_ids_subquery` yields no rows for a non-manager, so `within_managed_scope_clause`
 contributes nothing — never an unfiltered statement.
@@ -404,7 +404,7 @@ model `db/pat.py`). A manager's **group** scope is never encoded in the token �
   holding the scoped `manage:*` tokens **for nav/visibility only** (real enforcement is backend GATE 2).
 - Sidebar (`Connectors`/`Document Sets`/`Groups`) shows for managers.
 - **Group detail page** — per-member "Make Manager" / "Revoke Manager" toggle (mirrors the old "Make Curator"
-  affordance), calling the new endpoint. Files under `web/src/app/ee/admin/groups/[groupId]/`.
+  affordance), calling the new endpoint. Files under `web/src/app/admin/groups/[groupId]/`.
 - The resource list pages (connectors / doc-sets / agents / skills) call backend list endpoints whose
   filters now return the manager-scoped set — no client-side scoping logic needed (and must not be relied on
   for security). **Exception: the GROUP list is NOT auto-scoped** — `fetch_user_groups` returns all groups
@@ -437,7 +437,7 @@ backend/
     db/tools.py                        ← MOD: owner-or-admin manage gates (D8); agent-mediated scope kept only for view (§11.1)
     server/.../{document_set,connector,cc_pair,persona}/api.py  ← MOD: allow_scope=True deps
     server/.../permissions api         ← MOD: /users/me/permissions adds is_manager
-  ee/onyx/
+  loge/
     db/user_group.py                   ← MOD: make/revoke_group_manager + gates in update/add_users
     db/persona.py                      ← MOD: update_persona_access gate
     db/token_limit.py                  ← MOD: managed-scope enforcement on group token-limit writes
@@ -622,7 +622,7 @@ capture. So is the reverse — sharing a public agent *into* a managed group —
 
 Plumbing (review-F2/F4/BR-3): thread the acting `user: User` into `update_persona_access` from all callers
 (`create_update_persona` `persona.py:384`, `update_persona_shared` `persona.py:472`, `update_group_agents`
-`user_group/api.py:269/281`); apply to BOTH `onyx/db/persona.py:273` (MIT) and `ee/onyx/db/persona.py:68` (EE);
+`user_group/api.py:269/281`); apply to BOTH `onyx/db/persona.py:273` (MIT) and `loge/db/persona.py:68` (EE);
 re-read current groups + `is_public` in-txn (don't trust caller flags). `is_public` stays owner/admin-gated
 (unchanged — `update_persona_shared`'s `is_owner_or_admin`). The group `/agents` roster surface uses the same
 manager-scope GATE 2 (target group ∈ managed) — §11.4.

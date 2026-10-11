@@ -103,7 +103,7 @@ class TestPostQueryChunkCensoring:
         )
 
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
+        "loge.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
     )
     def test_post_query_chunk_censoring_no_user(
         self, mock_get_sources: MagicMock
@@ -114,10 +114,10 @@ class TestPostQueryChunkCensoring:
         assert result == chunks
 
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
+        "loge.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
     )
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
+        "loge.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
     )
     def test_post_query_chunk_censoring_salesforce_censored(
         self, mock_censor_func: MagicMock, mock_get_sources: MagicMock
@@ -137,10 +137,10 @@ class TestPostQueryChunkCensoring:
         mock_censor_func_impl.assert_called_once()
 
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
+        "loge.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
     )
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
+        "loge.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
     )
     def test_post_query_chunk_censoring_salesforce_error(
         self, mock_censor_func: MagicMock, mock_get_sources: MagicMock
@@ -156,10 +156,10 @@ class TestPostQueryChunkCensoring:
         mock_censor_func_impl.assert_called_once()
 
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
+        "loge.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
     )
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
+        "loge.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
     )
     def test_post_query_chunk_censoring_no_censoring(
         self, mock_censor_func: MagicMock, mock_get_sources: MagicMock
@@ -174,10 +174,10 @@ class TestPostQueryChunkCensoring:
         mock_censor_func_impl.assert_not_called()
 
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
+        "loge.external_permissions.post_query_censoring._get_all_censoring_enabled_sources"
     )
     @patch(
-        "ee.onyx.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
+        "loge.external_permissions.post_query_censoring.DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION"
     )
     def test_post_query_chunk_censoring_order_maintained(
         self, mock_censor_func: MagicMock, mock_get_sources: MagicMock

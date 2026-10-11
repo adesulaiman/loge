@@ -91,7 +91,7 @@ deletion units.
 | POST | `/manage/admin/deletion-attempt` | `create_deletion_attempt_for_connector_id` | `server/manage/administrative.py`. **The real deletion trigger.** Needs `CCPairAccessLevel.EDIT` on the pair. |
 | POST, GET | `/manage/admin/indexing/targeted-reindex`, `/manage/admin/indexing/targeted-reindex/{job_id}` | `server/documents/targeted_reindex.py` | Reindex only the documents that previously failed, and read the job. |
 | POST, GET | `/manage/admin/credential/{id}/capability-check`, `/capability-report`, `/manage/admin/credential/capability-reports`, `/manage/admin/credential/{id}/binding-check` | `server/documents/credential_capabilities.py` | Test a credential/connector combination without indexing. See [[connectors]] §4.8. |
-| GET, PUT | `/manage/admin/cc-pair/{id}/data-access`, `/manage-access`; GET `/manage/admin/manage-access-prefill` | `ee/onyx/server/documents/cc_pair.py` | EE only. Data-access groups decide who reads the pair's documents. Manage-access groups, each with a role, decide who administers it. See [[access-control]]. |
+| GET, PUT | `/manage/admin/cc-pair/{id}/data-access`, `/manage-access`; GET `/manage/admin/manage-access-prefill` | `loge/server/documents/cc_pair.py` | EE only. Data-access groups decide who reads the pair's documents. Manage-access groups, each with a role, decide who administers it. See [[access-control]]. |
 
 ### Environment / config
 
@@ -236,7 +236,7 @@ then inserts the `ConnectorCredentialPair` row with `status=SCHEDULED`. The gate
 `encrypt_string_to_bytes` (`utils/encryption.py`), which is a
 `fetch_versioned_implementation` dispatch:
 
-- **EE (`backend/ee/onyx/utils/encryption.py:_encrypt_string`)**: real AES-CBC
+- **EE (`backend/loge/utils/encryption.py:_encrypt_string`)**: real AES-CBC
   with a random IV per value, keyed off `ENCRYPTION_KEY_SECRET` trimmed to a
   valid AES key size (`_get_trimmed_key`).
 - **CE (`backend/onyx/utils/encryption.py:_encrypt_string`)**: a passthrough.
@@ -253,7 +253,7 @@ copies `./ee` to `/app/ee`), so `fetch_versioned_implementation` resolves the
 EE symbol and real AES encryption runs with or without a license.
 
 The CE passthrough is therefore reached only when EE code is genuinely absent:
-an image built without `ee/onyx`. In that build
+an image built without `loge`. In that build
 credentials are stored unencrypted and the only signal is a log warning.
 
 On read, `process_result_value` never decrypts eagerly. It wraps the encrypted
@@ -385,11 +385,11 @@ It does not block the delete call; see §9.
    credential-reading endpoint must call `.get_value(apply_mask=...)`
    explicitly (the type system forces this) and must default to masked.
 3. **Encryption depends on whether EE code is loaded, not on the
-   license.** Real AES-CBC lives only in `ee/onyx/utils/encryption.py`; the
+   license.** Real AES-CBC lives only in `loge/utils/encryption.py`; the
    `onyx/utils/encryption.py` implementation is a passthrough. Dispatch goes
    through `fetch_versioned_implementation`, and EE code loads by default
    because the image ships `ee/` and `set_is_ee_if_available` loads it when
-   present. So a standard deployment does encrypt. A build without `ee/onyx`
+   present. So a standard deployment does encrypt. A build without `loge`
    silently stores plaintext. Any change
    to `set_is_ee_if_available`, to `is_ee_available`, or to the Dockerfile's
    `ee` copy changes credential encryption for every existing deployment.
@@ -407,7 +407,7 @@ It does not block the delete call; see §9.
    [[permission-sync]] is the source of truth for who can see its documents;
    `PUBLIC` and `PRIVATE` never consult external permissions. For `SYNC_RESTRICTED`, only members of the pair's data-access groups can see the documents their source ACL allows.
    One code path changes `access_type` on an existing pair: the Community
-   downgrade (`ee/onyx/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`)
+   downgrade (`loge/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`)
    sets every pair that is not `PUBLIC` to `PUBLIC`. It also clears
    `auto_sync_options`, `last_time_perm_sync` and `last_time_external_group_sync`,
    deletes the pair's `user_group__cc_pair_data_access` rows, and marks the
@@ -470,7 +470,7 @@ It does not block the delete call; see §9.
 |---|---|
 | adds a field to `connector_specific_config` | The connector implementation that reads it ([[connectors]]), the add-connector form schema in `web/src/views/admin/connectors/AddConnectorPage/`, and whether the field is a secret that belongs in `credential_json` instead. |
 | changes credential encryption (`utils/encryption.py`, EE variant, or `rotate_encryption_key.py`) | Both CE and EE code paths; `SensitiveValue`'s `is_json` branch; every `.get_value(apply_mask=...)` call site (there are 60+) still needs to decrypt correctly; run a rotation dry-run against a populated `credential` table. |
-| changes `AccessType` (adding a value, changing semantics) | [[permission-sync]] (what `SYNC` means to it), [[access-control]] (`build_only_permission_sync_included_where`-style clauses in `connector_credential_pair.py`), and every place that special-cases `PUBLIC`/`SYNC` in a `where_clause`. Also the Community downgrade (`ee/onyx/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`) and `has_perm_synced_cc_pairs`. |
+| changes `AccessType` (adding a value, changing semantics) | [[permission-sync]] (what `SYNC` means to it), [[access-control]] (`build_only_permission_sync_included_where`-style clauses in `connector_credential_pair.py`), and every place that special-cases `PUBLIC`/`SYNC` in a `where_clause`. Also the Community downgrade (`loge/db/community_downgrade.py:make_all_cc_pairs_public__no_commit`) and `has_perm_synced_cc_pairs`. |
 | changes the deletion flow | The orphan-document invariant (§5.4) above all else; `sync_record` progress reporting; the Redis fence keys in `RedisConnector.delete`; whether `Connector`/`Credential` cascade rules still hold. |
 | changes `ConnectorCredentialPairStatus` (adding/removing a value) | `active_statuses()`, `indexable_statuses()`, `is_active()`, every `status.in_([...])` check in `connector_credential_pair.py` and the deletion/indexing task modules, and the frontend status badge components under `web/src/app/admin/connector/`. |
 | changes `ConnectorCredentialPair.id` vs `(connector_id, credential_id)` usage | Every join table above uses `id`; `document_by_connector_credential_pair` uses the composite pair directly. Mixing the two silently orphans rows. |

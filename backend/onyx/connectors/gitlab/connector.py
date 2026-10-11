@@ -1,4 +1,3 @@
-import fnmatch
 import itertools
 from collections import deque
 from collections.abc import Iterable, Iterator
@@ -9,11 +8,13 @@ import gitlab
 import pytz
 from gitlab.v4.objects import Project
 
-from onyx.configs.app_configs import (
-    GITLAB_CONNECTOR_INCLUDE_CODE_FILES,
-    INDEX_BATCH_SIZE,
-)
+from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
+from onyx.connectors.cross_connector_utils.git_indexable_files import (
+    BRANCH_MODE_ALL,
+    BRANCH_MODE_SINGLE,
+    is_indexable_path,
+)
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import time_str_to_utc
 from onyx.connectors.interfaces import (
     GenerateDocumentsOutput,
@@ -35,14 +36,6 @@ T = TypeVar("T")
 
 
 logger = setup_logger()
-
-# List of directories/Files to exclude
-exclude_patterns = [
-    "logs",
-    ".github/",
-    ".gitlab/",
-    ".pre-commit-config.yaml",
-]
 
 
 def _batch_gitlab_objects(git_objs: Iterable[T], batch_size: int) -> Iterator[list[T]]:
@@ -112,42 +105,42 @@ def _convert_issue_to_document(issue: Any) -> Document:
 
 
 def _convert_code_to_document(
-    project: Project, file: Any, url: str, projectName: str, projectOwner: str
-) -> Document:
-    # Dynamically get the default branch from the project object
-    default_branch = project.default_branch
+    project: Project,
+    file: Any,
+    url: str,
+    project_name: str,
+    project_owner: str,
+    branch: str,
+) -> Document | None:
+    """Build a Document from one blob at a branch tip. Skips non-text files."""
+    size = file.get("size")
+    path = file["path"]
+    if not is_indexable_path(path, size if isinstance(size, int) else None):
+        return None
 
-    # Fetch the file content using the correct branch
-    file_content_obj = project.files.get(
-        file_path=file["path"],
-        ref=default_branch,  # Use the default branch
-    )
+    file_content_obj = project.files.get(file_path=path, ref=branch)
     try:
         file_content = file_content_obj.decode().decode("utf-8")
     except UnicodeDecodeError:
         file_content = file_content_obj.decode().decode("latin-1")
 
-    # Construct the file URL dynamically using the default branch
-    file_url = (
-        f"{url}/{projectOwner}/{projectName}/-/blob/{default_branch}/{file['path']}"
-    )
+    file_url = f"{url}/{project_owner}/{project_name}/-/blob/{branch}/{path}"
 
-    # Create and return a Document object
-    doc = Document(
-        id=file["id"],
+    return Document(
+        # Id includes the branch so the same path on two tips is two documents.
+        id=file_url,
         sections=[TextSection(link=file_url, text=file_content)],
         source=DocumentSource.GITLAB,
-        semantic_identifier=file["name"],
+        semantic_identifier=path,
         doc_updated_at=datetime.now().replace(tzinfo=timezone.utc),
-        primary_owners=[],  # Add owners if needed
-        metadata={"type": "CodeFile"},
+        primary_owners=[],
+        metadata={
+            "type": "CodeFile",
+            "object_type": "File",
+            "path": path,
+            "branch": branch,
+        },
     )
-    return doc
-
-
-def _should_exclude(path: str) -> bool:
-    """Check if a path matches any of the exclude patterns."""
-    return any(fnmatch.fnmatch(path, pattern) for pattern in exclude_patterns)
 
 
 class GitlabConnector(LoadConnector, PollConnector):
@@ -157,9 +150,11 @@ class GitlabConnector(LoadConnector, PollConnector):
         project_name: str,
         batch_size: int = INDEX_BATCH_SIZE,
         state_filter: str = "all",
-        include_mrs: bool = True,
-        include_issues: bool = True,
-        include_code_files: bool = GITLAB_CONNECTOR_INCLUDE_CODE_FILES,
+        include_mrs: bool = False,
+        include_issues: bool = False,
+        include_code_files: bool = True,
+        branch_mode: str = BRANCH_MODE_SINGLE,
+        branch: str | None = None,
     ) -> None:
         self.project_owner = project_owner
         self.project_name = project_name
@@ -168,6 +163,11 @@ class GitlabConnector(LoadConnector, PollConnector):
         self.include_mrs = include_mrs
         self.include_issues = include_issues
         self.include_code_files = include_code_files
+        mode = (branch_mode or BRANCH_MODE_SINGLE).strip().lower()
+        self.branch_mode = (
+            BRANCH_MODE_ALL if mode == BRANCH_MODE_ALL else BRANCH_MODE_SINGLE
+        )
+        self.branch = (branch or "").strip() or None
         self.gitlab_client: gitlab.Gitlab | None = None
 
     def load_credentials(self, credentials: dict[str, Any]) -> dict[str, Any] | None:
@@ -175,6 +175,48 @@ class GitlabConnector(LoadConnector, PollConnector):
             credentials["gitlab_url"], private_token=credentials["gitlab_access_token"]
         )
         return None
+
+    def _resolve_branches(self, project: Project) -> list[str]:
+        if self.branch_mode == BRANCH_MODE_ALL:
+            names = sorted(
+                {branch.name for branch in project.branches.list(iterator=True)}
+            )
+            if names:
+                return names
+            return [project.default_branch] if project.default_branch else []
+        return [self.branch or project.default_branch]
+
+    def _fetch_code_files_for_branch(
+        self, project: Project, branch: str
+    ) -> GenerateDocumentsOutput:
+        assert self.gitlab_client is not None
+        # BFS: recursive repository_tree is slow on large projects.
+        queue: deque[str] = deque([""])
+        while queue:
+            current_path = queue.popleft()
+            files = project.repository_tree(
+                path=current_path, ref=branch, all=True
+            )
+            for file_batch in _batch_gitlab_objects(files, self.batch_size):
+                code_doc_batch: list[Document | HierarchyNode] = []
+                for file in file_batch:
+                    if file["type"] == "tree":
+                        queue.append(file["path"])
+                        continue
+                    if file["type"] != "blob":
+                        continue
+                    doc = _convert_code_to_document(
+                        project,
+                        file,
+                        self.gitlab_client.url,
+                        self.project_name,
+                        self.project_owner,
+                        branch,
+                    )
+                    if doc is not None:
+                        code_doc_batch.append(doc)
+                if code_doc_batch:
+                    yield code_doc_batch
 
     def _fetch_from_gitlab(
         self, start: datetime | None = None, end: datetime | None = None
@@ -185,34 +227,15 @@ class GitlabConnector(LoadConnector, PollConnector):
             f"{self.project_owner}/{self.project_name}"
         )
 
-        # Fetch code files
         if self.include_code_files:
-            # Fetching using BFS as project.report_tree with recursion causing slow load
-            queue = deque([""])  # Start with the root directory
-            while queue:
-                current_path = queue.popleft()
-                files = project.repository_tree(path=current_path, all=True)
-                for file_batch in _batch_gitlab_objects(files, self.batch_size):
-                    code_doc_batch: list[Document | HierarchyNode] = []
-                    for file in file_batch:
-                        if _should_exclude(file["path"]):
-                            continue
-
-                        if file["type"] == "blob":
-                            code_doc_batch.append(
-                                _convert_code_to_document(
-                                    project,
-                                    file,
-                                    self.gitlab_client.url,
-                                    self.project_name,
-                                    self.project_owner,
-                                )
-                            )
-                        elif file["type"] == "tree":
-                            queue.append(file["path"])
-
-                    if code_doc_batch:
-                        yield code_doc_batch
+            for branch in self._resolve_branches(project):
+                logger.info(
+                    "Indexing GitLab tip for %s/%s branch %s",
+                    self.project_owner,
+                    self.project_name,
+                    branch,
+                )
+                yield from self._fetch_code_files_for_branch(project, branch)
 
         if self.include_mrs:
             merge_requests = project.mergerequests.list(
@@ -274,14 +297,13 @@ if __name__ == "__main__":
     import os
 
     connector = GitlabConnector(
-        # gitlab_url="https://gitlab.com/api/v4",
         project_owner=os.environ["PROJECT_OWNER"],
         project_name=os.environ["PROJECT_NAME"],
         batch_size=10,
         state_filter="all",
-        include_mrs=True,
-        include_issues=True,
-        include_code_files=GITLAB_CONNECTOR_INCLUDE_CODE_FILES,
+        include_mrs=False,
+        include_issues=False,
+        include_code_files=True,
     )
 
     connector.load_credentials(

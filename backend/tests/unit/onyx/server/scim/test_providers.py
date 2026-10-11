@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 
-from ee.onyx.server.scim.models import (
+from loge.server.scim.models import (
     SCIM_ENTERPRISE_USER_SCHEMA,
     SCIM_USER_SCHEMA,
     ScimEmail,
@@ -12,15 +12,15 @@ from ee.onyx.server.scim.models import (
     ScimUserGroupRef,
     ScimUserResource,
 )
-from ee.onyx.server.scim.providers.base import (
+from loge.server.scim.providers.base import (
     COMMON_IGNORED_PATCH_PATHS,
     get_default_provider,
 )
-from ee.onyx.server.scim.providers.entra import (
+from loge.server.scim.providers.entra import (
     _ENTRA_IGNORED_PATCH_PATHS,
     EntraProvider,
 )
-from ee.onyx.server.scim.providers.okta import OktaProvider
+from loge.server.scim.providers.okta import OktaProvider
 
 
 def _make_mock_user(

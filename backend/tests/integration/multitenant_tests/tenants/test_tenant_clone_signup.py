@@ -11,8 +11,8 @@ from uuid import uuid4
 from sqlalchemy import column, delete, select, table
 from sqlalchemy.orm import Session
 
-from ee.onyx.db import tenant_snapshot
-from ee.onyx.db.user_tenant_mapping import get_tenant_id_for_email
+from loge.db import tenant_snapshot
+from loge.db.user_tenant_mapping import get_tenant_id_for_email
 from onyx.db.engine.shard_routing import get_shard_for_tenant
 from onyx.db.engine.sql_engine import get_catalog_session, get_session_with_tenant
 from onyx.db.models import AvailableTenant, Skill

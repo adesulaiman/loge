@@ -10,9 +10,9 @@
 **Edition:** EE only. Self-hosted billing and cloud billing share one API surface
 but route to different backends.
 **Owns:**
-`backend/ee/onyx/server/billing/` (`api.py`, `service.py`, `billing_cache.py`,
-`models.py`), `backend/ee/onyx/server/license/` (`api.py`, `models.py`),
-`backend/ee/onyx/utils/tier.py`, `backend/onyx/server/settings/tier_order.py`,
+`backend/loge/server/billing/` (`api.py`, `service.py`, `billing_cache.py`,
+`models.py`), `backend/loge/server/license/` (`api.py`, `models.py`),
+`backend/loge/utils/tier.py`, `backend/onyx/server/settings/tier_order.py`,
 `backend/onyx/db/models.py:License`, `web/src/app/admin/billing/` (`page.tsx`,
 `PlansView.tsx`, `CheckoutView.tsx`, `BillingDetailsView.tsx`,
 `LicenseActivationCard.tsx`), `web/src/lib/billing/` (`svc.ts`, `types.ts`)
@@ -45,7 +45,7 @@ upgraded (see §5). Billing, auth, and user-management routes stay open.
 ## 2. Surfaces
 
 ### HTTP endpoints, unified billing (router prefix `/admin/billing`,
-`backend/ee/onyx/server/billing/api.py`)
+`backend/loge/server/billing/api.py`)
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
@@ -61,7 +61,7 @@ All authenticated handlers gate on
 `require_permission(Permission.FULL_ADMIN_PANEL_ACCESS)`.
 
 ### License endpoints (router prefix `/license`, self-hosted only,
-`backend/ee/onyx/server/license/api.py`)
+`backend/loge/server/license/api.py`)
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
@@ -76,7 +76,7 @@ All authenticated handlers gate on
 All of these gate on `FULL_ADMIN_PANEL_ACCESS` too, and are sync `def` (not
 `async def`) because the work is blocking: `requests` calls, sync SQLAlchemy,
 RSA signature verification (module docstring,
-`backend/ee/onyx/server/license/api.py`).
+`backend/loge/server/license/api.py`).
 
 ### Frontend routes to backend
 
@@ -91,7 +91,7 @@ throw if `NEXT_PUBLIC_CLOUD_ENABLED` is true.
 | Variable | Read in | Effect |
 |---|---|---|
 | `MULTI_TENANT` | `shared_configs/configs.py` | Selects the cloud vs. self-hosted branch throughout this component. |
-| `CLOUD_DATA_PLANE_URL` | `ee/onyx/configs/app_configs.py` | Default `https://cloud.onyx.app/api`. Self-hosted proxy target for `/proxy/claim-license`, `/proxy/create-checkout-session`, etc. |
+| `CLOUD_DATA_PLANE_URL` | `loge/configs/app_configs.py` | Default `https://cloud.onyx.app/api`. Self-hosted proxy target for `/proxy/claim-license`, `/proxy/create-checkout-session`, etc. |
 | `CONTROL_PLANE_API_BASE_URL` | `onyx/configs/app_configs.py` | Default `http://localhost:8082`. Cloud's direct billing target. |
 | `BILLING_CACHE_TTL_SECONDS` | `onyx/configs/app_configs.py`, read by `billing_cache.py` | Default 3600. TTL for the per-tenant billing-info cache (§5). |
 | `STRIPE_PUBLISHABLE_KEY` (config name `STRIPE_PUBLISHABLE_KEY_OVERRIDE`), `STRIPE_PUBLISHABLE_KEY_URL` | `onyx/configs/app_configs.py` | The env override takes priority over the S3-hosted key. |
@@ -104,17 +104,17 @@ throw if `NEXT_PUBLIC_CLOUD_ENABLED` is true.
   (`Index("idx_license_singleton", text("(true)"), unique=True)`). Stores the
   raw signed license blob (`license_data: str`) plus timestamps. There is no
   parsed/structured license table; the payload is decoded and verified on
-  read (`ee/onyx/utils/license.py`), and its parsed form
-  (`ee/onyx/server/license/models.py:LicenseMetadata`) is cached in Redis, not
+  read (`loge/utils/license.py`), and its parsed form
+  (`loge/server/license/models.py:LicenseMetadata`) is cached in Redis, not
   Postgres.
 - No dedicated seat table. Seats are counted live:
-  `ee/onyx/db/license.py:get_used_seats` counts active `UserTenantMapping`
+  `loge/db/license.py:get_used_seats` counts active `UserTenantMapping`
   rows on cloud (`MULTI_TENANT`), keeping only rows whose `User` is active and
   excluding the anonymous user
-  (`ee/onyx/db/user_tenant_mapping.py:get_tenant_count`). On self-hosted it
+  (`loge/db/user_tenant_mapping.py:get_tenant_count`). On self-hosted it
   counts active `User` rows excluding `AccountType.EXT_PERM_USER`,
   `AccountType.SERVICE_ACCOUNT`, and the anonymous user.
-  `ee/onyx/db/license.py:user_counts_toward_seats`
+  `loge/db/license.py:user_counts_toward_seats`
   is the per-user predicate kept manually in sync with that query's filter.
 - No local subscription/plan table on either deployment type. Cloud billing
   state (Stripe subscription id, status, period dates, seats) lives entirely
@@ -123,16 +123,16 @@ throw if `NEXT_PUBLIC_CLOUD_ENABLED` is true.
   billing; it is not part of this component's data model.
 - Redis keys: `billing:info:{tenant_id}` (`billing_cache.py:BILLING_CACHE_KEY`),
   the admin-page cache `billing-information:v1`
-  (`ee/onyx/server/billing/api.py:BILLING_INFO_CACHE_KEY`), the self-hosted
+  (`loge/server/billing/api.py:BILLING_INFO_CACHE_KEY`), the self-hosted
   circuit breaker `billing_circuit_open`
-  (`ee/onyx/server/billing/api.py:BILLING_CIRCUIT_BREAKER_KEY`), and the
-  license metadata cache read by `ee/onyx/db/license.py:get_cached_license_metadata`.
+  (`loge/server/billing/api.py:BILLING_CIRCUIT_BREAKER_KEY`), and the
+  license metadata cache read by `loge/db/license.py:get_cached_license_metadata`.
 
 ---
 
 ## 4. How it works
 
-### 4.1 Tier resolution (`ee/onyx/utils/tier.py:get_tier`)
+### 4.1 Tier resolution (`loge/utils/tier.py:get_tier`)
 
 ```
 get_tier(tenant_id=None)
@@ -149,12 +149,12 @@ get_tier(tenant_id=None)
       (a Redis write failure after a good refresh still returns the fresh tier)
 ```
 
-`tier_from_license_metadata` (`ee/onyx/utils/tier.py:tier_from_license_metadata`)
+`tier_from_license_metadata` (`loge/utils/tier.py:tier_from_license_metadata`)
 maps `LicenseMetadata` to `Tier`: `ApplicationStatus.GATED_ACCESS` forces
 `Tier.COMMUNITY`; a missing or unrecognized `customer_tier` (legacy licenses
 predate the field) defaults to `Tier.ENTERPRISE` for backward compatibility.
 `_CUSTOMER_TIER_TO_TIER` maps the two paid wire values
-(`ee/onyx/server/license/models.py:CustomerTier.BUSINESS`,
+(`loge/server/license/models.py:CustomerTier.BUSINESS`,
 `CustomerTier.ENTERPRISE`) to `onyx/server/settings/models.py:Tier`. There is
 no `CustomerTier.COMMUNITY`: Community is the absence of a paid tier, never a
 value the control plane sends.
@@ -173,7 +173,7 @@ POST /license/claim {session_id?}
        (re-authenticates using the currently stored license blob)
   -> invalidate_billing_info_cache()   # a Stripe-side change makes the plan snapshot stale
 ```
-(`ee/onyx/server/license/api.py:claim_license`)
+(`loge/server/license/api.py:claim_license`)
 
 The frontend calls this after Stripe checkout redirects back
 (`web/src/app/admin/billing/page.tsx` retries claim up to 3 times with 2s
@@ -182,9 +182,9 @@ and again on `/seats/update` (the control plane regenerates the license
 after a seat change; the frontend polls `/license/claim` after a short
 delay rather than the seat-update endpoint returning the new license
 inline, per the comment in
-`ee/onyx/server/billing/api.py:update_seats`).
+`loge/server/billing/api.py:update_seats`).
 
-### 4.3 Checkout and portal (`ee/onyx/server/billing/service.py`)
+### 4.3 Checkout and portal (`loge/server/billing/service.py`)
 
 The unified `/admin/billing` handlers, for both self-hosted and cloud, funnel through
 `_make_billing_request` (`service.py:_make_billing_request`), which picks a
@@ -199,10 +199,10 @@ base URL and auth scheme by deployment type:
 The external payment provider is Stripe throughout; this codebase never
 calls Stripe's API directly, only the control plane, which owns the Stripe
 integration. `create_checkout_session` returns a `stripe_checkout_url`
-(`ee/onyx/server/billing/models.py:CreateCheckoutSessionResponse`);
+(`loge/server/billing/models.py:CreateCheckoutSessionResponse`);
 `create_customer_portal_session` returns a `stripe_customer_portal_url`, with
 an optional `flow_type=payment_method_update` to deep-link straight to the
-add-card screen (`ee/onyx/server/billing/models.py:StripePortalFlowType`).
+add-card screen (`loge/server/billing/models.py:StripePortalFlowType`).
 
 ### 4.4 Seat validation
 
@@ -210,7 +210,7 @@ Both `/admin/billing/create-checkout-session` and `/admin/billing/seats/update`
 compare the requested seat count against `get_used_seats()` before calling
 the service layer, and reject with `OnyxErrorCode.VALIDATION_ERROR` if the
 request would under-provision seats already in use
-(`ee/onyx/server/billing/api.py:create_checkout_session`,
+(`loge/server/billing/api.py:create_checkout_session`,
 `:update_seats`). This is a client-request-time check; it does not by itself
 prevent seats going over the limit through other means (a license swap, a
 control-plane-side downgrade) - that is enforced separately by
@@ -219,20 +219,20 @@ control-plane-side downgrade) - that is enforced separately by
 ### 4.5 Community downgrade (self-hosted)
 
 ```
-POST /license/downgrade                       ee/onyx/server/license/api.py:downgrade_to_community
+POST /license/downgrade                       loge/server/license/api.py:downgrade_to_community
   MULTI_TENANT -> OnyxError(VALIDATION_ERROR)
-  make_all_cc_pairs_public__no_commit         ee/onyx/db/community_downgrade.py
-  remove_custom_user_groups__no_commit        ee/onyx/db/community_downgrade.py
-  disable_paid_features__no_commit            ee/onyx/db/community_downgrade.py
+  make_all_cc_pairs_public__no_commit         loge/db/community_downgrade.py
+  remove_custom_user_groups__no_commit        loge/db/community_downgrade.py
+  disable_paid_features__no_commit            loge/db/community_downgrade.py
   db_session.commit()                         one commit for the three steps
-  reset_settings()                            ee/onyx/server/enterprise_settings/store.py
+  reset_settings()                            loge/server/enterprise_settings/store.py
   clear_chat_retention()                      onyx/server/settings/store.py
-  delete_license(db_session)                  ee/onyx/db/license.py
+  delete_license(db_session)                  loge/db/license.py
   -> CommunityDowngradeResponse(connectors_made_public, user_groups_removed)
 ```
 
 The route is under `/license`, which is in `LICENSE_ENFORCEMENT_ALLOWED_PREFIXES`
-(`ee/onyx/configs/license_enforcement_config.py`). An admin can call it while an
+(`loge/configs/license_enforcement_config.py`). An admin can call it while an
 expired license gates the other routes.
 
 Two entry points open `web/src/sections/modals/DowngradeToCommunityModal.tsx`,
@@ -279,19 +279,19 @@ calls `web/src/lib/billing/svc.ts:downgradeToCommunity` and reloads the page.
    (control plane), never a guessed tier.
 2. **Tier resolution fails toward the lower tier, never the higher one.**
    Self-hosted: a DB read failure (missing table, `SQLAlchemyError`) returns
-   `Tier.COMMUNITY` (`ee/onyx/utils/tier.py:_self_hosted_tier`). Cloud: a
+   `Tier.COMMUNITY` (`loge/utils/tier.py:_self_hosted_tier`). Cloud: a
    Redis read failure or a control-plane lookup failure returns `Tier.BUSINESS`
-   (`ee/onyx/utils/tier.py:get_tier`), which is the cloud floor tier (cloud
+   (`loge/utils/tier.py:get_tier`), which is the cloud floor tier (cloud
    has no `Tier.COMMUNITY`; the public schema itself resolves to `BUSINESS`
    unconditionally). Neither path can fail toward `ENTERPRISE`.
 3. **`apply_license_status_to_settings` fails closed on cache failure, explicitly.**
-   `ee/onyx/server/settings/api.py:apply_license_status_to_settings` catches
+   `loge/server/settings/api.py:apply_license_status_to_settings` catches
    `CACHE_TRANSIENT_ERRORS`, sets `ee_features_enabled` to `False` and `tier`
    to `Tier.COMMUNITY`, with the comment "Fail closed - disable EE features if
    we can't verify license." This is a different failure
    mode from point 4 below; do not conflate the two.
 4. **The self-hosted license-enforcement middleware fails *open* on cache
-   transient errors, deliberately.** `ee/onyx/server/middleware/license_enforcement.py`
+   transient errors, deliberately.** `loge/server/middleware/license_enforcement.py`
    catches `CACHE_TRANSIENT_ERRORS` around its metadata read and sets
    `is_gated = False` with the comment "Fail open - don't block users due to
    cache connectivity issues." This governs whether a request is *blocked*
@@ -317,7 +317,7 @@ calls `web/src/lib/billing/svc.ts:downgradeToCommunity` and reloads the page.
 8. **EE code loading, license validity, and tier are three separate
    questions.** Per [[editions-and-gating]]: `global_version.is_ee_version()`
    only says `ee.<module>` imported. `ee_features_enabled` on `GET /settings`
-   (`ee/onyx/server/settings/api.py:apply_license_status_to_settings`) says
+   (`loge/server/settings/api.py:apply_license_status_to_settings`) says
    whether the deployment may use paid features at all (a boolean gate).
    `get_tier()` says *which* tier, for tier-specific behavior
    (`tier_at_least`). A change must not conflate these, e.g. gating a
@@ -326,7 +326,7 @@ calls `web/src/lib/billing/svc.ts:downgradeToCommunity` and reloads the page.
    incorrectly if such a state existed; always use `tier_at_least(get_tier(),
    Tier.X)` for tier-specific gates.
 9. **The Community downgrade deletes the license last.**
-   `ee/onyx/server/license/api.py:downgrade_to_community` commits the database
+   `loge/server/license/api.py:downgrade_to_community` commits the database
    changes and resets the settings before it calls `delete_license`. A failure
    before that call leaves a licensed deployment, and a second call completes
    the downgrade. A change that deletes the license earlier breaks this.
@@ -378,20 +378,20 @@ calls `web/src/lib/billing/svc.ts:downgradeToCommunity` and reloads the page.
 ### Tests
 
 ```bash
-cd backend && uv run pytest tests/unit/ee/onyx/server/billing/test_billing_api.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/billing/test_billing_service.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/billing/test_billing_cache.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/billing/test_proxy.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/license/test_api.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/tenants/test_billing_api.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/tenants/test_billing_seat_enforcement.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/middleware/test_license_enforcement.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/settings/test_license_enforcement_settings.py
-cd backend && uv run pytest tests/unit/ee/onyx/utils/test_tier.py
-cd backend && uv run pytest tests/unit/ee/onyx/db/test_license.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/db/test_community_downgrade.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/db/test_community_downgrade_groups.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/db/test_community_downgrade_paid_features.py
+cd backend && uv run pytest tests/unit/loge/server/billing/test_billing_api.py
+cd backend && uv run pytest tests/unit/loge/server/billing/test_billing_service.py
+cd backend && uv run pytest tests/unit/loge/server/billing/test_billing_cache.py
+cd backend && uv run pytest tests/unit/loge/server/billing/test_proxy.py
+cd backend && uv run pytest tests/unit/loge/server/license/test_api.py
+cd backend && uv run pytest tests/unit/loge/server/tenants/test_billing_api.py
+cd backend && uv run pytest tests/unit/loge/server/tenants/test_billing_seat_enforcement.py
+cd backend && uv run pytest tests/unit/loge/server/middleware/test_license_enforcement.py
+cd backend && uv run pytest tests/unit/loge/server/settings/test_license_enforcement_settings.py
+cd backend && uv run pytest tests/unit/loge/utils/test_tier.py
+cd backend && uv run pytest tests/unit/loge/db/test_license.py
+cd backend && uv run pytest tests/external_dependency_unit/loge/db/test_community_downgrade.py
+cd backend && uv run pytest tests/external_dependency_unit/loge/db/test_community_downgrade_groups.py
+cd backend && uv run pytest tests/external_dependency_unit/loge/db/test_community_downgrade_paid_features.py
 ```
 
 Frontend:
@@ -423,7 +423,7 @@ not.
 
 ## 9. Footguns
 
-- **A directory under `web/src/app/ee/admin/` is reachable only if its path is in
+- **A directory under `web/src/app/admin/` is reachable only if its path is in
   `web/src/proxy.ts:EE_ROUTES`.** The billing route `/admin/billing`
   (`ADMIN_ROUTES.BILLING`, `web/src/lib/admin-routes.ts`) is not in `EE_ROUTES`.
   The page lives in `web/src/app/admin/billing/`: `page.tsx`, `PlansView.tsx`,

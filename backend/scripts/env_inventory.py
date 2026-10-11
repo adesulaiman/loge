@@ -401,7 +401,7 @@ def collect_reads() -> list[EnvRead]:
             continue
         for path in iter_python_files(root):
             rel = str(path.relative_to(REPO_ROOT))
-            is_ee = "/ee/" in f"/{rel}" or rel.startswith("backend/ee/")
+            is_ee = "/ee/" in f"/{rel}" or rel.startswith("backend/loge/")
             try:
                 tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
             except SyntaxError:

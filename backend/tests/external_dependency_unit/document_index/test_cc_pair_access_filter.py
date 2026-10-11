@@ -14,11 +14,11 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.cc_pair_data_access import (
+from loge.db.cc_pair_data_access import (
     fetch_data_access_cc_pair_ids_for_user_group,
     set_cc_pair_data_access_groups__no_commit,
 )
-from ee.onyx.db.user_group import prepare_user_group_for_deletion
+from loge.db.user_group import prepare_user_group_for_deletion
 from onyx.access.access import get_access_for_documents, user_can_access_chat_file
 from onyx.access.cc_pair_access import get_cc_pair_access_mode
 from onyx.access.models import DocumentAccess

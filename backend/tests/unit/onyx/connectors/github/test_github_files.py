@@ -27,23 +27,27 @@ from tests.unit.onyx.connectors.utils import load_everything_from_checkpoint_con
         ("docs/guide.mdx", 100, True),
         ("notes.txt", 100, True),
         ("manual.rst", 100, True),
-        # disallowed extension (source code is intentionally excluded)
-        ("main.py", 100, False),
+        # source / config text at the branch tip is indexable knowledge
+        ("main.py", 100, True),
+        ("src/app.ts", 100, True),
+        ("script.sh", 100, True),
+        ("data.json", 100, True),
+        ("config.yaml", 100, True),
+        ("config.yml", 100, True),
+        ("schema.sql", 100, True),
+        # binary / unrelated formats stay out
         ("logo.png", 100, False),
-        # data / config / log formats are excluded (not "documents")
-        ("data.json", 100, False),
         ("table.csv", 100, False),
         ("table.tsv", 100, False),
-        ("config.yaml", 100, False),
-        ("config.yml", 100, False),
         ("doc.xml", 100, False),
-        ("schema.sql", 100, False),
         ("output.log", 100, False),
         ("settings.conf", 100, False),
         # oversized
         ("BIG.md", 5_000_000, False),
+        ("huge.py", 5_000_000, False),
         # denylisted path segment
         ("node_modules/pkg/README.md", 100, False),
+        ("node_modules/pkg/index.js", 100, False),
         (".git/config.md", 100, False),
         # size unknown is allowed (still extension-gated)
         ("README.md", None, True),
@@ -162,8 +166,8 @@ def test_files_indexed_when_enabled(
         {
             "README.md": b"# Hello world",
             "docs/guide.md": b"a guide",
-            "src/main.py": b"print('hi')",  # excluded extension
-            "logo.png": b"\x89PNG\r\n",  # excluded extension
+            "src/main.py": b"print('hi')",  # source tip is indexed
+            "logo.png": b"\x89PNG\r\n",  # binary still excluded
         }
     )
     mock_github_client.get_repo.return_value = mock_repo
@@ -176,6 +180,7 @@ def test_files_indexed_when_enabled(
     assert ids == [
         "https://github.com/test-org/test-repo/blob/main/README.md",
         "https://github.com/test-org/test-repo/blob/main/docs/guide.md",
+        "https://github.com/test-org/test-repo/blob/main/src/main.py",
     ]
 
     readme = next(d for d in docs if d.id.endswith("README.md"))
@@ -478,7 +483,58 @@ def test_nonexistent_branch_raises_clear_error(
     )
 
     with pytest.raises(ConnectorValidationError, match="no-such-branch"):
-        connector._list_indexable_files(mock_repo)
+        connector._list_indexable_files(mock_repo, "no-such-branch")
+
+
+def test_all_branch_mode_indexes_each_tip(
+    mock_github_client: MagicMock,
+    create_mock_repo: Callable[..., MagicMock],
+) -> None:
+    """branch_mode=all indexes each branch tip once, not commit history."""
+    connector = GithubConnector(
+        repo_owner="test-org",
+        repositories="test-repo",
+        include_prs=False,
+        include_issues=False,
+        include_files=True,
+        branch_mode="all",
+    )
+    connector.github_client = mock_github_client
+
+    mock_repo = create_mock_repo({"README.md": b"# tip"})
+    main_branch = MagicMock()
+    main_branch.name = "main"
+    develop_branch = MagicMock()
+    develop_branch.name = "develop"
+    mock_repo.get_branches.return_value = [develop_branch, main_branch]
+
+    def _tree_for_ref(ref: str, recursive: bool = False) -> MagicMock:
+        del recursive
+        tree = MagicMock()
+        tree.tree = [_tree_element(f"{ref}.md", 10)]
+        tree.raw_data = {"truncated": False}
+        return tree
+
+    mock_repo.get_git_tree.side_effect = _tree_for_ref
+
+    def _get_contents(path: str, ref: str | None = None) -> MagicMock:
+        cf = MagicMock()
+        cf.decoded_content = f"content of {path} on {ref}".encode()
+        return cf
+
+    mock_repo.get_contents.side_effect = _get_contents
+    mock_github_client.get_repo.return_value = mock_repo
+
+    with patch.object(SerializedRepository, "to_Repository", return_value=mock_repo):
+        outputs = load_everything_from_checkpoint_connector(connector, 0, time.time())
+
+    docs = [i for i in _all_items(outputs) if isinstance(i, Document)]
+    ids = sorted(d.id for d in docs)
+    assert ids == [
+        "https://github.com/test-org/test-repo/blob/develop/develop.md",
+        "https://github.com/test-org/test-repo/blob/main/main.md",
+    ]
+    assert {d.metadata.get("branch") for d in docs} == {"develop", "main"}
 
 
 def test_prs_disabled_404_does_not_crash_files(

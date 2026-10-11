@@ -10,7 +10,7 @@ from sqlalchemy import Engine, Table, text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.orm import Session
 
-from ee.onyx.server.middleware import tenant_tracking
+from loge.server.middleware import tenant_tracking
 from onyx.auth.session_tokens import build_session_token_value
 from onyx.auth.users import auth_backend, get_redis_strategy
 from onyx.configs import app_configs

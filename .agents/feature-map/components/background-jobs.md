@@ -20,7 +20,7 @@ mechanism as the rest of the codebase
 `backend/onyx/background/celery/tasks/monitoring/`,
 `backend/onyx/background/task_utils.py`, `periodic_poller.py`, `error_logging.py`,
 `backend/onyx/db/tasks.py`, `db/sync_record.py`, `db/background_error.py`,
-`backend/ee/onyx/background/celery/apps/`, `ee/onyx/background/celery/tasks/beat_schedule.py`
+`backend/loge/background/celery/apps/`, `loge/background/celery/tasks/beat_schedule.py`
 
 **Read first:** `backend/onyx/background/README.md`. It is the design overview
 written by the team that built this layer. This document maps it to code, adds
@@ -59,7 +59,7 @@ and re-exported through a "factory stub" in
 `fetch_versioned_implementation("onyx.background.celery.apps.<name>", "celery_app")`
 (`versioned_apps/primary.py:app`), which is the same EE/CE dispatch mechanism
 described in `[[editions-and-gating]]`: in a build that ships the EE code,
-the loader resolves to `ee/onyx/background/celery/apps/<name>.py` instead of the
+the loader resolves to `loge/background/celery/apps/<name>.py` instead of the
 CE file. `onyx/background/celery/versioned_apps/light.py` is the one exception;
 its docstring states there is no EE variant, so it imports the CE app directly.
 Workers are started against the `versioned_apps` module (`supervisord.conf` and
@@ -138,7 +138,7 @@ this document.
 
 `onyx/background/celery/tasks/beat_schedule.py` defines three lists, resolved
 through `fetch_versioned_implementation` so EE can extend them
-(`ee/onyx/background/celery/tasks/beat_schedule.py` imports and re-exports the CE
+(`loge/background/celery/tasks/beat_schedule.py` imports and re-exports the CE
 lists plus its own additions):
 
 - `beat_task_templates`: self-hosted-or-cloud task templates (`check-for-indexing`,
@@ -191,7 +191,7 @@ seconds, `beat_schedule.py:BEAT_EXPIRES_DEFAULT`), matching the
 
 - `TaskQueueState` (`onyx/db/models.py`, accessed through `onyx/db/tasks.py`):
   one row per explicitly registered job (not every Celery task; today only query-history
-  exports call `register_task`, in `ee/onyx/server/query_history/api.py`), tracked by `task_name`/`task_id`/`status`
+  exports call `register_task`, in `loge/server/query_history/api.py`), tracked by `task_name`/`task_id`/`status`
   (`TaskStatus.PENDING/STARTED/SUCCESS/FAILURE`). `db/tasks.py:register_task`,
   `mark_task_as_started_with_id`, `mark_task_as_finished_with_id`,
   `check_task_is_live_and_not_timed_out`.
@@ -207,10 +207,10 @@ seconds, `beat_schedule.py:BEAT_EXPIRES_DEFAULT`), matching the
   `onyx/background/error_logging.py:emit_background_error`, which swallows
   `IntegrityError` (e.g. the `cc_pair_id` was deleted concurrently) by retrying
   the insert with `cc_pair_id=None`. `emit_background_error`
-  is called from exactly two places: `ee/onyx/background/celery/tasks/external_group_syncing/tasks.py`
-  and `ee/onyx/external_permissions/confluence/group_sync.py`. No admin API or
+  is called from exactly two places: `loge/background/celery/tasks/external_group_syncing/tasks.py`
+  and `loge/external_permissions/confluence/group_sync.py`. No admin API or
   frontend route reads `BackgroundError` back out (unverified further; a search
-  of `onyx/server` and `ee/onyx/server` found none). See §9.
+  of `onyx/server` and `loge/server` found none). See §9.
 
 ### Redis key patterns
 
@@ -376,7 +376,7 @@ See [[document-index]] for the cached admin warnings it supplies.
    change that adds a new fenced flow without wiring it into a `check_for_*`
    validation loop leaves that fence with only the 7-day TTL as a safety net.
 5. **A task must not hold a DB session across a long external call.** The
-   concrete example is in `ee/onyx/background/celery/tasks/external_group_syncing/tasks.py`:
+   concrete example is in `loge/background/celery/tasks/external_group_syncing/tasks.py`:
    a comment there explains that a DB connection can be killed by Postgres's
    `idle_in_transaction_session_timeout` during a long external API call, and
    the fix was to move stale-row cleanup to the *start* of the next cycle
@@ -396,7 +396,7 @@ See [[document-index]] for the cached admin warnings it supplies.
    won't work. Timeout logic must be implemented within the task itself." (Some
    tasks, e.g. `check_for_pruning`, still catch `SoftTimeLimitExceeded`
    defensively, but nothing raises it under the thread-pool executor.)
-9. **DB operations belong under `onyx/db/` or `ee/onyx/db/`.** Task modules
+9. **DB operations belong under `onyx/db/` or `loge/db/`.** Task modules
    call into `onyx/db/tasks.py`, `db/sync_record.py`, `db/background_error.py`,
    etc.; they do not run ad hoc queries inline (`backend/AGENTS.md`).
 
@@ -444,7 +444,7 @@ See [[document-index]] for the cached admin warnings it supplies.
 | changes a queue name (an `OnyxCeleryQueues` constant) | every `-Q` list in `backend/supervisord.conf` and `deployment/helm/charts/onyx/templates/celery-worker-*.yaml`; every `send_task`/`apply_async` call that references the old name |
 | changes the beat schedule (`beat_schedule.py` or the EE equivalent) | whether the task is per-tenant or cloud-wide (wrong list changes whether `beat_multiplier` applies); the `expires` value; whether `DISABLE_VECTOR_DB` filtering needs the task name added to `_VECTOR_DB_BEAT_TASK_NAMES` |
 | changes a fence or lock (key name, TTL, payload schema) | the checker task's fence-validation pass for that fence family (mirror `validate_pruning_fences`); `on_task_postrun`/`on_task_revoked` taskset cleanup, which matches on key prefix; `ACTIVE_FENCES` membership add/remove sites |
-| adds a worker | its `apps/<name>.py`, `versioned_apps/<name>.py`, `configs/<name>.py`; an entry in `backend/supervisord.conf`; a Helm `celery-worker-<name>.yaml` (plus HPA/ScaledObject if it should autoscale); an entry in `background/README.md`'s worker table (keep it truthful, see §9); whether it needs an EE counterpart under `ee/onyx/background/celery/apps/` |
+| adds a worker | its `apps/<name>.py`, `versioned_apps/<name>.py`, `configs/<name>.py`; an entry in `backend/supervisord.conf`; a Helm `celery-worker-<name>.yaml` (plus HPA/ScaledObject if it should autoscale); an entry in `background/README.md`'s worker table (keep it truthful, see §9); whether it needs an EE counterpart under `loge/background/celery/apps/` |
 | touches `TenantAwareTask` or the tenant contextvar | every worker, since all of them install it as `celery_app.Task`; [[multi-tenancy]] |
 | touches `app_base.py` signal handlers | logging prefixes leaking across tasks, taskset cleanup correctness for every fenced flow, not just the one you're testing |
 
@@ -529,7 +529,7 @@ shared machinery, not feature correctness.
   anywhere. The only symptom is "this never happened." Cross-check §2's table
   whenever you touch a queue name.
 - **`BackgroundError` is not a general failure-surfacing mechanism.** It is
-  written from exactly two call sites (both under `ee/onyx`, both in
+  written from exactly two call sites (both under `loge`, both in
   external-group/permission-sync code), and nothing reads it back through an
   API or the frontend. A new task that calls
   `emit_background_error` expecting an admin to see it should verify there is

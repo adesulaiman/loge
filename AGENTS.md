@@ -43,9 +43,10 @@ This file provides guidance to AI agents when working with code in this reposito
 Each sub-project has its own agents file with the standards for that area — read it before working
 there:
 
-- `backend/` — FastAPI app + Celery workers. `onyx/` is the Community Edition core, `ee/` mirrors its
-  layout for Enterprise features, `alembic/` holds migrations, `tests/` the test suites. Standards
-  (Celery, migrations, testing, error handling, LLM tracing): `backend/AGENTS.md`.
+- `backend/` — FastAPI app + Celery workers. `onyx/` is the core package; `loge/` holds the full
+  feature package (former Enterprise code, still Enterprise-licensed). `alembic/` holds migrations,
+  `tests/` the test suites. Standards (Celery, migrations, testing, error handling, LLM tracing):
+  `backend/AGENTS.md`.
 - `web/` — Next.js frontend. Standards (also cover `desktop/`, the Tauri shell): `web/AGENTS.md`.
 - `mobile/` — React Native + Expo app. Standards: `mobile/AGENTS.md`. Mobile differs from web on
   several points (no DOM, NativeWind, expo-router), so do **not** assume the web rules apply there.

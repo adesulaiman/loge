@@ -80,11 +80,11 @@ an `APIRouter` (marks every route in the router) or on an individual
 | `onyx/server/manage/administrative.py` | Admin deletion-attempt endpoint. |
 | `onyx/server/manage/get_state.py` | Health, readiness, version, auth-type endpoints. |
 | `onyx/server/auth/captcha_api.py` | Pre-OAuth captcha verification (router-level tag). |
-| `ee/onyx/server/user_group/api.py` | EE user-group management (router-level tag); see [[access-control]]. |
-| `ee/onyx/server/query_and_chat/search_backend.py` | EE search-flow classification and search history. |
-| `ee/onyx/server/query_history/api.py` | Query-history export endpoints. |
-| `ee/onyx/server/analytics/api.py` | Analytics router (router-level tag). |
-| `ee/onyx/server/token_rate_limits/api.py` | Token rate-limit admin router (router-level tag); see [[rate-and-usage-limits]]. |
+| `loge/server/user_group/api.py` | EE user-group management (router-level tag); see [[access-control]]. |
+| `loge/server/query_and_chat/search_backend.py` | EE search-flow classification and search history. |
+| `loge/server/query_history/api.py` | Query-history export endpoints. |
+| `loge/server/analytics/api.py` | Analytics router (router-level tag). |
+| `loge/server/token_rate_limits/api.py` | Token rate-limit admin router (router-level tag); see [[rate-and-usage-limits]]. |
 
 This list is exhaustive; re-run the grep above before
 trusting a specific count, since new endpoints can add or drop the tag.

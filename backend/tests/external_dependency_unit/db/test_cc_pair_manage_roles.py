@@ -13,8 +13,8 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.user_group import update_user_group
-from ee.onyx.server.user_group.models import UserGroupUpdate
+from loge.db.user_group import update_user_group
+from loge.server.user_group.models import UserGroupUpdate
 from onyx.configs.constants import DocumentSource
 from onyx.db.connector_credential_pair import (
     CCPairAccessLevel,

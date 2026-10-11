@@ -25,15 +25,22 @@
   </a>
 </p>
 
-# Onyx - The context layer powered by all your apps
+# Loge - The context layer powered by all your apps
 
-> "LLMs know about everything public, but what if it could also know what's going on in our team? I want an AI coworker, not an AI new hire."
+> Private fork of [Onyx](https://github.com/onyx-dot-app/onyx) rebranded as Loge.
+> Full feature code lives under `backend/loge/` and `web/src/loge/` and remains
+> under the Onyx Enterprise License (see root `LICENSE`). MIT applies to the rest.
+>
+> For local unlock of paid features, use `backend/scripts/seed_dev_license.py`
+> (development only).
 
-**[Onyx](https://www.onyx.app/?utm_source=onyx_repo&utm_medium=github&utm_campaign=readme)** is the knowledge/context layer for your team and AI agents.
+**Loge** is the knowledge/context layer for your team and AI agents.
 
-Onyx connects to your application to index and surface knowledge from 50+ applications while protecting your data sovereignty through flexible self-hosted deployments.
+Loge connects to your applications to index and surface knowledge from 50+
+sources while protecting data sovereignty through self-hosted deployments.
 
-Beyond search, Onyx enables LLMs with advanced features like web search, sandboxes, skills, and more.
+Beyond search, Loge enables LLMs with advanced features like web search,
+sandboxes, skills, and more.
 
 
 > [!TIP]
@@ -43,6 +50,87 @@ Beyond search, Onyx enables LLMs with advanced features like web search, sandbox
 > ```
 
 ![Onyx chat answering a question about use cases](docs/assets/onyx-chat-use-cases.png)
+
+---
+
+## Local development (Loge)
+
+Run Docker dependencies, then four processes in separate terminals. Use the
+repo-root `.venv` and `.vscode/.env` for the Python services.
+
+### 1. One-time setup
+
+```bash
+# From the repo root
+uv sync --frozen
+cp .vscode/env_template.txt .vscode/.env   # if you do not have .vscode/.env yet
+# Edit .vscode/.env: set GEN_AI_API_KEY (or other LLM keys) as needed.
+# Keep MODEL_SERVER_PORT=9001 in sync with the model server command below.
+
+cd web && bun install && cd ..
+```
+
+Start Postgres, Redis, OpenSearch, and object storage (MinIO):
+
+```bash
+cd deployment/docker_compose
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d \
+  relational_db cache object-store opensearch
+cd ../..
+```
+
+Optional (dev license unlock): `uv run --directory backend python scripts/seed_dev_license.py`
+
+### 2. Run the four services
+
+Use **four terminals**. Keep them running.
+
+**Model server** (embeddings / NLP — port **9001**):
+
+```bash
+cd backend
+uv run uvicorn model_server.main:app --reload --port 9001
+```
+
+**API backend** (port **8080**):
+
+```bash
+uv run --env-file .vscode/.env --directory backend \
+  uvicorn onyx.main:app --reload --port 8080
+```
+
+**Background jobs** (indexing, Celery workers — required for connectors):
+
+```bash
+uv run --env-file .vscode/.env --directory backend \
+  python ./scripts/dev_run_background_jobs.py
+```
+
+**Frontend** (port **3000**; proxies `/api` to the backend):
+
+```bash
+cd web
+bun run dev
+```
+
+Open the app at [http://localhost:3000](http://localhost:3000). Call the API
+through the frontend (for example `http://localhost:3000/api/...`), not
+directly on `:8080`, unless you know you need to.
+
+| Service        | Port  | Notes                                      |
+|----------------|-------|--------------------------------------------|
+| Frontend       | 3000  | Main UI                                    |
+| API            | 8080  | FastAPI                                    |
+| Model server   | 9001  | Must match `MODEL_SERVER_PORT` in `.env`   |
+| OpenSearch     | 9200  | Document / vector index                    |
+| MinIO          | 9004  | File store (`S3_ENDPOINT_URL`)             |
+| Postgres       | 5432  | Default local password often `password`    |
+
+If indexing fails with `Connection reset by peer` on embed calls, check that
+background jobs use `MODEL_SERVER_PORT=9001` and that nothing else (for example
+php-fpm) is bound to port **9000**.
+
+For deeper contribution setup, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

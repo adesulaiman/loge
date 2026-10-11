@@ -1695,3 +1695,82 @@ class TestAutoModeSyncKeepsDefaultModelsVisible:
         finally:
             db_session.rollback()
             _cleanup_provider(db_session, provider_name)
+
+    def test_openrouter_auto_sync_keeps_catalog_models_visible(
+        self,
+        db_session: Session,
+        provider_name: str,
+    ) -> None:
+        """OpenRouter Auto mode must not hide models outside the recommended
+        list — the live `/models` catalog is opt-out, not exclusive.
+        """
+        from onyx.db.llm import insert_new_model_configuration__no_commit
+
+        config = _create_mock_llm_recommendations(
+            provider=LlmProviderNames.OPENROUTER,
+            default_model_name="z-ai/glm-5.3",
+            additional_models=["deepseek/deepseek-v4-pro"],
+        )
+
+        try:
+            with patch(
+                "onyx.server.manage.llm.api.fetch_llm_recommendations_from_github",
+                return_value=config,
+            ):
+                put_llm_provider(
+                    llm_provider_upsert_request=LLMProviderUpsertRequest(
+                        name=provider_name,
+                        provider=LlmProviderNames.OPENROUTER,
+                        api_key="sk-or-test-key-0000000000000000000000000000",
+                        api_key_changed=True,
+                        is_auto_mode=True,
+                        model_configurations=[],
+                    ),
+                    is_creation=True,
+                    user=_create_mock_admin(),
+                    db_session=db_session,
+                )
+
+            db_session.expire_all()
+            provider = fetch_existing_llm_provider(
+                name=provider_name, db_session=db_session
+            )
+            assert provider is not None
+
+            # Simulate an admin refetch that pulled DeepSeek V4 Flash into DB.
+            insert_new_model_configuration__no_commit(
+                db_session=db_session,
+                llm_provider_id=provider.id,
+                model_name="deepseek/deepseek-v4-flash",
+                supported_flows=[LLMModelFlowType.CHAT],
+                is_visible=True,
+                max_input_tokens=None,
+                display_name="DeepSeek V4 Flash",
+            )
+            db_session.commit()
+
+            sync_auto_mode_models(
+                db_session=db_session,
+                provider=provider,
+                llm_recommendations=config,
+            )
+
+            db_session.expire_all()
+            provider = fetch_existing_llm_provider(
+                name=provider_name, db_session=db_session
+            )
+            assert provider is not None
+            visibility = {
+                mc.name: mc.is_visible for mc in provider.model_configurations
+            }
+
+            assert visibility["z-ai/glm-5.3"] is True
+            assert visibility["deepseek/deepseek-v4-pro"] is True
+            assert visibility["deepseek/deepseek-v4-flash"] is True, (
+                "OpenRouter Auto sync must not hide catalog models outside "
+                "the recommended list"
+            )
+
+        finally:
+            db_session.rollback()
+            _cleanup_provider(db_session, provider_name)

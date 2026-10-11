@@ -21,10 +21,11 @@
 
 ## 1. What the user experiences
 
-A bell icon in the sidebar opens a popover feed of notifications: new release
-available, a shared assistant, a connector that broke, a license about to expire, a
-site-wide announcement from an admin. Each row can be dismissed one at a time, or all
-at once.
+A bell icon in the sidebar opens a popover feed of notifications: a shared assistant,
+a connector that broke, a license about to expire, a site-wide announcement from an
+admin. Upstream Onyx release-note and permissions-migration announcements are not
+created and are hidden from the feed if older rows remain. Each row can be dismissed
+one at a time, or all at once.
 
 Anything loud enough (severity `WARNING` or `ERROR`) also appears as a floating card
 in the bottom-left corner while it is active, one at a time, pageable if more than one
@@ -51,8 +52,11 @@ editing or deleting it clears everyone's copy so it re-shows fresh.
 | PUT | `/admin/banner` | `upsert_admin_banner` | Writes the KV banner, then deletes every `SYSTEM_ANNOUNCEMENT` row so it re-materializes for everyone on next read. |
 | DELETE | `/admin/banner` | `delete_admin_banner` | Clears the KV banner and the `SYSTEM_ANNOUNCEMENT` rows. |
 
-Release notes have no dedicated endpoint. `ensure_release_notes_fresh_and_notify`
-(`release_notes/utils.py`) runs only from inside `get_notifications_api`.
+Release-note fetching (`ensure_release_notes_fresh_and_notify`) and the permissions-
+migration feature announcement are not started from `get_notifications_api` in Loge.
+Existing `RELEASE_NOTES` rows and `FEATURE_ANNOUNCEMENT` rows with
+`feature=permissions_migration_v1` are filtered out of list and count queries in
+`onyx/db/notification.py`.
 
 ### Frontend
 
@@ -62,7 +66,7 @@ Release notes have no dedicated endpoint. `ensure_release_notes_fresh_and_notify
   `useBannerQueue` (`web/src/lib/banner/hooks.ts`), which fetches one
   severity-filtered page (`min_severity=warning`) and collapses same-type rows via
   `buildBannerQueue` (`web/src/lib/banner/queue.ts`).
-- `web/src/app/ee/admin/theme/page.tsx`: the admin banner editor. It calls
+- `web/src/app/admin/theme/page.tsx`: the admin banner editor. It calls
   `/api/admin/banner` directly and is reachable only from the EE admin section, even
   though the backend router itself is registered unconditionally in
   `onyx/main.py`.
@@ -115,12 +119,12 @@ nothing from a dedicated model or table; it is entirely a `Notification` produce
 | `REINDEX` | `server/settings/api.py` |
 | `PERSONA_SHARED` | `db/persona.py` |
 | `TRIAL_ENDS_TWO_DAYS` | `server/settings/api.py`; global (`user_id=None`), delivered via the settings payload, not the per-user feed (§9) |
-| `RELEASE_NOTES` | `db/release_notes.py:create_release_notifications_for_versions` |
+| `RELEASE_NOTES` | Producer still exists (`db/release_notes.py`) but is not called from the notifications API in Loge; existing rows are hidden from the feed |
 | `ASSISTANT_FILES_READY` | `indexing/adapters/user_file_indexing_adapter.py` |
-| `FEATURE_ANNOUNCEMENT` | `server/features/build/utils.py:ensure_build_mode_intro_notification`, `notifications/utils.py:ensure_permissions_migration_notification` |
+| `FEATURE_ANNOUNCEMENT` | `server/features/build/utils.py:ensure_build_mode_intro_notification` (permissions-migration ensure is not called; those rows are hidden) |
 | `SYSTEM_ANNOUNCEMENT` | `notifications/utils.py:ensure_system_announcement_notification`, sourced from the admin banner KV value |
 | `CONNECTOR_REPEATED_ERRORS`, `CONNECTOR_INVALID` | `background/celery/tasks/docprocessing/tasks.py`, `background/indexing/run_docfetching.py`, `db/credentials.py`, `db/connector_credential_pair.py` (via `connector_alerts.py`) |
-| `LICENSE_EXPIRY_WARNING` | `ee/onyx/utils/license_notifications.py` (EE only) |
+| `LICENSE_EXPIRY_WARNING` | `loge/utils/license_notifications.py` (EE only) |
 | `SCHEDULED_TASK_FAILED`, `SCHEDULED_TASK_AWAITING_APPROVAL`, `SCHEDULED_TASK_PRE_APPROVED_ACTION`, `APPROVAL_REQUESTED` | `server/features/build/scheduled_tasks/executor.py`, `sandbox_proxy/addons/gate.py` (Craft/build-mode) |
 
 ---
@@ -134,25 +138,23 @@ semantics) or `batch_create_notifications` (many users, one insert). Both live i
 `onyx/db/notification.py` and both rely on the unique index for idempotency rather
 than a pre-check-then-insert race.
 
-Two producers materialize lazily on read rather than from a background job:
+Producers that materialize lazily on read rather than from a background job:
 - `ensure_system_announcement_notification` (`notifications/utils.py`): reads the
   admin's KV-stored banner (`admin_banner.py:get_admin_banner`) and creates a
   `SYSTEM_ANNOUNCEMENT` row for the requesting user if one is set.
-- `ensure_release_notes_fresh_and_notify` (`release_notes/utils.py`): fetches
-  `changelog.mdx` from GitHub (ETag-cached in Redis, refreshed at most hourly), parses
-  entries newer than the running version, and calls
-  `create_release_notifications_for_versions` to batch-create one row per eligible
-  active user per version.
+- `ensure_build_mode_intro_notification` (`build/utils.py`): creates the Craft
+  intro when applicable.
 
-Both run from `get_notifications_api` (`notifications/api.py:_check_for_notifications_to_create`
-and the per-banner-type ensure loop), throttled per-user for 5 minutes
-(`ENSURE_THROTTLE_SECONDS`, a `TTLCache`) when the request is the banner queue's
-severity-only poll, so a background job is not required for these to appear.
+`ensure_system_announcement_notification` runs from the per-banner-type ensure loop
+on severity-filtered polls; `ensure_build_mode_intro_notification` runs from
+`_check_for_notifications_to_create` on the first page of an unfiltered feed. Both
+paths throttle per-user for 5 minutes (`ENSURE_THROTTLE_SECONDS`, a `TTLCache`) when
+the request is the banner queue's severity-only poll.
 
 License expiry is the one EE-only, genuinely background producer:
-`check_license_expiry_notifications_task` (`ee/onyx/background/celery/tasks/license_notifications/tasks.py`)
+`check_license_expiry_notifications_task` (`loge/background/celery/tasks/license_notifications/tasks.py`)
 runs on a schedule, computes an `ExpiryWarningStage` from the stored license, and calls
-`notify_admins_for_stage` (`ee/onyx/utils/license_notifications.py`), which
+`notify_admins_for_stage` (`loge/utils/license_notifications.py`), which
 batch-creates the notification and sends an email to newly-notified admins. A
 same-request fallback, `ensure_license_expiry_notification_for_user`, materializes the
 requesting admin's row on read (no email) so the banner does not wait for the daily
@@ -184,10 +186,10 @@ the frontend dismisses it client-side only, via a browser cookie
 ## 5. Contracts and invariants
 
 1. **A dedup key (`notif_type` + `additional_data`) must stay stable once shipped.**
-   `ensure_permissions_migration_notification` comments this explicitly: changing the
-   `"feature"` string in `additional_data` breaks the unique-index dedup and
-   re-notifies every user. The same applies to `connector_alert_additional_data`'s
-   `cc_pair_id` key and the release notes `version` key.
+   Changing a shipped `"feature"` string in `additional_data` breaks the unique-index
+   dedup and would re-notify every user. The same applies to
+   `connector_alert_additional_data`'s `cc_pair_id` key and the release notes
+   `version` key.
 2. **Dismissal is per user unless the row itself is global (`user_id is NULL`).** A
    new producer must decide up front whether its notification is per-user or global;
    there is no per-notification override of dismissal scope.
@@ -222,7 +224,7 @@ the frontend dismisses it client-side only, via a browser cookie
   (`onyx/key_value_store/factory.py`), confirmed by the test fixture
   `tenant_context` in `test_admin_banner_notification.py`.
 - [[editions-and-gating]]: license-expiry notifications are EE-only
-  (`ee/onyx/utils/license_notifications.py`) and no-op under `MULTI_TENANT`.
+  (`loge/utils/license_notifications.py`) and no-op under `MULTI_TENANT`.
 - [[background-jobs]]: `check_license_expiry_notifications_task` is a scheduled Celery
   task; every other producer runs inline on a request or another background job
   (indexing, docprocessing).
@@ -248,7 +250,7 @@ the frontend dismisses it client-side only, via a browser cookie
 | changes the dedup key for an existing kind | every existing undismissed row of that kind stops matching new inserts, so already-dismissed users get re-notified; this is the mechanism the admin banner edit path uses deliberately, so make sure a change elsewhere is intentional, not accidental |
 | changes dismissal semantics (adds a global dismiss, or changes per-user scoping) | `get_notification_by_id`'s ownership check, and the `TRIAL_ENDS_TWO_DAYS` cookie-based path, which assumes non-admin users cannot dismiss global rows server-side |
 | touches `create_notification` / `batch_create_notifications` | the unique index migration `8405ca81cc83` and every producer's assumption that a duplicate call is a no-op, not an error |
-| touches the admin banner KV schema (`AdminBanner` model) | `web/src/app/ee/admin/theme/page.tsx` and `ensure_system_announcement_notification`'s mapping of banner fields to notification title/description |
+| touches the admin banner KV schema (`AdminBanner` model) | `web/src/app/admin/theme/page.tsx` and `ensure_system_announcement_notification`'s mapping of banner fields to notification title/description |
 
 ---
 
@@ -259,9 +261,9 @@ the frontend dismisses it client-side only, via a browser cookie
 ```bash
 cd backend && uv run pytest tests/external_dependency_unit/db/test_notification.py
 cd backend && uv run pytest tests/external_dependency_unit/db/test_admin_banner_notification.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/utils/test_license_notifications.py
-cd backend && uv run pytest tests/external_dependency_unit/ee/onyx/background/celery/test_license_notifications_task.py
-cd backend && uv run pytest tests/unit/ee/onyx/background/celery/tasks/license_notifications
+cd backend && uv run pytest tests/external_dependency_unit/loge/utils/test_license_notifications.py
+cd backend && uv run pytest tests/external_dependency_unit/loge/background/celery/test_license_notifications_task.py
+cd backend && uv run pytest tests/unit/loge/background/celery/tasks/license_notifications
 ```
 
 No release-notes-specific test file exists; the parsing and
@@ -311,7 +313,7 @@ playwright coverage was found for the bell popover or banner queue.
   can make `GET /admin/banner` (admin view) and what users actually see diverge.
 - **The admin banner's backend router is not EE-gated, only its editor UI is.**
   `admin_banner_router` is registered unconditionally in `onyx/main.py`; only the
-  frontend page that calls it (`web/src/app/ee/admin/theme/page.tsx`) lives under the
+  frontend page that calls it (`web/src/app/admin/theme/page.tsx`) lives under the
   EE admin section. A CE deployment with API access could still set it.
 - **A row's `severity` is fixed at first insert for its dedup group.** A producer that
   wants to escalate urgency without spamming a new row must vary `additional_data`

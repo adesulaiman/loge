@@ -28,6 +28,7 @@ import { useCredentialFieldCopy } from "@/lib/credentials/hooks";
 import { CredentialFieldsRenderer } from "@/lib/credentials/components/CredentialFieldsRenderer";
 import { TypedFile } from "@/lib/connectors/fileTypes";
 import { SvgPlusCircle } from "@opal/icons";
+import { TextFormField } from "@/components/Field";
 
 interface CreateButtonProps {
   onClick: () => void;
@@ -109,7 +110,9 @@ export default function CreateCredential({
     setSubmitting(true);
     formikHelpers.setSubmitting(true);
 
-    const { share, groups, ...credentialValues } = values;
+    const { share, groups, name, ...credentialValues } = values;
+    const trimmedName =
+      typeof name === "string" ? name.trim() : "";
 
     let privateKey: TypedFile | null = null;
     const filteredCredentialValues = Object.fromEntries(
@@ -126,7 +129,7 @@ export default function CreateCredential({
       const response = await submitCredential({
         credential_json: filteredCredentialValues,
         ...shareAccountPayload({ share, groups }),
-        // No name: the credential list shows its "Untitled" fallback.
+        ...(trimmedName ? { name: trimmedName } : {}),
         source: sourceType,
         private_key: privateKey || undefined,
       });
@@ -196,6 +199,7 @@ export default function CreateCredential({
     <Formik<CreateCredentialFormValues>
       initialValues={{
         ...initialCredentialValues(spec),
+        name: "",
         share: DEFAULT_SHARE_AUDIENCE,
         groups: [],
         ...(initialAuthMethod && {
@@ -221,6 +225,11 @@ export default function CreateCredential({
           // credential step's create card, or a modal).
           <Form className="w-full">
             <Section alignItems="stretch" gap={4}>
+              <TextFormField
+                name="name"
+                label={t("credentials.create.name.label")}
+                placeholder={t("credentials.create.name.placeholder")}
+              />
               <CredentialFieldsRenderer
                 source={sourceType}
                 spec={spec}

@@ -19,12 +19,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Table, delete, inspect, select
 from sqlalchemy.orm import Session
 
-from ee.onyx.auth.sso_domain_verification import (
+from loge.auth.sso_domain_verification import (
     revalidate_tenant_domains,
     verification_record,
     verify_domain_via_dns,
 )
-from ee.onyx.db.tenant_sso_domain import (
+from loge.db.tenant_sso_domain import (
     claim_email_domains,
     is_claimed_domain,
     is_email_domain_verified,
@@ -32,7 +32,7 @@ from ee.onyx.db.tenant_sso_domain import (
     mark_domain_unverified,
     mark_domain_verified,
 )
-from ee.onyx.db.user_tenant_mapping import (
+from loge.db.user_tenant_mapping import (
     is_active_member,
     lookup_tenant_id_for_login,
 )
@@ -104,7 +104,7 @@ def _mapping_active(session: Session, email: str) -> bool:
     )
 
 
-@patch("ee.onyx.db.user_tenant_mapping.MULTI_TENANT", True)
+@patch("loge.db.user_tenant_mapping.MULTI_TENANT", True)
 def test_lookup_does_not_accept_a_pending_invitation(
     catalog_session: Session,
 ) -> None:
@@ -120,7 +120,7 @@ def test_lookup_does_not_accept_a_pending_invitation(
         _cleanup(catalog_session, email)
 
 
-@patch("ee.onyx.db.user_tenant_mapping.MULTI_TENANT", True)
+@patch("loge.db.user_tenant_mapping.MULTI_TENANT", True)
 def test_lookup_refuses_to_choose_between_invitations(
     catalog_session: Session,
 ) -> None:
@@ -134,7 +134,7 @@ def test_lookup_refuses_to_choose_between_invitations(
 
 
 @pytest.mark.usefixtures("catalog_session")
-@patch("ee.onyx.db.user_tenant_mapping.MULTI_TENANT", True)
+@patch("loge.db.user_tenant_mapping.MULTI_TENANT", True)
 def test_lookup_returns_none_for_unknown_address() -> None:
     assert lookup_tenant_id_for_login(_new_email()) is None
 
@@ -172,7 +172,7 @@ class _TxtRecord:
         self.strings = [value.encode()]
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_claim_records_a_pending_unverified_domain(
     catalog_with_domains: Session,
 ) -> None:
@@ -188,7 +188,7 @@ def test_claim_records_a_pending_unverified_domain(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_unverified_domain_does_not_route(catalog_with_domains: Session) -> None:
     """A claim proves nothing until verified, so it must not route anyone."""
     tenant_id = f"tenant_{uuid4().hex[:12]}"
@@ -200,7 +200,7 @@ def test_unverified_domain_does_not_route(catalog_with_domains: Session) -> None
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_dns_verification_marks_verified_and_routes(
     catalog_with_domains: Session,
 ) -> None:
@@ -219,7 +219,7 @@ def test_dns_verification_marks_verified_and_routes(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_dns_verification_without_the_record_does_not_route(
     catalog_with_domains: Session,
 ) -> None:
@@ -238,7 +238,7 @@ def test_dns_verification_without_the_record_does_not_route(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_revalidation_drops_a_domain_whose_record_disappeared(
     catalog_with_domains: Session,
 ) -> None:
@@ -258,7 +258,7 @@ def test_revalidation_drops_a_domain_whose_record_disappeared(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_revalidation_keeps_a_domain_whose_record_is_present(
     catalog_with_domains: Session,
 ) -> None:
@@ -277,7 +277,7 @@ def test_revalidation_keeps_a_domain_whose_record_is_present(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_revalidation_keeps_a_domain_on_a_transient_dns_failure(
     catalog_with_domains: Session,
 ) -> None:
@@ -295,7 +295,7 @@ def test_revalidation_keeps_a_domain_on_a_transient_dns_failure(
         _clear_domains(catalog_with_domains, tenant_id)
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_catalog_writes_match_a_claim_regardless_of_domain_casing(
     catalog_with_domains: Session,
 ) -> None:
@@ -400,7 +400,7 @@ def test_resolved_workspace_authorize_urls_carry_a_workspace_pin(
     assert "workspace_token=" in provider["authorize_url"]
 
 
-@patch("ee.onyx.db.tenant_sso_domain.MULTI_TENANT", True)
+@patch("loge.db.tenant_sso_domain.MULTI_TENANT", True)
 def test_is_email_domain_verified_only_after_verification(
     catalog_with_domains: Session,
 ) -> None:
@@ -446,7 +446,7 @@ def catalog_with_oauth(catalog_session: Session) -> Generator[Session, None, Non
             catalog_session.commit()
 
 
-@patch("ee.onyx.db.user_tenant_mapping.MULTI_TENANT", True)
+@patch("loge.db.user_tenant_mapping.MULTI_TENANT", True)
 def test_is_active_member_only_for_a_current_active_membership(
     catalog_with_oauth: Session,
 ) -> None:

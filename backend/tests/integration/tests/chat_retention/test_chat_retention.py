@@ -10,7 +10,7 @@ from pytest import MonkeyPatch
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
-import ee.onyx.background.celery.tasks.ttl_management.tasks as ttl_tasks
+import loge.background.celery.tasks.ttl_management.tasks as ttl_tasks
 from onyx.configs.constants import CELERY_CHAT_TTL_DELETE_TASK_EXPIRES, OnyxRedisLocks
 from onyx.db.chat import delete_chat_session, get_chat_sessions_older_than
 from onyx.db.engine.sql_engine import get_session_with_current_tenant

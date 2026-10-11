@@ -29,30 +29,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 EOF
 
-# NOTE: intentionally keeping the web/src/app/ee directory
-# for now since there's no clean way to remove it
-echo "=== Removing enterprise directory and licenses from history ==="
+# NOTE: web/src/loge is also Enterprise-licensed; strip it for a MIT-only mirror.
+echo "=== Removing proprietary full-feature directories and licenses from history ==="
 git filter-repo \
-  --path backend/ee --invert-paths \
-  --path backend/ee/LICENSE --invert-paths \
-  --path web/src/app/ee/LICENSE --invert-paths \
+  --path backend/loge --invert-paths \
+  --path web/src/loge --invert-paths \
+  --path backend/loge/LICENSE --invert-paths \
+  --path web/src/loge/LICENSE --invert-paths \
   --force
 
 # NOTE: not ideal, since this means every day folks with the repo
 # locally will need to hard reset if they want to pull in more stuff.
-echo "=== Recreating empty enterprise directory ==="
-mkdir -p backend/ee
-touch backend/ee/__init__.py
-git add backend/ee
+echo "=== Recreating empty loge package stub (no full features) ==="
+mkdir -p backend/loge
+touch backend/loge/__init__.py
+git add backend/loge
 
 echo "=== Updating README ==="
 
 cat > /tmp/foss_notice.txt << 'EOF'
 
 > [!NOTE]
-> **This is the FOSS (Free and Open Source Software) version of Onyx**
+> **This is the FOSS (Free and Open Source Software) version of Loge / Onyx**
 > 
-> This repository is 100% MIT-licensed and automatically synced with the [main Onyx repository](https://github.com/onyx-dot-app/onyx). The [main repository](https://github.com/onyx-dot-app/onyx) is recommended for most users. This FOSS version is maintained for users with strict open-source licensing requirements.
+> This repository is 100% MIT-licensed and strips the proprietary `backend/loge`
+> and `web/src/loge` trees. The main repository is recommended for full features.
 > 
 > ---
 

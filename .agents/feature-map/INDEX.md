@@ -157,7 +157,7 @@ grep -oE 'path: "/admin[^"]*"' web/src/lib/admin-routes.ts | sort -u
 
 Two traps when auditing this yourself:
 
-- Some `/admin/*` paths are served from a second tree, `web/src/app/ee/admin/`, via a
+- Some `/admin/*` paths are served from a second tree, `web/src/app/admin/`, via a
   rewrite in `web/src/proxy.ts:EE_ROUTES`. Listing `web/src/app/admin/` alone misses
   theme, standard-answer, export-logs, performance, and groups.
 - A directory under `ee/admin/` that is **not** in `EE_ROUTES` is unreachable.

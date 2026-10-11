@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from onyx.db.enums import LLMModelFlowType
-from onyx.db.llm import sync_model_configurations
+from onyx.db.llm import NewModelConfiguration, sync_model_configurations
 from onyx.server.manage.llm.models import SyncModelEntry
 
 
@@ -333,3 +333,86 @@ class TestSyncModelConfigurations:
             assert result == 0
             mock_session.execute.assert_not_called()
             mock_session.commit.assert_not_called()
+
+    def test_openrouter_inserts_new_models_visible(self) -> None:
+        """OpenRouter catalog fetch inserts new models as visible (opt-out)."""
+        mock_provider = MagicMock()
+        mock_provider.id = 1
+        mock_provider.provider = "openrouter"
+        mock_provider.model_configurations = []
+
+        mock_session = MagicMock()
+        captured: list[NewModelConfiguration] = []
+
+        def _capture_insert(
+            db_session: MagicMock,
+            provider_id: int,
+            models: list[NewModelConfiguration],
+        ) -> dict[str, int]:
+            captured.extend(models)
+            return {m.name: i + 1 for i, m in enumerate(models)}
+
+        with (
+            patch(
+                "onyx.db.llm.fetch_existing_llm_provider_by_id",
+                return_value=mock_provider,
+            ),
+            patch(
+                "onyx.db.llm.insert_new_model_configurations__no_commit",
+                side_effect=_capture_insert,
+            ),
+        ):
+            result = sync_model_configurations(
+                db_session=mock_session,
+                provider_id=1,
+                models=[
+                    SyncModelEntry(
+                        name="deepseek/deepseek-v4-flash",
+                        display_name="DeepSeek V4 Flash",
+                    ),
+                ],
+            )
+
+            assert result == 1
+            assert len(captured) == 1
+            assert captured[0].is_visible is True
+
+    def test_non_openrouter_inserts_new_models_hidden(self) -> None:
+        """Other dynamic providers still insert new models as hidden (opt-in)."""
+        mock_provider = MagicMock()
+        mock_provider.id = 1
+        mock_provider.provider = "ollama"
+        mock_provider.model_configurations = []
+
+        mock_session = MagicMock()
+        captured: list[NewModelConfiguration] = []
+
+        def _capture_insert(
+            db_session: MagicMock,
+            provider_id: int,
+            models: list[NewModelConfiguration],
+        ) -> dict[str, int]:
+            captured.extend(models)
+            return {m.name: i + 1 for i, m in enumerate(models)}
+
+        with (
+            patch(
+                "onyx.db.llm.fetch_existing_llm_provider_by_id",
+                return_value=mock_provider,
+            ),
+            patch(
+                "onyx.db.llm.insert_new_model_configurations__no_commit",
+                side_effect=_capture_insert,
+            ),
+        ):
+            result = sync_model_configurations(
+                db_session=mock_session,
+                provider_id=1,
+                models=[
+                    SyncModelEntry(name="llama3", display_name="Llama 3"),
+                ],
+            )
+
+            assert result == 1
+            assert len(captured) == 1
+            assert captured[0].is_visible is False

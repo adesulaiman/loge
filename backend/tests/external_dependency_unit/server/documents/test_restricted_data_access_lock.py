@@ -8,14 +8,14 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.cc_pair_data_access import (
+from loge.db.cc_pair_data_access import (
     assert_restricted_cc_pairs_keep_a_group,
     fetch_data_access_groups_for_cc_pair,
     lock_cc_pairs_for_data_access__no_commit,
     remove_cc_pair_data_access__no_commit,
 )
-from ee.onyx.server.documents.cc_pair import set_cc_pair_data_access
-from ee.onyx.server.documents.models import CCPairDataAccessUpdateRequest
+from loge.server.documents.cc_pair import set_cc_pair_data_access
+from loge.server.documents.models import CCPairDataAccessUpdateRequest
 from onyx.db.engine.sql_engine import get_session_with_current_tenant
 from onyx.db.enums import AccessType
 from onyx.db.models import UserGroup, UserGroup__CCPairDataAccess

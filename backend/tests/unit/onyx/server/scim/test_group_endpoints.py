@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from fastapi import Response
 
-from ee.onyx.server.scim.api import (
+from loge.server.scim.api import (
     create_group,
     delete_group,
     get_group,
@@ -15,15 +15,15 @@ from ee.onyx.server.scim.api import (
     patch_group,
     replace_group,
 )
-from ee.onyx.server.scim.models import (
+from loge.server.scim.models import (
     ScimGroupMember,
     ScimGroupResource,
     ScimPatchOperation,
     ScimPatchOperationType,
     ScimPatchRequest,
 )
-from ee.onyx.server.scim.patch import ScimPatchError
-from ee.onyx.server.scim.providers.base import ScimProvider
+from loge.server.scim.patch import ScimPatchError
+from loge.server.scim.providers.base import ScimProvider
 from tests.unit.onyx.server.scim.conftest import (
     assert_scim_error,
     make_db_group,
@@ -174,7 +174,7 @@ class TestGetGroup:
 class TestCreateGroup:
     """Tests for POST /scim/v2/Groups."""
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_success(
         self,
         mock_validate: MagicMock,
@@ -220,7 +220,7 @@ class TestCreateGroup:
 
         assert_scim_error(result, 409)
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_invalid_member_returns_400(
         self,
         mock_validate: MagicMock,
@@ -243,7 +243,7 @@ class TestCreateGroup:
 
         assert_scim_error(result, 400)
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_nonexistent_member_returns_400(
         self,
         mock_validate: MagicMock,
@@ -267,7 +267,7 @@ class TestCreateGroup:
 
         assert_scim_error(result, 400)
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_creates_external_id_mapping(
         self,
         mock_validate: MagicMock,
@@ -296,7 +296,7 @@ class TestCreateGroup:
 class TestReplaceGroup:
     """Tests for PUT /scim/v2/Groups/{group_id}."""
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_success(
         self,
         mock_validate: MagicMock,
@@ -344,7 +344,7 @@ class TestReplaceGroup:
 
         assert_scim_error(result, 404)
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_invalid_member_returns_400(
         self,
         mock_validate: MagicMock,
@@ -369,7 +369,7 @@ class TestReplaceGroup:
 
         assert_scim_error(result, 400)
 
-    @patch("ee.onyx.server.scim.api._validate_and_parse_members")
+    @patch("loge.server.scim.api._validate_and_parse_members")
     def test_syncs_external_id(
         self,
         mock_validate: MagicMock,
@@ -399,7 +399,7 @@ class TestReplaceGroup:
 class TestPatchGroup:
     """Tests for PATCH /scim/v2/Groups/{group_id}."""
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_rename(
         self,
         mock_apply: MagicMock,
@@ -465,7 +465,7 @@ class TestPatchGroup:
 
         assert_scim_error(result, 404)
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_patch_error_returns_error_response(
         self,
         mock_apply: MagicMock,
@@ -500,7 +500,7 @@ class TestPatchGroup:
 
         assert_scim_error(result, 400)
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_add_members(
         self,
         mock_apply: MagicMock,
@@ -544,7 +544,7 @@ class TestPatchGroup:
         mock_dal.validate_member_ids.assert_called_once()
         mock_dal.upsert_group_members.assert_called_once()
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_add_nonexistent_member_returns_400(
         self,
         mock_apply: MagicMock,
@@ -586,7 +586,7 @@ class TestPatchGroup:
 
         assert_scim_error(result, 400)
 
-    @patch("ee.onyx.server.scim.api.apply_group_patch")
+    @patch("loge.server.scim.api.apply_group_patch")
     def test_remove_members(
         self,
         mock_apply: MagicMock,

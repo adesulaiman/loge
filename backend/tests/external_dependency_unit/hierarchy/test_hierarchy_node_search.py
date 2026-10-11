@@ -10,7 +10,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.hierarchy import _search_accessible_hierarchy_nodes as ee_search
+from loge.db.hierarchy import _search_accessible_hierarchy_nodes as ee_search
 from onyx.configs.constants import DocumentSource
 from onyx.db.enums import HierarchyNodeType
 from onyx.db.hierarchy import _search_accessible_hierarchy_nodes as mit_search

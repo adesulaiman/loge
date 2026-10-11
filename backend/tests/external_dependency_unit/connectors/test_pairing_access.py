@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.utils import tier
-from ee.onyx.utils.tier import Tier
+from loge.utils import tier
+from loge.utils.tier import Tier
 from onyx.configs.constants import DocumentSource
 from onyx.connectors import pairing_access
 from onyx.connectors.pairing_access import validate_pairing_access

@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ee.onyx.connectors.perm_sync_valid import validate_canvas_perm_sync
-from ee.onyx.external_permissions.canvas.access import (
+from loge.connectors.perm_sync_valid import validate_canvas_perm_sync
+from loge.external_permissions.canvas.access import (
     CanvasCoursePermissionContext,
     build_course_permission_context,
 )
-from ee.onyx.external_permissions.canvas.doc_sync import canvas_doc_sync
-from ee.onyx.external_permissions.canvas.group_sync import canvas_group_sync
+from loge.external_permissions.canvas.doc_sync import canvas_doc_sync
+from loge.external_permissions.canvas.group_sync import canvas_group_sync
 from onyx.access.models import DocExternalAccess, ExternalAccess
 from onyx.connectors.canvas.connector import (
     CanvasAnnouncement,

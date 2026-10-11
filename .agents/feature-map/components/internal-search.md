@@ -57,10 +57,10 @@ downstream, so it should not hand-craft time or source scoping into the query te
 | POST | `/admin/search` | `admin_search` (`server/query_and_chat/query_backend.py`) | Admin-only. Calls `document_index.keyword_retrieval` or `random_retrieval` directly, bypassing this whole pipeline. Used for admin document inspection, not for chat. |
 | GET | `/query/valid-tags` | `get_tags` (`server/query_and_chat/query_backend.py`) | Tag autocomplete for the filter UI. |
 
-The EE Search UI backend (`ee/onyx/server/query_and_chat/search_backend.py`,
-`ee/onyx/search/process_search_query.py`) is a **separate, lighter pipeline**. It
+The EE Search UI backend (`loge/server/query_and_chat/search_backend.py`,
+`loge/search/process_search_query.py`) is a **separate, lighter pipeline**. It
 calls `search_pipeline()` directly with its own query expansion
-(`ee/onyx/secondary_llm_flows/query_expansion.py:expand_keywords`) and its own
+(`loge/secondary_llm_flows/query_expansion.py:expand_keywords`) and its own
 constant `TARGET_NUM_SECTIONS_FOR_LLM_SELECTION`. It shares `search_pipeline`,
 `merge_individual_chunks`, `weighted_reciprocal_rank_fusion`, and
 `select_sections_for_expansion` with this component, but is not the

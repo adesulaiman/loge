@@ -8,7 +8,7 @@ from zipfile import ZipFile
 
 import pytest
 
-from ee.onyx.db.usage_export import UsageReportMetadata
+from loge.db.usage_export import UsageReportMetadata
 from onyx.configs.constants import DEFAULT_PERSONA_ID
 from onyx.db.engine.sql_engine import get_session_with_current_tenant
 from onyx.db.enums import SystemUsageAttribution

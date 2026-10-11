@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.external_permissions.google_drive.doc_sync import gdrive_doc_sync
-from ee.onyx.external_permissions.google_drive.group_sync import gdrive_group_sync
+from loge.external_permissions.google_drive.doc_sync import gdrive_doc_sync
+from loge.external_permissions.google_drive.group_sync import gdrive_group_sync
 from onyx.access.models import DocExternalAccess
 from onyx.connectors.google_drive.connector import GoogleDriveConnector
 from onyx.db.models import ConnectorCredentialPair
@@ -109,7 +109,7 @@ def test_gdrive_perm_sync_with_real_data(
 
     # Use the connector directly without mocking Google Drive API calls
     with patch(
-        "ee.onyx.external_permissions.google_drive.doc_sync.GoogleDriveConnector",
+        "loge.external_permissions.google_drive.doc_sync.GoogleDriveConnector",
         return_value=_build_connector(google_drive_service_acct_connector_factory),
     ):
         # Call the function under test
@@ -135,7 +135,7 @@ def test_gdrive_perm_sync_with_real_data(
 
     # create new connector
     with patch(
-        "ee.onyx.external_permissions.google_drive.group_sync.GoogleDriveConnector",
+        "loge.external_permissions.google_drive.group_sync.GoogleDriveConnector",
         return_value=_build_connector(google_drive_service_acct_connector_factory),
     ):
         external_user_group_generator = gdrive_group_sync("test_tenant", mock_cc_pair)

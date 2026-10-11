@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.query_history import (
+from loge.db.query_history import (
     fetch_chat_sessions_eagerly_by_time,
     get_page_of_chat_sessions,
 )

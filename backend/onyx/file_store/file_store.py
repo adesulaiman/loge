@@ -178,12 +178,25 @@ def build_s3_client(
             client_kwargs["config"] = reduce(Config.merge, configs)
 
         # Without explicit keys, boto3 uses the IAM role or default credentials.
+        # A custom endpoint (MinIO, etc.) must not fall back to that chain: an
+        # expired AWS SSO token then hits real AWS (or signs MinIO wrongly) and
+        # surfaces as InvalidToken, which looks like a MinIO outage.
         if access_key_id and secret_access_key:
             client_kwargs.update(
                 {
                     "aws_access_key_id": access_key_id,
                     "aws_secret_access_key": secret_access_key,
                 }
+            )
+            if endpoint_url:
+                # Ignore AWS_SESSION_TOKEN in the process env; MinIO static keys
+                # never use STS session tokens.
+                client_kwargs["aws_session_token"] = None
+        elif endpoint_url:
+            raise RuntimeError(
+                "S3_ENDPOINT_URL is set but S3_AWS_ACCESS_KEY_ID / "
+                "S3_AWS_SECRET_ACCESS_KEY are missing. Refusing the AWS default "
+                "credential chain for a self-hosted object store."
             )
         return boto3.client(**client_kwargs)
 

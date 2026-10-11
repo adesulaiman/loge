@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+<defs>
+<linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#04070F"/>
+<stop offset=".5" stop-color="#0A1326"/>
+<stop offset="1" stop-color="#18284A"/>
+</linearGradient>
+<radialGradient id="glow" cx=".5" cy=".5" r=".5">
+<stop offset="0" stop-color="#8FB0FF" stop-opacity=".3"/>
+<stop offset="1" stop-color="#8FB0FF" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="haze" cx=".5" cy="1" r=".7">
+<stop offset="0" stop-color="#3A5590" stop-opacity=".45"/>
+<stop offset="1" stop-color="#3A5590" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="streak" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#FF5A47" stop-opacity="0"/>
+<stop offset="1" stop-color="#FF5A47" stop-opacity=".9"/>
+</linearGradient>
+<filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .6  0 0 0 0 .7  0 0 0 0 1  0 0 0 .5 0"/></filter>
+</defs>
+<rect width="1440" height="900" fill="url(#s)"/>
+<rect y="500" width="1440" height="400" fill="url(#haze)"/>
+<g fill="#FFFFFF">
+<circle cx="90" cy="70" r="1.4" opacity=".8"/><circle cx="210" cy="140" r="1" opacity=".6"/><circle cx="330" cy="60" r="1.2" opacity=".7"/>
+<circle cx="440" cy="190" r="1" opacity=".5"/><circle cx="560" cy="90" r="1.5" opacity=".85"/><circle cx="680" cy="170" r="1" opacity=".55"/>
+<circle cx="760" cy="50" r="1.2" opacity=".7"/><circle cx="880" cy="130" r="1" opacity=".6"/><circle cx="960" cy="40" r="1.3" opacity=".75"/>
+<circle cx="1300" cy="80" r="1.2" opacity=".7"/><circle cx="1390" cy="200" r="1" opacity=".55"/><circle cx="1250" cy="330" r="1.1" opacity=".5"/>
+<circle cx="150" cy="300" r="1" opacity=".45"/><circle cx="380" cy="320" r="1.2" opacity=".5"/><circle cx="620" cy="300" r="1" opacity=".4"/>
+<circle cx="1000" cy="280" r="1" opacity=".45"/><circle cx="1360" cy="420" r="1" opacity=".4"/><circle cx="60" cy="460" r="1" opacity=".35"/>
+</g>
+<path d="M556 82l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#FFFFFF" opacity=".9"/>
+<path d="M1296 74l1.6 4.8 4.8 1.6-4.8 1.6-1.6 4.8-1.6-4.8-4.8-1.6 4.8-1.6z" fill="#FFFFFF" opacity=".8"/>
+<circle cx="1120" cy="210" r="180" fill="url(#glow)"/>
+<circle cx="1120" cy="210" r="74" fill="#E4EAFF"/>
+<path d="M1120 136a74 74 0 0 1 0 148a54 74 0 0 0 0-148z" fill="#C3CEF0"/>
+<circle cx="1094" cy="190" r="9" fill="#C3CEF0" opacity=".7"/>
+<circle cx="1140" cy="232" r="6" fill="#C3CEF0" opacity=".6"/>
+<path d="M520 360L760 300" stroke="url(#streak)" stroke-width="2" stroke-linecap="round"/>
+<path d="M0 900V812H40V790H72V804H110V770H138V760H150V770H176V800H220V782H262V808H300V776H340V746H352V776H380V796H430V780H470V810H520V772H548V756H580V772H612V798H660V786H700V762H736V790H780V804H822V770H850V742H862V728H866V742H880V770H910V794H960V780H1000V806H1046V774H1084V790H1126V764H1160V786H1204V800H1250V778H1290V796H1330V770H1370V790H1410V804H1440V900Z" fill="#0E1A33"/>
+<path d="M864 728V690" stroke="#0E1A33" stroke-width="2"/>
+<circle cx="864" cy="688" r="3" fill="#FF5A47"/>
+<circle cx="864" cy="688" r="8" fill="#FF5A47" opacity=".25"/>
+<g fill="#6EA8FF" opacity=".55">
+<rect x="116" y="786" width="4" height="5"/><rect x="128" y="796" width="4" height="5"/><rect x="346" y="760" width="3" height="4"/>
+<rect x="556" y="770" width="4" height="5"/><rect x="566" y="784" width="4" height="5"/><rect x="708" y="776" width="4" height="5"/>
+<rect x="1134" y="778" width="4" height="5"/><rect x="1144" y="790" width="4" height="5"/><rect x="1338" y="784" width="4" height="5"/>
+</g>
+<g fill="#FFB36B" opacity=".5">
+<rect x="306" y="790" width="4" height="5"/><rect x="888" y="784" width="4" height="5"/><rect x="1052" y="788" width="4" height="5"/><rect x="740" y="800" width="4" height="5"/>
+</g>
+<path d="M0 900V846H56V830H96V852H150V822H190V838H246V856H300V826H336V812H372V836H420V850H470V834H520V858H580V828H610V816H646V840H700V852H760V832H800V846H860V824H900V842H960V856H1010V830H1050V818H1092V838H1150V850H1200V828H1246V844H1300V832H1344V852H1400V836H1440V900Z" fill="#070D1B"/>
+<g fill="#6EA8FF" opacity=".5">
+<rect x="160" y="836" width="4" height="5"/><rect x="346" y="826" width="4" height="5"/><rect x="620" y="830" width="4" height="5"/><rect x="1060" y="832" width="4" height="5"/><rect x="1256" y="852" width="4" height="5"/>
+</g>
+<rect width="1440" height="900" filter="url(#g)" opacity=".06"/>
+</svg>

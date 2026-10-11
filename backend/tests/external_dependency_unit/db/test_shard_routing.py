@@ -479,7 +479,7 @@ def test_schema_creation_follows_the_shard_map(
     seeds it through a shard-routed session — writing into a schema that does not
     exist on that database.
     """
-    from ee.onyx.server.tenants.schema_management import create_schema_if_not_exists
+    from loge.server.tenants.schema_management import create_schema_if_not_exists
 
     tenant_id = f"tenant_{uuid4()}"
     _set_tenant_shard(tenant_id, SECOND_SHARD)
@@ -504,7 +504,7 @@ def test_drop_schema_follows_the_shard_map(two_shards: dict[str, Any]) -> None:
 
     A default-pinned drop would silently no-op, leaving the real schema behind.
     """
-    from ee.onyx.server.tenants.schema_management import drop_schema
+    from loge.server.tenants.schema_management import drop_schema
 
     tenant_b = two_shards["tenant_b"]
     second_engine = shard_registry.get_engine_for_shard(SECOND_SHARD)
@@ -520,7 +520,7 @@ def test_alembic_url_targets_the_tenants_shard(two_shards: dict[str, Any]) -> No
 
     Checked at the URL level because running the full tree per test is far too slow.
     """
-    from ee.onyx.server.tenants.schema_management import _tenant_connection_string
+    from loge.server.tenants.schema_management import _tenant_connection_string
 
     url_a = _tenant_connection_string(two_shards["tenant_a"])
     url_b = _tenant_connection_string(two_shards["tenant_b"])
@@ -725,7 +725,7 @@ def test_run_alembic_migrations_targets_the_tenants_shard(
     """
     import sqlalchemy.ext.asyncio as sa_asyncio
 
-    from ee.onyx.server.tenants.schema_management import run_alembic_migrations
+    from loge.server.tenants.schema_management import run_alembic_migrations
 
     def _capture(url: Any, *_: Any, **__: Any) -> Any:
         raise _CapturedAlembicURL(str(url))

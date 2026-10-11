@@ -1,8 +1,8 @@
 {
   "mcpOAuth": {
     "consent": {
-      "title": "连接到 Onyx",
-      "request": "允许 {clientName} 搜索 Onyx 吗？",
+      "title": "连接到 Loge",
+      "request": "允许 {clientName} 搜索 Loge 吗？",
       "account": "当前登录账号：{email}",
       "workspace": "工作区：{workspaceName}",
       "appAddress": "应用地址：{origin}",
@@ -16,13 +16,13 @@
       "signInRequired": "请登录以授权此应用。",
       "signIn": "登录",
       "forbidden": "你无法授权此应用。请联系工作区管理员。",
-      "loadFailed": "Onyx 无法加载此请求。请重试。",
+      "loadFailed": "Loge 无法加载此请求。请重试。",
       "retry": "重试"
     },
     "connections": {
       "cancel": "取消",
       "title": "已连接的应用",
-      "description": "你已允许搜索 Onyx 的应用。",
+      "description": "你已允许搜索 Loge 的应用。",
       "empty": "没有已连接的应用。",
       "loading": "正在加载已连接的应用...",
       "expires": "到期日期：{date}",
@@ -32,7 +32,7 @@
       "failed": "无法断开应用连接。请重试。",
       "loadFailed": "无法加载已连接的应用。",
       "confirmTitle": "断开 {clientName} 的连接吗？",
-      "confirmDescription": "此应用将失去对 Onyx 的访问权限。你可以稍后重新连接。"
+      "confirmDescription": "此应用将失去对 Loge 的访问权限。你可以稍后重新连接。"
     }
   },
   "accountPopover": {
@@ -1319,8 +1319,8 @@
       },
       "slackChannelChart": {
         "description": "查询总数与自动解决数对比",
-        "empty": "所选时间范围内此工作区没有 OnyxBot 活动。",
-        "error": "获取 OnyxBot 数据失败。",
+        "empty": "所选时间范围内此工作区没有 LogeBot 活动。",
+        "error": "获取 LogeBot 数据失败。",
         "series": {
           "autoResolved": {
             "label": "自动解决"
@@ -1560,7 +1560,7 @@
           "label": "许可证密钥已过期"
         },
         "keyField": {
-          "description": "粘贴或附加您从 Onyx 收到的许可证密钥文件。",
+          "description": "粘贴或附加您从 Loge 收到的许可证密钥文件。",
           "title": "许可证密钥"
         },
         "updateKey": {
@@ -2623,7 +2623,7 @@
         },
         "organizationLinks": {
           "label": "将组织链接视为公开链接",
-          "description": "让所有 Onyx 用户都能看到通过组织范围链接共享的文件。"
+          "description": "让所有 Loge 用户都能看到通过组织范围链接共享的文件。"
         },
         "authorityHost": {
           "label": "授权主机",
@@ -3184,7 +3184,7 @@
         "title": "未找到用户"
       },
       "header": {
-        "description": "控制谁可以使用 Craft，即 Onyx 的智能体式应用构建器。",
+        "description": "控制谁可以使用 Craft，即 Loge 的智能体式应用构建器。",
         "title": "访问权限"
       },
       "perUserAccess": {
@@ -3215,7 +3215,7 @@
         }
       },
       "unavailable": {
-        "description": "Craft 由 Onyx 按部署逐一启用。请联系您的 Onyx 客户代表以获取访问权限。",
+        "description": "Craft 由 Loge 按部署逐一启用。请联系您的 Loge 客户代表以获取访问权限。",
         "title": "此部署不提供 Craft"
       },
       "usersLoadError": {
@@ -3301,7 +3301,7 @@
         "label": "在 Craft 中试用"
       },
       "unavailable": {
-        "description": "Craft 由 Onyx 按部署逐一启用。请联系您的 Onyx 客户代表以获取访问权限。",
+        "description": "Craft 由 Loge 按部署逐一启用。请联系您的 Loge 客户代表以获取访问权限。",
         "title": "此部署不提供 Craft"
       }
     },
@@ -3351,6 +3351,10 @@
         },
         "submitError": {
           "toast": "提交凭据时出错"
+        },
+        "name": {
+          "label": "名称(可选):",
+          "placeholder": "例如：生产账户"
         }
       },
       "delete": {
@@ -4054,7 +4058,7 @@
         "title": "导出日志"
       },
       "header": {
-        "description": "下载服务器日志文件的 zip 压缩包,以附加到 Onyx 支持工单中。"
+        "description": "下载服务器日志文件的 zip 压缩包,以附加到 Loge 支持工单中。"
       },
       "receipt": {
         "duplicateHost": {
@@ -4169,7 +4173,7 @@
         "noCustomSkills": "无自定义技能",
         "orgCredentialsSet": "已设置组织凭证",
         "perUserCredentials": "按用户凭证",
-        "providedByOnyx": "由 Onyx 提供",
+        "providedByOnyx": "由 Loge 提供",
         "tools": "{count, plural, one {# 个工具} other {# 个工具}}",
         "upstreamPatterns": "{count, plural, one {# 个上游模式} other {# 个上游模式}}"
       },
@@ -4599,7 +4603,7 @@
           "placeholder": "费用上限",
           "unit": "(USD)"
         },
-        "disabledTooltip": "Token 速率限制仅在 [Onyx 企业版](/admin/billing) 中提供。",
+        "disabledTooltip": "Token 速率限制仅在 [Loge 企业版](/admin/billing) 中提供。",
         "section": {
           "description": "限制此用户组在指定时间段内可以使用的 token 数量。",
           "title": "Token 速率限制"
@@ -5172,7 +5176,7 @@
         }
       },
       "cloudDisabled": {
-        "tooltip": "此设置由 Onyx Cloud 管理。"
+        "tooltip": "此设置由 Loge Cloud 管理。"
       },
       "contextualModel": {
         "description": "此模型用于为分块生成上下文。",
@@ -5186,7 +5190,7 @@
       },
       "embeddingModel": {
         "cloudManaged": {
-          "title": "Embedding 模型和相关设置由 Onyx Cloud 管理。"
+          "title": "Embedding 模型和相关设置由 Loge Cloud 管理。"
         },
         "description": "{appName} 使用此模型对文档进行编码，以供搜索和检索。",
         "title": "Embedding 模型"
@@ -6258,7 +6262,7 @@
         },
         "requestSentBody": "您的加入请求已发送。在等待 {domain} 管理员批准期间，您可以先以自己的团队身份浏览体验。",
         "tryOnyxButton": {
-          "label": "等待期间先试用 Onyx"
+          "label": "等待期间先试用 Loge"
         }
       },
       "newTenant": {
@@ -7069,7 +7073,7 @@
         }
       },
       "liteModeNotice": {
-        "description": "此部署运行的是 Onyx Lite，它没有向量数据库，因此连接器和文档索引均已禁用，不会索引任何内容。要连接数据源并索引文档，请以**标准模式**部署 Onyx。请查看[部署指南]({docsUrl})开始使用。",
+        "description": "此部署运行的是 Loge Lite，它没有向量数据库，因此连接器和文档索引均已禁用，不会索引任何内容。要连接数据源并索引文档，请以**标准模式**部署 Loge。请查看[部署指南]({docsUrl})开始使用。",
         "title": "Lite 模式下无法使用索引功能"
       },
       "providerCard": {
@@ -7095,10 +7099,10 @@
     "slackBots": {
       "channelConfig": {
         "createError": {
-          "toast": "创建 OnyxBot 配置出错 - {error}"
+          "toast": "创建 LogeBot 配置出错 - {error}"
         },
         "updateError": {
-          "toast": "更新 OnyxBot 配置出错 - {error}"
+          "toast": "更新 LogeBot 配置出错 - {error}"
         }
       },
       "channels": {
@@ -7216,16 +7220,16 @@
         },
         "disableDefault": {
           "label": "禁用默认配置",
-          "warning": "警告：禁用默认配置后，OnyxBot 只会在明确配置过的 Slack 频道中回复。此外，OnyxBot 也不会回复私信。"
+          "warning": "警告：禁用默认配置后，LogeBot 只会在明确配置过的 Slack 频道中回复。此外，LogeBot 也不会回复私信。"
         },
         "documentSets": {
           "autoSyncedDisabled": {
-            "tooltip": "无法使用此文档集，因为它包含启用了权限自动同步的连接器。OnyxBot 在此频道中的回复对所有 Slack 用户可见，因此沿用提问者的权限可能会意外泄露私密信息。"
+            "tooltip": "无法使用此文档集，因为它包含启用了权限自动同步的连接器。LogeBot 在此频道中的回复对所有 Slack 用户可见，因此沿用提问者的权限可能会意外泄露私密信息。"
           },
           "autoSyncedNote": {
             "text": "以下文档集无法附加，因为它们包含自动同步的文档："
           },
-          "description": "选择 OnyxBot 在 Slack 中回答问题时使用的文档集。",
+          "description": "选择 LogeBot 在 Slack 中回答问题时使用的文档集。",
           "hideUnselectableButton": {
             "label": "隐藏不可选的文档集"
           },
@@ -7250,12 +7254,12 @@
         },
         "isEphemeral": {
           "label": "以私密（临时）消息回复用户",
-          "tooltip": "启用后，OnyxBot 只会以私密（临时）消息回复该用户。如果您在上面还选择了“搜索”智能体，启用此选项后，该用户的私有文档也可用于其查询。"
+          "tooltip": "启用后，LogeBot 只会以私密（临时）消息回复该用户。如果您在上面还选择了“搜索”智能体，启用此选项后，该用户的私有文档也可用于其查询。"
         },
         "knowledgeSource": {
           "allPublic": {
             "label": "所有公开知识",
-            "sublabel": "让 OnyxBot 基于所有公开连接器中的信息进行回复"
+            "sublabel": "让 LogeBot 基于所有公开连接器中的信息进行回复"
           },
           "documentSets": {
             "label": "指定文档集",
@@ -7272,7 +7276,7 @@
           }
         },
         "nonSearchAgent": {
-          "description": "选择 OnyxBot 在 Slack 中回答问题时使用的非搜索智能体。"
+          "description": "选择 LogeBot 在 Slack 中回答问题时使用的非搜索智能体。"
         },
         "privacyAlert": {
           "connectors": {
@@ -7283,7 +7287,7 @@
         },
         "questionmarkPrefilter": {
           "label": "仅回复提问",
-          "tooltip": "启用后，OnyxBot 只会回复包含问号的消息"
+          "tooltip": "启用后，LogeBot 只会回复包含问号的消息"
         },
         "removedDocumentSets": {
           "toast": "我们已从您的选择中移除了一个或多个文档集，因为它们不再有效。请检查并更新您的配置。"
@@ -7293,15 +7297,15 @@
             "tooltip": "启用“以私密（临时）消息回复用户”时不可用，因为临时回复只针对单个用户。"
           },
           "label": "（可选）仅回复特定用户/用户组",
-          "subtext": "如果指定，则只有这些用户/用户组可以在此频道中调用 OnyxBot，且回复仅对他们可见。"
+          "subtext": "如果指定，则只有这些用户/用户组可以在此频道中调用 LogeBot，且回复仅对他们可见。"
         },
         "respondTagOnly": {
-          "label": "仅回复 @OnyxBot",
-          "tooltip": "启用后，OnyxBot 只会在被直接提及时回复"
+          "label": "仅回复 @LogeBot",
+          "tooltip": "启用后，LogeBot 只会在被直接提及时回复"
         },
         "respondToBots": {
           "label": "回复机器人消息",
-          "tooltip": "未启用时，OnyxBot 将始终忽略来自机器人的消息"
+          "tooltip": "未启用时，LogeBot 将始终忽略来自机器人的消息"
         },
         "responseType": {
           "detailed": {
@@ -7311,10 +7315,10 @@
           "standard": {
             "label": "标准"
           },
-          "tooltip": "控制 OnyxBot 回复的格式。"
+          "tooltip": "控制 LogeBot 回复的格式。"
         },
         "searchAgent": {
-          "description": "选择 OnyxBot 在 Slack 中回答问题时使用的搜索智能体。"
+          "description": "选择 LogeBot 在 Slack 中回答问题时使用的搜索智能体。"
         },
         "searchConfig": {
           "section": {
@@ -7330,7 +7334,7 @@
           "section": {
             "prompt": "配置“仍需帮助”按钮"
           },
-          "tooltip": "OnyxBot 的回复底部将包含一个按钮，询问用户是否仍需帮助。"
+          "tooltip": "LogeBot 的回复底部将包含一个按钮，询问用户是否仍需帮助。"
         },
         "syncEnabledAgents": {
           "hideButton": {
@@ -7351,17 +7355,17 @@
       },
       "intro": {
         "autoAnswer": {
-          "item": "设置 OnyxBot，让它在特定频道中自动回答问题。"
+          "item": "设置 LogeBot，让它在特定频道中自动回答问题。"
         },
         "description": "设置连接到 {appName} 的 Slack 机器人。设置完成后，您可以直接在 Slack 中向 {appName} 提问。此外，您还可以：",
         "directMessage": {
-          "item": "像在 Web 界面中一样，直接给 OnyxBot 发消息进行搜索。"
+          "item": "像在 Web 界面中一样，直接给 LogeBot 发消息进行搜索。"
         },
         "docsPrompt": {
-          "text": "请按照 Onyx 文档中的<link>指南</link>开始使用！"
+          "text": "请按照 Loge 文档中的<link>指南</link>开始使用！"
         },
         "documentSets": {
-          "item": "根据提问所在的频道，选择 OnyxBot 应基于哪些文档集回答。"
+          "item": "根据提问所在的频道，选择 LogeBot 应基于哪些文档集回答。"
         }
       },
       "list": {
@@ -7379,7 +7383,7 @@
       },
       "newChannel": {
         "header": {
-          "title": "为 Slack 频道配置 OnyxBot"
+          "title": "为 Slack 频道配置 LogeBot"
         }
       },
       "table": {
@@ -7874,7 +7878,7 @@
         "label": "首次访问弹窗通知"
       },
       "appName": {
-        "description": "此名称将在整个应用中显示,并替换界面中的\"Onyx\"。",
+        "description": "此名称将在整个应用中显示,并替换界面中的\"Loge\"。",
         "label": "应用显示名称"
       },
       "chatFooter": {
@@ -7900,7 +7904,7 @@
         "label": "问候语"
       },
       "helpLink": {
-        "description": "除 Onyx 文档外,在用户菜单中添加自定义帮助链接。",
+        "description": "除 Loge 文档外,在用户菜单中添加自定义帮助链接。",
         "enterpriseTooltip": "自定义帮助链接是企业版套餐的功能。",
         "label": "自定义帮助链接"
       },
@@ -9463,7 +9467,7 @@
         "label": "创建新组织"
       },
       "createTeamOption": {
-        "text": "创建新的 Onyx 团队"
+        "text": "创建新的 Loge 团队"
       },
       "differentEmailPrompt": {
         "text": "拥有使用其他邮箱的账户？"
@@ -9472,10 +9476,10 @@
         "title": "未找到账户"
       },
       "inviteOption": {
-        "text": "受邀加入现有的 Onyx 团队"
+        "text": "受邀加入现有的 Loge 团队"
       },
       "notFound": {
-        "description": "我们在记录中找不到您的账户。要访问 Onyx，您需要执行以下操作之一："
+        "description": "我们在记录中找不到您的账户。要访问 Loge，您需要执行以下操作之一："
       },
       "signInLink": {
         "label": "登录"
@@ -9544,7 +9548,7 @@
         "description": "账户访问限制或权限问题"
       },
       "cloudSupportPrompt": {
-        "text": "如果问题持续存在，请通过 <link>support@onyx.app</link> 联系 Onyx 团队"
+        "text": "如果问题持续存在，请通过 <link>support@onyx.app</link> 联系 Loge 团队"
       },
       "code": {
         "accessDenied": "您的身份提供方拒绝了访问。",
@@ -11492,7 +11496,8 @@
     "welcome": {
       "greeting": {
         "helpText": "有什么可以帮您？",
-        "startText": "开始吧。"
+        "startText": "开始吧。",
+        "subtitle": "搜索团队的私有知识。每个回答都会显示来源。"
       },
       "incognito": {
         "title": "您处于无痕模式"
@@ -11958,7 +11963,7 @@
         "alt": "徽标"
       },
       "poweredBy": {
-        "label": "由 Onyx 提供支持"
+        "label": "由 Loge 提供支持"
       }
     },
     "modelSelectors": {
@@ -12160,8 +12165,8 @@
             "label": "名称"
           }
         },
-        "managedDescription": "由 Onyx 提供，请配置智能体可以执行的操作。",
-        "managedNote": "此应用由 Onyx 提供，凭据由系统代管。请在下方选择智能体可以执行的操作。用户可从“应用”页面连接它。",
+        "managedDescription": "由 Loge 提供，请配置智能体可以执行的操作。",
+        "managedNote": "此应用由 Loge 提供，凭据由系统代管。请在下方选择智能体可以执行的操作。用户可从“应用”页面连接它。",
         "saveButton": "保存"
       },
       "customApp": {
@@ -12246,14 +12251,14 @@
           "startAuthFailed": "无法启动授权"
         },
         "header": {
-          "description": "连接 Onyx Craft 在工作时可用作上下文的工具。",
+          "description": "连接 Loge Craft 在工作时可用作上下文的工具。",
           "manageButton": "管理应用",
           "searchPlaceholder": "搜索应用...",
           "title": "应用"
         },
         "kinds": {
           "app": {
-            "blurb": "Onyx 直接支持的集成。每个都附带教 Craft 如何使用它的技能，从这里开始。",
+            "blurb": "Loge 直接支持的集成。每个都附带教 Craft 如何使用它的技能，从这里开始。",
             "empty": "您的组织尚未配置任何应用。",
             "emptyTitle": "暂无应用",
             "tabLabel": "应用 · {count}"
@@ -12634,7 +12639,7 @@
       },
       "llmLocked": {
         "backToChatButton": "返回聊天",
-        "description": "Onyx Craft 需要模型提供商，且只有管理员可以设置。请让您的管理员连接 Anthropic、OpenAI 或 OpenRouter。",
+        "description": "Loge Craft 需要模型提供商，且只有管理员可以设置。请让您的管理员连接 Anthropic、OpenAI 或 OpenRouter。",
         "title": "需要 LLM 提供商"
       },
       "llmSetup": {
@@ -14220,10 +14225,10 @@
     },
     "adminSidebar": {
       "businessOrEnterpriseOnly": {
-        "tooltip": "此功能仅在 [Onyx 商业版或企业版](/admin/billing) 中提供。"
+        "tooltip": "此功能仅在 [Loge 商业版或企业版](/admin/billing) 中提供。"
       },
       "enterpriseOnly": {
-        "tooltip": "此功能仅在 [Onyx 企业版](/admin/billing) 中提供。"
+        "tooltip": "此功能仅在 [Loge 企业版](/admin/billing) 中提供。"
       },
       "exitAdminPanel": {
         "label": "退出管理面板"
@@ -14867,7 +14872,7 @@
     "disk": "OpenSearch 数据节点的磁盘使用率至少为 85%。磁盘空间耗尽时，索引可能停止。",
     "jvmMemory": "多次检查显示 OpenSearch JVM 内存使用率持续超过 85%。搜索和索引可能失败。",
     "vectorMemory": "OpenSearch 向量内存接近满载或已达到上限。搜索和索引可能失败。",
-    "contact": "请联系系统管理员或通过 [support@onyx.app](mailto:support@onyx.app) 联系 Onyx 团队。",
+    "contact": "请联系系统管理员或通过 [support@onyx.app](mailto:support@onyx.app) 联系 Loge 团队。",
     "stale": "最新检查不可用。此警告反映上次成功检查的结果，尚未确认恢复。",
     "dismiss": "关闭",
     "diskTitle": "磁盘空间",

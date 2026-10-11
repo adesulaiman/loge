@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.external_permissions.jira.group_sync import jira_group_sync
+from loge.external_permissions.jira.group_sync import jira_group_sync
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.models import InputType
 from onyx.db.enums import AccessType, ConnectorCredentialPairStatus

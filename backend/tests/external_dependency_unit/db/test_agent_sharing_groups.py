@@ -6,9 +6,9 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.persona import transfer_persona_ownership as ee_transfer
-from ee.onyx.db.persona import update_persona_access as ee_update_persona_access
-from ee.onyx.db.user_group import _handle_owned_personas_for_group_deletion__no_commit
+from loge.db.persona import transfer_persona_ownership as ee_transfer
+from loge.db.persona import update_persona_access as ee_update_persona_access
+from loge.db.user_group import _handle_owned_personas_for_group_deletion__no_commit
 from onyx.db.enums import (
     PersonaAccessLevel,
     PersonaSharePermission,

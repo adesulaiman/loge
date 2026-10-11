@@ -7,12 +7,12 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.scim import ScimDAL
-from ee.onyx.server.enterprise_settings.api import (
+from loge.db.scim import ScimDAL
+from loge.server.enterprise_settings.api import (
     create_scim_token,
     get_active_scim_token,
 )
-from ee.onyx.server.scim.models import ScimTokenCreate
+from loge.server.scim.models import ScimTokenCreate
 from onyx.db.models import ScimToken, User
 
 
@@ -71,7 +71,7 @@ class TestGetActiveToken:
 
 
 class TestCreateToken:
-    @patch("ee.onyx.server.enterprise_settings.api.generate_scim_token")
+    @patch("loge.server.enterprise_settings.api.generate_scim_token")
     def test_creates_token_and_revokes_previous(
         self,
         mock_generate: MagicMock,
@@ -108,7 +108,7 @@ class TestCreateToken:
         # Session was committed
         scim_dal._session.commit.assert_called_once()  # ty: ignore[unresolved-attribute]
 
-    @patch("ee.onyx.server.enterprise_settings.api.generate_scim_token")
+    @patch("loge.server.enterprise_settings.api.generate_scim_token")
     def test_creates_first_token_when_none_exist(
         self,
         mock_generate: MagicMock,

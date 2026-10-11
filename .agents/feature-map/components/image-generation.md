@@ -31,7 +31,7 @@ default. The model list in the admin form includes the GPT Image 2.5 variants
 `gpt-image-1` (`web/src/views/admin/ImageGenerationPage/constants.ts`).
 Until an admin does this, the tool does not appear at all. Missing or
 incomplete configuration hides the tool. A rejected API key does not, and it
-fails only when the tool runs. The exception is EE tenant provisioning, which creates a default config from the OpenAI key (`ee/onyx/server/tenants/provisioning.py`). The tool does not appear in a deployment without a default config; the model
+fails only when the tool runs. The exception is EE tenant provisioning, which creates a default config from the OpenAI key (`loge/server/tenants/provisioning.py`). The tool does not appear in a deployment without a default config; the model
 never sees an image generation tool it cannot use, and a user is never told
 "image generation failed" for a capability that was simply never turned on.
 

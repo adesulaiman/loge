@@ -136,7 +136,7 @@ export default function AgentRowActions({
             id: "stats",
             icon: SvgBarChart,
             title: t("rowActions.statsItem.title"),
-            onSelect: () => router.push(`/ee/agents/stats/${agent.id}`),
+            onSelect: () => router.push(`/agents/stats/${agent.id}`),
           },
         ]
       : []),

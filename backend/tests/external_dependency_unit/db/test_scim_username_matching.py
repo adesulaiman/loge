@@ -10,8 +10,8 @@ from uuid import uuid4
 
 import pytest
 
-from ee.onyx.db.scim import ScimDAL
-from ee.onyx.server.scim.filtering import ScimFilter, ScimFilterOperator
+from loge.db.scim import ScimDAL
+from loge.server.scim.filtering import ScimFilter, ScimFilterOperator
 from tests.external_dependency_unit.db.conftest import ScimUserFactory
 
 

@@ -1,7 +1,7 @@
 """Integration tests for MANAGE_USER_GROUPS permission gate (Enterprise).
 
 MANAGE_USER_GROUPS protects the user-group admin endpoints in
-``backend/ee/onyx/server/user_group/api.py`` (router prefix ``/manage``).
+``backend/loge/server/user_group/api.py`` (router prefix ``/manage``).
 
 Note: ``GET /manage/admin/user-group`` is guarded by READ_USER_GROUPS
 (implied by MANAGE_USER_GROUPS) so we deliberately exclude it here —
@@ -14,7 +14,7 @@ from uuid import uuid4
 
 import pytest
 
-from ee.onyx.server.user_group.models import UserGroup as UserGroupSnapshot
+from loge.server.user_group.models import UserGroup as UserGroupSnapshot
 from onyx.db.enums import AccessType, Permission
 from tests.integration.common_utils.managers.cc_pair import CCPairManager
 from tests.integration.common_utils.managers.document_set import DocumentSetManager

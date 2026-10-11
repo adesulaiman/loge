@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import JSON, cast, select, update
+from sqlalchemy import JSON, and_, cast, not_, select, update
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -12,6 +12,10 @@ from onyx.auth.permissions import has_global_permission
 from onyx.configs.constants import NotificationType
 from onyx.db.enums import NotificationSeverity, Permission
 from onyx.db.models import Notification, User
+
+# Upstream Onyx product announcements — keep rows but hide them from the
+# Loge feed and unread badge.
+_HIDDEN_PERMISSIONS_FEATURE = "permissions_migration_v1"
 
 
 def _notification_additional_data_key() -> ColumnElement[dict]:
@@ -32,7 +36,15 @@ def _notification_filters(
     min_severity: NotificationSeverity | None = None,
 ) -> list[ColumnElement[bool]]:
     filters = [
-        Notification.user_id == user.id if user else Notification.user_id.is_(None)
+        Notification.user_id == user.id if user else Notification.user_id.is_(None),
+        Notification.notif_type != NotificationType.RELEASE_NOTES,
+        not_(
+            and_(
+                Notification.notif_type == NotificationType.FEATURE_ANNOUNCEMENT,
+                _notification_additional_data_key()["feature"].astext
+                == _HIDDEN_PERMISSIONS_FEATURE,
+            )
+        ),
     ]
     if not include_dismissed:
         filters.append(Notification.dismissed.is_(False))

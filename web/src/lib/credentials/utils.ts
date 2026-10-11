@@ -155,6 +155,7 @@ export function createValidationSchema(
       fieldMethods && ((method) => fieldMethods.includes(method))
     );
   }
+  schemaFields["name"] = Yup.string().trim().optional();
   return Yup.object().shape(schemaFields);
 }
 

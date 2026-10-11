@@ -12,7 +12,7 @@ import pytest
 import requests
 from requests import HTTPError
 
-from ee.onyx.external_permissions.confluence.page_access import (
+from loge.external_permissions.confluence.page_access import (
     get_page_restrictions_with_per_ancestor_fetch,
 )
 from onyx.connectors.confluence.access import (

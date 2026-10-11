@@ -9,8 +9,8 @@ import pytest
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
-from ee.onyx.server.oauth import api as connector_api
-from ee.onyx.server.oauth import confluence_cloud, google_drive, slack
+from loge.server.oauth import api as connector_api
+from loge.server.oauth import confluence_cloud, google_drive, slack
 from onyx.configs.constants import DocumentSource, FederatedConnectorSource
 from onyx.db.models import User
 from onyx.error_handling.error_codes import OnyxErrorCode

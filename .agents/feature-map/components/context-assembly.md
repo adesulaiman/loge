@@ -11,7 +11,7 @@
 **Owns:**
 `backend/onyx/chat/prompt_utils.py`, `backend/onyx/llm/token_budget.py`, `compression.py`,
 `COMPRESSION.md`, `incognito.py`, `incognito_context.py`,
-`backend/onyx/prompts/`, `backend/ee/onyx/prompts/`
+`backend/onyx/prompts/`, `backend/loge/prompts/`
 
 **Read first:** `backend/onyx/chat/README.md`. Its "Reasons / Experiments" section
 is the rationale behind the ordering and the reminder placement in this document.
@@ -320,7 +320,7 @@ prompts stay visible.
 
 Tool call *arguments* stay in history. For the internal search tool, they are
 the original arguments the LLM supplied. Query expansion (EE:
-`backend/ee/onyx/prompts/query_expansion.py`) changes only what the tool runs.
+`backend/loge/prompts/query_expansion.py`) changes only what the tool runs.
 It does not rewrite the saved arguments.
 
 ### 4.8 Token budget

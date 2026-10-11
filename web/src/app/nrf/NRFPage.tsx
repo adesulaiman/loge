@@ -44,14 +44,14 @@ import DocumentsSidebar from "@/sections/document-sidebar/DocumentsSidebar";
 import PreviewModal from "@/sections/modals/PreviewModal";
 import { useQueryController } from "@/providers/QueryControllerProvider";
 import { paidTierGated } from "@/ce";
-import EESearchUI from "@/ee/sections/SearchUI";
+import LogeSearchUI from "@/loge/sections/SearchUI";
 import useMultiModelChat from "@/hooks/useMultiModelChat";
 import MultiModelSelector from "@/sections/model-selector/MultiModelSelector";
 import { Section } from "@/layouts/general-layouts";
 import { useTranslations } from "next-intl";
 import { useSettings } from "@/lib/settings/hooks";
 
-const SearchUI = paidTierGated(EESearchUI);
+const SearchUI = paidTierGated(LogeSearchUI);
 
 interface NRFPageProps {
   isSidePanel?: boolean;

@@ -14,7 +14,7 @@ Onyx. It does not work on multi-tenant Onyx Cloud.
 
 A multi-tenant deployment reads the workspace from the credential itself. See
 `_get_tenant_id_from_request` in
-`backend/ee/onyx/server/middleware/tenant_tracking.py`: it accepts an Onyx API
+`backend/loge/server/middleware/tenant_tracking.py`: it accepts an Onyx API
 key or PAT prefix, a server-issued session token, or the anonymous-user cookie.
 An external IdP token carries none of these, so the request falls back to the
 default schema, which owns no workspace data. Use an API key on multi-tenant

@@ -16,7 +16,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from sqlalchemy import text
 
-from ee.onyx.server.tenants.schema_management import (
+from loge.server.tenants.schema_management import (
     create_schema_if_not_exists,
     drop_schema,
 )
@@ -55,7 +55,7 @@ class TestTenantProvisioningRollback:
         setup_tenant fails, rollback is called, but drop_schema was broken
         (isidentifier rejected UUIDs with hyphens), leaving orphaned schemas.
         """
-        from ee.onyx.background.celery.tasks.tenant_provisioning.tasks import (
+        from loge.background.celery.tasks.tenant_provisioning.tasks import (
             pre_provision_tenant,
         )
 
@@ -74,17 +74,17 @@ class TestTenantProvisioningRollback:
         mock_lock.acquire.return_value = True
 
         with patch(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.get_redis_client"
+            "loge.background.celery.tasks.tenant_provisioning.tasks.get_redis_client"
         ) as mock_redis:
             mock_redis.return_value.lock.return_value = mock_lock
 
             with patch(
-                "ee.onyx.server.tenants.provisioning.setup_tenant"
+                "loge.server.tenants.provisioning.setup_tenant"
             ) as mock_setup:
                 mock_setup.side_effect = Exception("Simulated provisioning failure")
 
                 with patch(
-                    "ee.onyx.server.tenants.schema_management.create_schema_if_not_exists",
+                    "loge.server.tenants.schema_management.create_schema_if_not_exists",
                     side_effect=track_schema_creation,
                 ):
                     # Run pre-provisioning - it should fail and trigger rollback

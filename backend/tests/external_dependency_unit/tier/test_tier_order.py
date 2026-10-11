@@ -2,8 +2,8 @@
 
 import pytest
 
-from ee.onyx.configs.license_enforcement_config import PATH_PREFIX_MIN_TIER
-from ee.onyx.server.middleware.tier_gate import _required_tier
+from loge.configs.license_enforcement_config import PATH_PREFIX_MIN_TIER
+from loge.server.middleware.tier_gate import _required_tier
 from onyx.server.gateway.configs import GATEWAY_PATH_PREFIX
 from onyx.server.settings.models import Tier
 from onyx.server.settings.tier_order import TIER_RANK, tier_at_least

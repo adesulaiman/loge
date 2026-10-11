@@ -8,8 +8,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ee.onyx.access.access import _get_access_for_documents
-from ee.onyx.db.external_perm import fetch_external_groups_for_user
+from loge.access.access import _get_access_for_documents
+from loge.db.external_perm import fetch_external_groups_for_user
 from onyx.access.utils import prefix_external_group, prefix_user_email
 from onyx.configs.constants import PUBLIC_DOC_PAT
 from onyx.db.models import DocumentByConnectorCredentialPair, User

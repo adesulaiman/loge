@@ -133,7 +133,7 @@ own those.
  (A) SearchTool.run(), search_tool.py     │  (B) search_chunks, search_runner.py
      takes no slack_context               │      only when NOT pre-fetched by (A)
      prefetches once per run(), passes    │      (only the EE Search UI path,
-     result into every non-Slack lane     │      ee/onyx/search/process_search_query.py,
+     result into every non-Slack lane     │      loge/search/process_search_query.py,
      via prefetched_federated_retrieval_  │      calls search_pipeline with no
      infos                                │      prefetched_federated_retrieval_infos)
                                           │      also takes no slack_context
@@ -350,7 +350,7 @@ future source makes it non-empty) merge the same way, but arrive through
   than through the registry, but it does not state that the registry path is
   empty in practice for every call site that exists today; that fact belongs
   here.
-- The EE Search UI backend (`ee/onyx/search/process_search_query.py`) calls
+- The EE Search UI backend (`loge/search/process_search_query.py`) calls
   `search_pipeline` directly. It reaches `get_federated_retrieval_functions` through call site
   (B) in §4.1, but never reaches `_run_slack_search` (that lane lives only inside
   `SearchTool`), so **it never returns Slack federated results.** The `/search` API

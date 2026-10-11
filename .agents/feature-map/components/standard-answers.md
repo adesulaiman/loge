@@ -9,11 +9,11 @@
 **Domain:** integrations
 **Edition:** EE
 **Owns:**
-`backend/ee/onyx/db/standard_answer.py`,
-`backend/ee/onyx/server/manage/standard_answer.py`,
-`backend/ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py`,
+`backend/loge/db/standard_answer.py`,
+`backend/loge/server/manage/standard_answer.py`,
+`backend/loge/onyxbot/slack/handlers/handle_standard_answers.py`,
 `backend/onyx/onyxbot/slack/handlers/handle_standard_answers.py` (CE fallback),
-`web/src/app/ee/admin/standard-answer/`
+`web/src/app/admin/standard-answer/`
 
 ---
 
@@ -21,7 +21,7 @@
 
 A workspace admin creates a standard answer at `/admin/standard-answer/new`: a
 keyword or regex pattern, the answer text, and one or more categories
-(`web/src/app/ee/admin/standard-answer/StandardAnswerCreationForm.tsx`). A Slack
+(`web/src/app/admin/standard-answer/StandardAnswerCreationForm.tsx`). A Slack
 channel config is assigned one or more of those categories. When a message in
 that channel matches an assigned answer's pattern, the Slack bot posts the
 canned answer directly, with a "Generate Full Answer" button, instead of running
@@ -34,14 +34,14 @@ and `/admin/standard-answer/[id]`.
 
 | Surface | Where |
 |---|---|
-| `/admin/standard-answer`, `/new`, `/[id]` | `web/src/app/ee/admin/standard-answer/` |
-| `POST/GET /manage/admin/standard-answer` | `ee/onyx/server/manage/standard_answer.py` |
-| `PATCH/DELETE /manage/admin/standard-answer/{id}` | `ee/onyx/server/manage/standard_answer.py` |
-| `POST/GET/PATCH/DELETE /manage/admin/standard-answer/category[/{id}]` | `ee/onyx/server/manage/standard_answer.py` |
+| `/admin/standard-answer`, `/new`, `/[id]` | `web/src/app/admin/standard-answer/` |
+| `POST/GET /manage/admin/standard-answer` | `loge/server/manage/standard_answer.py` |
+| `PATCH/DELETE /manage/admin/standard-answer/{id}` | `loge/server/manage/standard_answer.py` |
+| `POST/GET/PATCH/DELETE /manage/admin/standard-answer/category[/{id}]` | `loge/server/manage/standard_answer.py` |
 | Slack channel config field `standard_answer_categories` | `backend/onyx/db/models.py:SlackChannelConfig` |
 
 All admin endpoints require `Permission.FULL_ADMIN_PANEL_ACCESS`
-(`ee/onyx/server/manage/standard_answer.py`), not a Slack-specific permission.
+(`loge/server/manage/standard_answer.py`), not a Slack-specific permission.
 
 ---
 
@@ -52,7 +52,7 @@ or a regex pattern, depending on `match_regex`), `answer` text, `active`
 (soft-delete flag), `match_regex`, `match_any_keywords`. A partial unique index
 enforces one active answer per `keyword` (`unique_keyword_active`, `postgresql_where=(active == True)`), so a deactivated keyword
 can be reused by a new answer. The Community downgrade sets `active=False` on every answer
-(`ee/onyx/db/community_downgrade.py:disable_paid_features__no_commit`, see [[billing]] §4.5).
+(`loge/db/community_downgrade.py:disable_paid_features__no_commit`, see [[billing]] §4.5).
 
 `StandardAnswerCategory` (`models.py:StandardAnswerCategory`): just an `id` and unique `name`.
 
@@ -82,10 +82,10 @@ answers were attached to a given assistant `ChatMessage`, added by
 handle_message.py: handle_standard_answers(...)                 onyx/onyxbot/slack/handlers/
   └─ fetch_versioned_implementation(..., "_handle_standard_answers")   [[editions-and-gating]]
         ├─ CE fallback: always returns False                    onyx/onyxbot/.../handle_standard_answers.py
-        └─ EE: _handle_standard_answers(...)                     ee/onyx/onyxbot/.../handle_standard_answers.py
+        └─ EE: _handle_standard_answers(...)                     loge/onyxbot/.../handle_standard_answers.py
               ├─ diff configured categories' answers against ones already
               │  used in this Slack thread
-              ├─ find_matching_standard_answers(query, id_in, db_session)   ee/onyx/db/standard_answer.py
+              ├─ find_matching_standard_answers(query, id_in, db_session)   loge/db/standard_answer.py
               ├─ if matched: create a ChatMessage pair, attach
               │  chat_message.standard_answers, post the Slack blocks
               └─ returns True (matched) or False (no match)
@@ -100,12 +100,12 @@ else: handle_regular_answer(...)        # normal retrieval + LLM turn
    (`onyx/onyxbot/slack/handlers/handle_standard_answers.py:_handle_standard_answers`).
    In an EE-enabled process, this resolves to the EE implementation. See
    [[editions-and-gating]] for how that dispatch is decided at import time.
-2. The EE `_handle_standard_answers` (`ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py`)
+2. The EE `_handle_standard_answers` (`loge/onyxbot/slack/handlers/handle_standard_answers.py`)
    reads `slack_channel_config.standard_answer_categories`, collects every
    `StandardAnswer` in those categories, then subtracts any already used in the
    current Slack thread (via `ChatMessage.standard_answers` for chat sessions on
    that `slack_thread_id`) so the same canned answer is not repeated.
-3. `find_matching_standard_answers` (`ee/onyx/db/standard_answer.py`) matches
+3. `find_matching_standard_answers` (`loge/db/standard_answer.py`) matches
    the latest thread message against the remaining candidates: if
    `match_regex` is set, `re.search(keyword, query, re.IGNORECASE)`; otherwise a
    punctuation-stripped, whitespace-tokenized keyword/query comparison, either
@@ -133,7 +133,7 @@ else: handle_regular_answer(...)        # normal retrieval + LLM turn
 2. **A category must scope which channels can trigger an answer.** An answer
    fires only if it belongs to a category assigned to that channel's
    `SlackChannelConfig.standard_answer_categories`
-   (`ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py:_handle_standard_answers`).
+   (`loge/onyxbot/slack/handlers/handle_standard_answers.py:_handle_standard_answers`).
    An answer with no category assigned to any channel can never fire, by
    construction; a channel-config change that broadens categories broadens
    which answers leak into that channel, so category assignment is the only
@@ -152,19 +152,19 @@ else: handle_regular_answer(...)        # normal retrieval + LLM turn
 4. **A used answer is not repeated in the same Slack thread.** The "already
    used" set is computed from `ChatMessage.standard_answers` for chat sessions
    tied to the thread's `slack_thread_id`
-   (`ee/onyx/onyxbot/slack/handlers/handle_standard_answers.py`), so `remove_standard_answer`
+   (`loge/onyxbot/slack/handlers/handle_standard_answers.py`), so `remove_standard_answer`
    deactivating an answer does not retroactively un-mark it as used; deactivation
-   only stops future matches (`ee/onyx/db/standard_answer.py:remove_standard_answer`
+   only stops future matches (`loge/db/standard_answer.py:remove_standard_answer`
    sets `active=False`, it does not delete the row).
 5. **Only active answers can match or be listed.** `find_matching_standard_answers`
    and `fetch_standard_answers` both filter `StandardAnswer.active.is_(True)`
-   (`ee/onyx/db/standard_answer.py`); the partial unique index on
+   (`loge/db/standard_answer.py`); the partial unique index on
    `(keyword, active)` (`unique_keyword_active`) lets a new active answer reuse a
    deactivated keyword.
 6. **A category in use cannot be deleted.** `remove_standard_answer_category`
    refuses deletion if any active answer or Slack channel config still
    references it, and re-checks after commit under an `IntegrityError` race
-   (`ee/onyx/db/standard_answer.py:remove_standard_answer_category`).
+   (`loge/db/standard_answer.py:remove_standard_answer_category`).
 
 ---
 
@@ -248,7 +248,7 @@ integration or playwright test exercises the Slack short-circuit path or the
   even after the answer's `active` flag flips to `False`.
 - **Regex mode uses `re.search`, not `re.match` or `re.fullmatch`.** An
   unanchored pattern can match a substring anywhere in the message, which is a
-  common source of over-broad matches (`ee/onyx/db/standard_answer.py:find_matching_standard_answers`).
+  common source of over-broad matches (`loge/db/standard_answer.py:find_matching_standard_answers`).
 - **A used-status check keys off `slack_thread_id`, not the answer or the
   user.** Two different users in the same Slack thread share the "already
   answered" state.

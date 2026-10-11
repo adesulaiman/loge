@@ -1,8 +1,8 @@
-"""Enterprise code loads only when the build ships a real `ee.onyx` package.
+"""Full feature code loads only when the build ships a real `loge` package.
 
-`is_ee_available` rejects a missing `ee` package, a bare `ee` package, and an
-`ee/onyx` directory with no `__init__.py`. `set_is_ee_if_available` selects
-the Enterprise Edition only when `is_ee_available` is true.
+`is_ee_available` rejects a missing `loge` package and a directory with no
+`__init__.py`. `set_is_ee_if_available` selects the full feature set only when
+`is_ee_available` is true.
 """
 
 from importlib.machinery import ModuleSpec
@@ -19,18 +19,17 @@ from onyx.utils.variable_functionality import (
 
 
 def test_ee_is_available_when_the_package_is_real() -> None:
-    # Mocked, so this also runs on the MIT-only mirror, which has no `ee.onyx`.
     with patch(
         "onyx.utils.variable_functionality.importlib.util.find_spec",
-        return_value=ModuleSpec("ee.onyx", loader=None, origin="ee/onyx/__init__.py"),
+        return_value=ModuleSpec("loge.main", loader=None, origin="loge/main.py"),
     ):
         assert is_ee_available()
 
 
-def test_ee_is_unavailable_with_no_ee_package() -> None:
+def test_ee_is_unavailable_with_no_loge_package() -> None:
     with patch(
         "onyx.utils.variable_functionality.importlib.util.find_spec",
-        side_effect=ModuleNotFoundError("No module named 'ee'"),
+        side_effect=ModuleNotFoundError("No module named 'loge.main'"),
     ):
         assert not is_ee_available()
 
@@ -38,10 +37,9 @@ def test_ee_is_unavailable_with_no_ee_package() -> None:
 @pytest.mark.parametrize(
     "spec",
     [
-        # The MIT-only mirror: a bare `ee` package with no `onyx` inside.
         None,
-        # A leftover `ee/onyx` directory with no `__init__.py`.
-        ModuleSpec("ee.onyx", loader=None, origin=None),
+        # A leftover `loge` directory with no `main` module.
+        ModuleSpec("loge.main", loader=None, origin=None),
     ],
 )
 def test_ee_is_unavailable_without_a_real_package(spec: ModuleSpec | None) -> None:

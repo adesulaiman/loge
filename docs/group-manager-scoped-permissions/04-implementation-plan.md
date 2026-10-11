@@ -93,9 +93,9 @@ PR1 — verify, don't author: both columns, role-gated `is_manager` backfill (CU
 `within_managed_scope_clause`, `assert_within_scope`. Extend `require_permission` with
 `allow_scope: bool` (`auth/permissions.py`). Unit-coverable, no endpoints wired yet.
 
-**Step 3 — Manager assignment.** `make_group_manager` / `revoke_group_manager` (`ee/onyx/db/user_group.py`) with
+**Step 3 — Manager assignment.** `make_group_manager` / `revoke_group_manager` (`loge/db/user_group.py`) with
 a recompute trigger for the affected user. New EE endpoint `PUT …/user-group/{group_id}/manager`
-(`ee/onyx/server/user_group/api.py`) gated `admin ∨ group_id ∈ managed` (D3); reject non-member targets.
+(`loge/server/user_group/api.py`) gated `admin ∨ group_id ∈ managed` (D3); reject non-member targets.
 
 **Step 4 — Write-side gates (the security core).** Insert `assert_within_scope` into each scoped write
 fn, re-reading current groups in-txn: connector create/update (`db/connector_credential_pair.py:496` +
@@ -112,7 +112,7 @@ write path. `credentials.py` **and `feedback.py`** unchanged (documented no-ops 
 
 **Step 6 — API + frontend.** Add `is_manager` (and optionally `managed_group_ids`) to `GET /users/me/permissions`.
 Frontend: `usePermissions` / `hasPermission` consume the flag for nav visibility; group-detail page gets a
-per-member "Make/Revoke Manager" toggle (`web/src/app/ee/admin/groups/[groupId]/`) calling the Step-3 endpoint.
+per-member "Make/Revoke Manager" toggle (`web/src/app/admin/groups/[groupId]/`) calling the Step-3 endpoint.
 
 **Step 7 — PAT composition verification.** No schema change; add tests proving a scoped PAT narrows permissions
 and can never widen group reach (live `is_manager` bounds groups regardless of token).

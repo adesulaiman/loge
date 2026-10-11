@@ -12,7 +12,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ee.onyx.external_permissions.box.group_sync import box_group_sync
+from loge.external_permissions.box.group_sync import box_group_sync
 from onyx.connectors.box.connector import (
     BOX_ROOT_FOLDER_ID,
     BoxConnector,

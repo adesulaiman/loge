@@ -1,6 +1,6 @@
 import pytest
 
-from ee.onyx.server.scim.models import (
+from loge.server.scim.models import (
     ScimEmail,
     ScimGroupMember,
     ScimGroupResource,
@@ -13,13 +13,13 @@ from ee.onyx.server.scim.models import (
     ScimPatchValue,
     ScimUserResource,
 )
-from ee.onyx.server.scim.patch import (
+from loge.server.scim.patch import (
     ScimPatchError,
     apply_group_patch,
     apply_user_patch,
 )
-from ee.onyx.server.scim.providers.entra import EntraProvider
-from ee.onyx.server.scim.providers.okta import OktaProvider
+from loge.server.scim.providers.entra import EntraProvider
+from loge.server.scim.providers.okta import OktaProvider
 
 _OKTA_IGNORED = OktaProvider().ignored_patch_paths
 _ENTRA_IGNORED = EntraProvider().ignored_patch_paths

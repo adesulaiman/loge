@@ -16,8 +16,8 @@ import sys
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from ee.onyx.db.license import publish_license_metadata, upsert_license  # noqa: E402
-from ee.onyx.utils.license import (  # noqa: E402
+from loge.db.license import publish_license_metadata, upsert_license  # noqa: E402
+from loge.utils.license import (  # noqa: E402
     normalize_license_file,
     verify_license_signature,
 )

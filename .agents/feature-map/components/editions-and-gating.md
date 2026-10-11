@@ -13,40 +13,40 @@
 `backend/onyx/utils/variable_functionality.py`, `backend/onyx/feature_flags/`
 (`interface.py`, `factory.py`, `flags.py`, `feature_flags_keys.py`),
 `backend/onyx/db/gated_app.py`, `backend/onyx/server/settings/` (`api.py`,
-`store.py`, `models.py`, `tier_order.py`), `backend/ee/onyx/feature_flags/`
-(`factory.py`, `posthog_provider.py`), `backend/ee/onyx/server/license/`
-(`api.py`, `models.py`), `backend/ee/onyx/utils/tier.py`,
-`backend/ee/onyx/server/middleware/license_enforcement.py`, `backend/Dockerfile`
+`store.py`, `models.py`, `tier_order.py`), `backend/loge/feature_flags/`
+(`factory.py`, `posthog_provider.py`), `backend/loge/server/license/`
+(`api.py`, `models.py`), `backend/loge/utils/tier.py`,
+`backend/loge/server/middleware/license_enforcement.py`, `backend/Dockerfile`
 
 ---
 
 ## 1. What the user experiences
 
 An operator who clones the repository and runs a standard build with no license
-still gets **Enterprise code running underneath**, because
-`backend/Dockerfile:COPY --chown=onyx:onyx ./ee /app/ee` ships the `ee` package
-in every standard image, and
+still gets **full feature code running underneath**, because
+`backend/Dockerfile:COPY --chown=onyx:onyx ./loge /app/loge` ships the `loge`
+package in every standard image, and
 `backend/onyx/utils/variable_functionality.py:set_is_ee_if_available` loads it
-whenever the build ships it. No environment variable turns Enterprise code off.
+whenever the build ships it. No environment variable turns full features off.
 What changes with a license is not which code runs but which
-paths are unlocked: `backend/ee/onyx/server/middleware/license_enforcement.py`
-blocks or allows requests, and `backend/ee/onyx/utils/tier.py:get_tier` decides
+paths are unlocked: `backend/loge/server/middleware/license_enforcement.py`
+blocks or allows requests, and `backend/loge/utils/tier.py:get_tier` decides
 which tier-gated features respond instead of 402/403.
 
 For a self-hosted operator, the visible progression is: no license, run as
 Community (`Tier.COMMUNITY` in `backend/onyx/server/settings/models.py`);
 upload or claim a license via the `/license` endpoints
-(`backend/ee/onyx/server/license/api.py`), and previously blocked admin
+(`backend/loge/server/license/api.py`), and previously blocked admin
 surfaces, seat limits, and tier-gated features unlock. A cloud (`MULTI_TENANT`)
 deployment still registers the license routes. `GET /license`, `GET /license/seats`,
 and `POST /license/refresh` are callable only for ungated tenants. Claim, upload,
 delete, and downgrade reject cloud requests with a `MULTI_TENANT` check. Gating there is
 external, through the control plane:
-`backend/ee/onyx/server/middleware/tenant_tracking.py` calls
-`backend/ee/onyx/server/tenants/product_gating.py:is_tenant_gated`. For a gated
+`backend/loge/server/middleware/tenant_tracking.py` calls
+`backend/loge/server/tenants/product_gating.py:is_tenant_gated`. For a gated
 tenant it returns 402 (`SUBSCRIPTION_INACTIVE`) before the handler runs. `/license`
-is not in `backend/ee/onyx/configs/multi_tenant_gating_config.py:MULTI_TENANT_GATING_ALLOWED_PREFIXES`.
-`backend/ee/onyx/server/settings/api.py:apply_license_status_to_settings` sets
+is not in `backend/loge/configs/multi_tenant_gating_config.py:MULTI_TENANT_GATING_ALLOWED_PREFIXES`.
+`backend/loge/server/settings/api.py:apply_license_status_to_settings` sets
 `ee_features_enabled` to true for cloud.
 
 An admin building a custom OpenAPI action or MCP tool also sees per-action
@@ -62,14 +62,14 @@ tables, independent of CE/EE at all.
 
 | Variable | Read in | Default | Effect |
 |---|---|---|---|
-| `MULTI_TENANT` | `backend/shared_configs/configs.py` | `false` | Cloud mode. Selects control-plane gating (`add_api_server_tenant_id_middleware`) over the self-hosted license middleware in `backend/ee/onyx/main.py:get_application`. Also gates whether `backend/onyx/feature_flags/factory.py:get_default_feature_flag_provider` even attempts the PostHog provider. |
+| `MULTI_TENANT` | `backend/shared_configs/configs.py` | `false` | Cloud mode. Selects control-plane gating (`add_api_server_tenant_id_middleware`) over the self-hosted license middleware in `backend/loge/main.py:get_application`. Also gates whether `backend/onyx/feature_flags/factory.py:get_default_feature_flag_provider` even attempts the PostHog provider. |
 
 No environment variable selects the edition. On a self-hosted deployment, none
 turns license enforcement off.
 The build decides the edition (`variable_functionality.py:is_ee_available`, §4.1),
 and the license decides the tier (§4.4).
 
-### License endpoints (`backend/ee/onyx/server/license/api.py`, router prefix `/license`, self-hosted only)
+### License endpoints (`backend/loge/server/license/api.py`, router prefix `/license`, self-hosted only)
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
@@ -84,7 +84,7 @@ and the license decides the tier (§4.4).
 All handlers gate on `require_permission(Permission.FULL_ADMIN_PANEL_ACCESS)`
 and are sync `def` (not `async def`) because the work underneath is blocking
 (`requests` calls, sync SQLAlchemy, RSA verification, Redis); see the module
-docstring in `backend/ee/onyx/server/license/api.py`.
+docstring in `backend/loge/server/license/api.py`.
 
 ### Settings endpoints (`backend/onyx/server/settings/api.py`)
 
@@ -124,7 +124,7 @@ This component is mostly code dispatch, not data, with two exceptions:
   per-action approval policy, keyed by `(kind, target_id)` via
   `gated_app.py:_target_column`.
 - License metadata is stored and cached by EE code
-  (`backend/ee/onyx/db/license.py:get_license_metadata`,
+  (`backend/loge/db/license.py:get_license_metadata`,
   `get_cached_license_metadata`, `refresh_license_cache`), not owned by this
   document; see [[cc-pairs-and-credentials]] for the adjacent encrypted-secret
   storage pattern this component's dispatch also protects.
@@ -158,14 +158,14 @@ Because `backend/Dockerfile` always copies `./ee` into the image
 (`COPY --chown=onyx:onyx ./ee /app/ee`), the "on ModuleNotFoundError while
 is_ee" branch is not the path a standard deployment takes: `ee.<module>`
 resolves successfully essentially every time EE is set, which per the flow
-above is every build that ships `backend/ee/onyx`. The CE branch above
+above is every build that ships `backend/loge`. The CE branch above
 (`module_full = module`, no `ee.` prefix) is reached only when
 `global_version.is_ee_version()` is `False`, which requires a build without
 the `ee.onyx` package. `variable_functionality.py:is_ee_available` calls
 `importlib.util.find_spec("ee.onyx")` and returns false in three cases: there
 is no `ee` package (`find_spec` raises `ModuleNotFoundError`), there is a bare
 `ee` package with no `onyx` inside (the MIT-only mirror, per the function's
-docstring), or `ee/onyx` is a directory with no `__init__.py` (a namespace
+docstring), or `loge` is a directory with no `__init__.py` (a namespace
 package, whose spec has no origin). Such a build resolves every versioned
 symbol to CE.
 
@@ -210,14 +210,14 @@ merely reaching that function already implies EE.
   can run code. If EE, it delegates to
   `fetch_versioned_implementation` and re-raises on failure (an EE process
   that cannot load an EE-only symbol is a real error, not a fallback case).
-  Also used for the tier guards in `backend/ee/onyx/utils/tier.py`
+  Also used for the tier guards in `backend/loge/utils/tier.py`
   (`require_business_tier_for_sync_access`, `require_business_tier_for_connector_group_restrictions`,
   `require_business_tier_for_multi_sso`), which are no-ops in CE. Used at
   `backend/onyx/context/search/pipeline.py` for
   `onyx.external_permissions.post_query_censoring._post_query_chunk_censoring`,
   where there is **no CE module at that path at all**
   (`backend/onyx/external_permissions/` does not exist; only
-  `backend/ee/onyx/external_permissions/post_query_censoring.py` does). See
+  `backend/loge/external_permissions/post_query_censoring.py` does). See
   §5 and §9 for the safety implication.
 
 ### 4.3 Feature flags
@@ -226,7 +226,7 @@ merely reaching that function already implies EE.
 returns `NoOpFeatureFlagProvider` (`backend/onyx/feature_flags/interface.py`,
 always answers `False`) unless `MULTI_TENANT or DEV_MODE`, in which case it
 attempts the EE PostHog provider
-(`backend/ee/onyx/feature_flags/factory.py:get_posthog_feature_flag_provider`),
+(`backend/loge/feature_flags/factory.py:get_posthog_feature_flag_provider`),
 itself falling back to `NoOpFeatureFlagProvider` if `posthog` (the client) is
 `None`, for example no `POSTHOG_API_KEY` configured locally.
 
@@ -238,27 +238,27 @@ Two shapes of flag exist, both on `FeatureFlagProvider`
 - `feature_variant_for_tenant`: reads a multivariate flag for the whole tenant.
   The base class and `NoOpFeatureFlagProvider` return `None`. The PostHog
   provider keys the flag on `tenant_id`
-  (`backend/ee/onyx/feature_flags/posthog_provider.py`).
+  (`backend/loge/feature_flags/posthog_provider.py`).
 
 ### 4.4 Licensing
 
 Self-hosted only. `/license/claim` and `/license/upload`
-(`backend/ee/onyx/server/license/api.py`) both reject on `MULTI_TENANT`, since
+(`backend/loge/server/license/api.py`) both reject on `MULTI_TENANT`, since
 cloud licensing is driven by the control plane and the `gated_tenants` Redis
-key instead. `backend/ee/onyx/server/middleware/license_enforcement.py`
+key instead. `backend/loge/server/middleware/license_enforcement.py`
 enforces license state (`GATED_ACCESS`, seat limits) on every self-hosted
 deployment; MULTI_TENANT
 deployments get `add_api_server_tenant_id_middleware` instead
-(`backend/ee/onyx/main.py:get_application`). Whether EE *features* (as
+(`backend/loge/main.py:get_application`). Whether EE *features* (as
 opposed to EE *code*) are actually unlocked is a separate question, answered
-by `backend/ee/onyx/utils/tier.py:get_tier` and, for the UI, by the
+by `backend/loge/utils/tier.py:get_tier` and, for the UI, by the
 `ee_features_enabled` field that
-`backend/ee/onyx/server/settings/api.py:apply_license_status_to_settings` sets:
+`backend/loge/server/settings/api.py:apply_license_status_to_settings` sets:
 EE code loading is necessary but not sufficient for a paid feature to respond.
 With no license, `tier.py:_self_hosted_tier` resolves `Tier.COMMUNITY`.
 
 `GET /settings` reports the license state through
-`backend/ee/onyx/server/settings/api.py:apply_license_status_to_settings`
+`backend/loge/server/settings/api.py:apply_license_status_to_settings`
 (self-hosted). With no license in the cache or the DB, it sets
 `ee_features_enabled` to false and `tier` to `Tier.COMMUNITY`. It sets
 `application_status` to `GATED_ACCESS` only when a perm-synced cc-pair exists
@@ -281,7 +281,7 @@ not gated.
 2. **A CE stub that "does nothing" is not evidence Onyx does nothing.** The
    CE implementation of a versioned symbol may be an intentional no-op
    (`backend/onyx/utils/encryption.py:_encrypt_string` returns the input
-   unchanged) whose real behaviour lives only in `backend/ee/onyx/...` and
+   unchanged) whose real behaviour lives only in `backend/loge/...` and
    which is the version actually loaded by default. See §9.
 3. **A `fetch_ee_implementation_or_noop` no-op fallback must never widen
    access or skip a security control.** It may only skip *additional*
@@ -298,7 +298,7 @@ not gated.
    fails at import or call time in production, not in CI type-checking. The
    `# IMPORTANT DO NOT DELETE, THIS IS USED BY fetch_versioned_implementation`
    comments (e.g. above `_encrypt_string` and `_decrypt_bytes` in both
-   `backend/onyx/utils/encryption.py` and `backend/ee/onyx/utils/encryption.py`)
+   `backend/onyx/utils/encryption.py` and `backend/loge/utils/encryption.py`)
    exist because these symbols are invisible to static "who calls this"
    analysis; `importlib.import_module` plus `getattr` is a string-keyed
    lookup, not a normal import graph edge.
@@ -359,7 +359,7 @@ not gated.
 | changes how EE code is detected (`is_ee_available`, `set_is_ee_if_available`) | every place that calls `is_ee_available` directly rather than through `global_version` (`backend/onyx/background/celery/tasks/beat_schedule.py`); the unit-suite `_reset_leaked_ee_state` fixture assumption in `backend/tests/unit/conftest.py`; `backend/tests/unit/onyx/utils/test_ee_detection.py` |
 | changes the Dockerfile's `ee` copy or the `ee` requirements split | `backend/Dockerfile:COPY ./ee`, `backend/requirements/ee.txt`; a build that stops shipping `ee` flips every standard deployment's default resolution from EE to CE, which is the whole safety story in §5 point 2 |
 | adds a feature flag | whether it is a per-user boolean (`feature_enabled_for_user_tenant`) or a tenant-wide variant (`feature_variant_for_tenant`); what an unresolvable flag must do, since the first returns `False` when it cannot resolve; whether `MULTI_TENANT` gating on the PostHog provider is the intended scope, since self-hosted always gets `NoOpFeatureFlagProvider` unless `DEV_MODE` |
-| changes licensing (claim/upload/refresh/delete/downgrade, or `get_tier`) | `MULTI_TENANT` rejection branches in `ee/onyx/server/license/api.py`; `apply_license_status_to_settings` in `ee/onyx/server/settings/api.py`; seat-limit and `GATED_ACCESS` behaviour in `license_enforcement.py` |
+| changes licensing (claim/upload/refresh/delete/downgrade, or `get_tier`) | `MULTI_TENANT` rejection branches in `loge/server/license/api.py`; `apply_license_status_to_settings` in `loge/server/settings/api.py`; seat-limit and `GATED_ACCESS` behaviour in `license_enforcement.py` |
 | changes `gated_app`/`GatedActionPolicy` policy resolution | every consumer: `server/features/mcp/api.py`, `server/features/build/external_apps/api.py`, `sandbox_proxy/addons/gate.py`, `external_apps/matching/engine.py`; this is unrelated to CE/EE dispatch and must not be conflated with it |
 
 ---
@@ -383,8 +383,8 @@ not gated.
 ```bash
 cd backend && uv run pytest tests/unit -k "variable_functionality or license or tier or feature_flag"
 cd backend && uv run pytest tests/unit/onyx/utils/test_ee_detection.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/middleware/test_license_enforcement.py
-cd backend && uv run pytest tests/unit/ee/onyx/utils/test_tier.py
+cd backend && uv run pytest tests/unit/loge/server/middleware/test_license_enforcement.py
+cd backend && uv run pytest tests/unit/loge/utils/test_tier.py
 cd backend && uv run pytest tests/integration -k license
 ```
 
@@ -423,7 +423,7 @@ To exercise the CE path in a test, call `global_version.unset_ee()` and
    signature, then stores the license. With an empty `ONYX_DEV_LICENSE` it does
    nothing.
 4. A standard checkout cannot run the CE-only path, because it ships
-   `backend/ee/onyx`. Use the test approach above to confirm that a versioned
+   `backend/loge`. Use the test approach above to confirm that a versioned
    symbol resolves to the non-`ee.` module (see §9 for what changes).
 
 ---
@@ -435,7 +435,7 @@ To exercise the CE path in a test, call `global_version.unset_ee()` and
   returns `input_str.encode()` unchanged; it is a real no-op. But because
   `backend/Dockerfile` always ships `./ee` and `set_is_ee_if_available` loads
   it, the implementation that actually runs in a standard
-  deployment is `backend/ee/onyx/utils/encryption.py:_encrypt_string`, which
+  deployment is `backend/loge/utils/encryption.py:_encrypt_string`, which
   performs real AES-CBC encryption keyed by `ENCRYPTION_KEY_SECRET`. This
   project has already made this exact mistake once: concluding "Onyx never
   encrypts credentials" from the CE file alone. It normally does. Always

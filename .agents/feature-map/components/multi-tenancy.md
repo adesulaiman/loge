@@ -18,11 +18,11 @@ cross-tenant admin tooling apply.
 `backend/alembic_tenants/` (catalog migrations), `backend/alembic/` (tenant-schema
 migrations plus `run_multitenant_migrations.py`),
 `backend/onyx/background/celery/apps/app_base.py` (`TenantAwareTask`),
-`backend/ee/onyx/server/middleware/tenant_tracking.py`,
-`backend/ee/onyx/server/tenants/` (`provisioning.py`, `schema_management.py`,
+`backend/loge/server/middleware/tenant_tracking.py`,
+`backend/loge/server/tenants/` (`provisioning.py`, `schema_management.py`,
 `admin_api.py`, `product_gating.py`, `tenant_management_api.py`, and neighbors),
-`backend/ee/onyx/background/celery/tasks/tenant_provisioning/`, `cloud/`,
-`backend/ee/onyx/db/user_tenant_mapping.py`,
+`backend/loge/background/celery/tasks/tenant_provisioning/`, `cloud/`,
+`backend/loge/db/user_tenant_mapping.py`,
 `backend/onyx/auth/sso_tenant_token.py`, `backend/onyx/redis/tenant_redis_client.py`,
 `redis_tenant_work_gating.py`
 
@@ -43,7 +43,7 @@ document, chat, persona, and admin setting they see belongs to that workspace, a
 they cannot see or affect any other workspace's data through normal use. An admin
 never chooses a schema name or a database; that is entirely infrastructure. Cloud
 support staff can impersonate a specific user for troubleshooting
-(`ee/onyx/server/tenants/admin_api.py:impersonate_user`), which is the one place a
+(`loge/server/tenants/admin_api.py:impersonate_user`), which is the one place a
 human intentionally crosses the tenant boundary, and it is audited
 (`onyx/utils/audit.py:emit_audit_event`).
 
@@ -69,15 +69,15 @@ paths that already exist, and to make it visible when a new path does not.
 | `ONYX_DB_SHARD_OVERRIDES` | same | JSON map of `tenant_id -> shard name`, a static operator escape hatch bypassing the `tenant_shard` catalog table. |
 | `ONYX_DB_SHARD_MAP_TTL_SECONDS` / `_VERSION_POLL_SECONDS` | same | In-process shard-routing cache TTL and the Redis version-poll interval (`db/engine/shard_version.py`). |
 | `USE_IAM_AUTH` | same | RDS IAM auth instead of a static password; token minting is bound to a shard's specific host/port/user (`db/engine/iam_auth.py`). |
-| `TARGET_AVAILABLE_TENANTS` | `configs/app_configs.py`, read by `ee/onyx/background/celery/tasks/tenant_provisioning/tasks.py` | Size of the pre-provisioned tenant pool `check_available_tenants` maintains. |
+| `TARGET_AVAILABLE_TENANTS` | `configs/app_configs.py`, read by `loge/background/celery/tasks/tenant_provisioning/tasks.py` | Size of the pre-provisioned tenant pool `check_available_tenants` maintains. |
 
 ### Endpoints and tasks
 
 | Surface | Handler | Notes |
 |---|---|---|
-| `POST /tenants/impersonate` | `ee/onyx/server/tenants/admin_api.py:impersonate_user` | Cloud-superuser only. Issues a token for another tenant via `SESSION_TENANT_OVERRIDE_CONTEXTVAR`, audited. |
-| Tenant creation / assignment | `ee/onyx/server/tenants/provisioning.py:get_or_provision_tenant` | Called from the signup/OAuth flow. Draws from the pre-provisioned pool or creates fresh. |
-| `CLOUD_CHECK_AVAILABLE_TENANTS` (Celery) | `ee/onyx/background/celery/tasks/tenant_provisioning/tasks.py:check_available_tenants` | Beat task; tops up the pre-provisioned pool and migrates stale pool tenants. |
+| `POST /tenants/impersonate` | `loge/server/tenants/admin_api.py:impersonate_user` | Cloud-superuser only. Issues a token for another tenant via `SESSION_TENANT_OVERRIDE_CONTEXTVAR`, audited. |
+| Tenant creation / assignment | `loge/server/tenants/provisioning.py:get_or_provision_tenant` | Called from the signup/OAuth flow. Draws from the pre-provisioned pool or creates fresh. |
+| `CLOUD_CHECK_AVAILABLE_TENANTS` (Celery) | `loge/background/celery/tasks/tenant_provisioning/tasks.py:check_available_tenants` | Beat task; tops up the pre-provisioned pool and migrates stale pool tenants. |
 | SSO discovery / authorize | `backend/onyx/server/sso_discovery.py`, `onyx/auth/sso_tenant_token.py` | Cloud serves every workspace from one domain; discovery resolves the tenant and mints a short-lived signed `workspace_token` (`generate_sso_tenant_token`) that pins the authorize step to one tenant. |
 | Alembic (tenant schemas) | `backend/alembic/run_multitenant_migrations.py` | Parallel batched migration runner across every tenant schema on every shard. The `--snapshot-template` flag also stores the template dump new tenants are cloned from. |
 | Alembic (catalog) | `backend/alembic_tenants/` | Migrates only `PublicBase`-derived tables in the `public` schema. |
@@ -118,18 +118,18 @@ Physical layout (Postgres):
 - **`public.tenant_shard`** (`db/tenant_shard.py`): `(tenant_id, shard_name,
   updated_at)`. Written by `record_tenant_placement` before a tenant's schema is
   created; absence means "the default shard". Read by `shard_routing.py`.
-- **`public.user_tenant_mapping`** (`ee/onyx/db/user_tenant_mapping.py`): email to
+- **`public.user_tenant_mapping`** (`loge/db/user_tenant_mapping.py`): email to
   tenant, the reverse lookup used by `get_tenant_id_for_email` /
   `resolve_tenant_id` during login and impersonation.
 - **`public.available_tenant`**: the pre-provisioned tenant pool
-  `check_available_tenants` (`ee/onyx/background/celery/tasks/tenant_provisioning/tasks.py`)
+  `check_available_tenants` (`loge/background/celery/tasks/tenant_provisioning/tasks.py`)
   keeps topped up, so signup does not pay the schema build cost synchronously.
 - **`public.tenant_schema_snapshot`** (`onyx/db/models.py:TenantSchemaSnapshot`): a SQL
   dump of one shard's template schema (`TENANT_TEMPLATE_SCHEMA`) at one Alembic head
   revision, unique per `(shard_name, alembic_revision)`. The rollout job writes it:
   `alembic/run_multitenant_migrations.py --snapshot-template` migrates the template
   and calls `store_template_snapshots`. Only the newest two per shard are kept.
-  `ee/onyx/server/tenants/schema_management.py:build_tenant_schema` clones the
+  `loge/server/tenants/schema_management.py:build_tenant_schema` clones the
   snapshot for the code's head into a new tenant (`apply_snapshot`). It replays the
   migration chain instead when the shard has no snapshot at that head, or when the
   schema already holds tables (a retried build).
@@ -143,7 +143,7 @@ Physical layout (Postgres):
   (a `tenant_` prefix followed by a UUID, an AWS instance ID, or the literal `dev`).
   Both checks exist because a schema name cannot be parameterized in SQL; unqualified
   string interpolation of an unvalidated tenant ID is a SQL-injection path into
-  `CREATE SCHEMA`/`DROP SCHEMA` (`ee/onyx/server/tenants/schema_management.py:drop_schema`
+  `CREATE SCHEMA`/`DROP SCHEMA` (`loge/server/tenants/schema_management.py:drop_schema`
   checks `validate_tenant_id` explicitly for this reason).
 
 ---
@@ -153,7 +153,7 @@ Physical layout (Postgres):
 ### 4.1 An HTTP request: from cookie to a tenant-scoped session
 
 ```
-add_api_server_tenant_id_middleware              ee/onyx/server/middleware/tenant_tracking.py
+add_api_server_tenant_id_middleware              loge/server/middleware/tenant_tracking.py
   (registered only in EE's app; CE's onyx/main.py does not register any
    tenant-resolving middleware, because in CE MULTI_TENANT is always False)
   └─ _get_tenant_id_from_request
@@ -249,7 +249,7 @@ automatically, per Python's documented behavior. A task created inside a request
 reads the request's tenant. `db/pat.py:_schedule_pat_last_used_update` relies on
 this: its background task calls `get_current_tenant_id()` itself. Both
 `db/engine/async_sql_engine.py:get_async_engine_for_tenant` and
-`ee/onyx/server/middleware/tenant_tracking.py`'s gating check use `asyncio.to_thread`.
+`loge/server/middleware/tenant_tracking.py`'s gating check use `asyncio.to_thread`.
 The risk is a new call site that crosses a raw thread boundary without copying.
 
 ---
@@ -307,7 +307,7 @@ The risk is a new call site that crosses a raw thread boundary without copying.
    off. The one deliberate default-shard fallback is a missing `tenant_shard` table
    entirely, which means nothing has ever been mapped.
 8. **A cross-tenant admin action (impersonation) must be both narrowly scoped and
-   audited.** `ee/onyx/server/tenants/admin_api.py:impersonate_user` is gated on
+   audited.** `loge/server/tenants/admin_api.py:impersonate_user` is gated on
    `current_cloud_superuser`, sets `SESSION_TENANT_OVERRIDE_CONTEXTVAR` (not the
    plain tenant contextvar, so it cannot be confused with an ambient request
    tenant) only for the duration of issuing the token, and emits
@@ -381,9 +381,9 @@ cd backend && uv run pytest tests/unit/onyx/document_index/test_tenant_scoping.p
 cd backend && uv run pytest tests/unit/onyx/auth/test_session_tenant_resolution.py
 cd backend && uv run pytest tests/unit/onyx/auth/test_password_login_tenant_conflict.py
 cd backend && uv run pytest tests/unit/onyx/auth/test_rekey_tenant_mapping_after_login.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/middleware/test_tenant_tracking.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/tenants/test_impersonation_tenant_binding.py
-cd backend && uv run pytest tests/unit/ee/onyx/server/tenants/test_tenant_resolution_by_oauth_account.py
+cd backend && uv run pytest tests/unit/loge/server/middleware/test_tenant_tracking.py
+cd backend && uv run pytest tests/unit/loge/server/tenants/test_impersonation_tenant_binding.py
+cd backend && uv run pytest tests/unit/loge/server/tenants/test_tenant_resolution_by_oauth_account.py
 cd backend && uv run pytest tests/unit/onyx/background/celery/tasks/tenant_provisioning
 
 # External dependency: real Redis, real rollback path
@@ -488,7 +488,7 @@ PGPASSWORD="${POSTGRES_PASSWORD:-password}" psql -h "${POSTGRES_HOST:-localhost}
   access is uniformly tenant-prefixed through `TenantRedisClient`
   (`onyx/redis/tenant_redis_client.py:_prefix_key`), which the module's own
   docstring calls out as security-relevant specifically to prevent this class of
-  bug. The billing cache (`ee/onyx/server/billing/billing_cache.py`) keys
+  bug. The billing cache (`loge/server/billing/billing_cache.py`) keys
   explicitly by `tenant_id`. The handful of in-process `@lru_cache`/
   `@functools.cache` decorators found (`llm/model_capabilities.py:get_model_map`,
   `llm/multi_llm.py`'s two log-dedup caches, `indexing/document_push.py:get_document_push_config`,

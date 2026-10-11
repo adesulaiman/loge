@@ -5,7 +5,7 @@ delegates to the projection the UI reads, so asserting one asserts both."""
 import pytest
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.analytics import user_can_view_assistant_stats
+from loge.db.analytics import user_can_view_assistant_stats
 from onyx.db.enums import Permission
 from onyx.db.models import User
 from onyx.db.persona import can_view_persona_stats

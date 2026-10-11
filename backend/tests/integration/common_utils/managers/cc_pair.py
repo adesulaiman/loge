@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import httpx
 
-from ee.onyx.server.documents.manage_access import CCPairManageAccessRow
+from loge.server.documents.manage_access import CCPairManageAccessRow
 from onyx.connectors.models import InputType
 from onyx.db.enums import AccessType, ConnectorCredentialPairStatus, ConnectorManageRole
 from onyx.server.documents.models import (

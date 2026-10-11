@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from ee.onyx.db.usage_export import get_all_empty_chat_message_entries
+from loge.db.usage_export import get_all_empty_chat_message_entries
 from onyx.db.engine.sql_engine import get_session_with_current_tenant
 from onyx.db.seeding.chat_history_seeding import seed_chat_history
 

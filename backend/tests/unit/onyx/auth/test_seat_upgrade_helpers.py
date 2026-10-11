@@ -19,7 +19,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.db.license import user_counts_toward_seats as _canonical
+from loge.db.license import user_counts_toward_seats as _canonical
 from onyx.auth.users import _upgrade_will_add_seat, _user_currently_counts_toward_seats
 from onyx.configs.constants import ANONYMOUS_USER_EMAIL
 from onyx.db.enums import AccountType

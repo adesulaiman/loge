@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390"><title>Loge · Admin shell · mobile</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Dela+Gothic+One&family=JetBrains+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="loge.css"><style>html,body{margin:0;background:#cfd6e4}[hidden]{display:none!important}</style></head><body><div data-theme="light" style="position: relative; width: 390px; height: 844px; overflow: hidden; display: flex; flex-direction: column; font-family: var(--font-ui); color: var(--text); background: var(--paper);">
+
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 220px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); pointer-events: none;">
+<img class="loge-sky loge-sky--light" src="sky-light.svg" alt="" style="height: 844px; object-position: 80% 0;">
+<img class="loge-sky loge-sky--dark" src="sky-dark.svg" alt="" style="height: 844px; object-position: 80% 0;">
+</div>
+
+<header style="position: relative; z-index: 2; height: 68px; flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px 0;">
+<button class="loge-item" aria-label="Open admin menu" style="width: 48px; height: 48px; border: 0; background: transparent; border-radius: 12px; color: var(--text); display: grid; place-items: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+<img src="mark.svg" alt="" width="30" height="30" style="display: block; flex: none;">
+<span style="font-family: var(--font-brand); font-size: 22px; line-height: 1; letter-spacing: .02em; text-transform: uppercase;">L<span style="color: var(--accent);">o</span>ge</span>
+<span style="height: 24px; display: inline-flex; align-items: center; padding: 0 8px; border-radius: 6px; background: var(--btn-bg); color: var(--btn-text); font-family: var(--font-hud); font-size: 11px; font-weight: 700; letter-spacing: .16em;">ADMIN</span>
+<span style="flex: 1;"></span>
+<span style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #2456E0, #0E1525); color: #FFFFFF; display: grid; place-items: center; font-family: var(--font-hud); font-weight: 700; font-size: 15px;">R</span>
+</header>
+
+<main style="position: relative; z-index: 2; flex: 1; min-height: 0; padding: 22px 16px 0;">
+<h1 style="margin: 0; font-family: var(--font-brand); font-size: 32px; line-height: 1.05; font-weight: 400; letter-spacing: .02em; text-transform: uppercase;">Connectors</h1>
+<p style="margin: 10px 0 0; font-size: 15.5px; line-height: 1.5; color: var(--text-2);">Sources Loge can read. Documents are indexed in the background.</p>
+<button class="loge-send" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 52px; margin-top: 18px; border: 0; border-radius: 12px; background: var(--btn-bg); color: var(--btn-text); font-size: 16px; font-weight: 700; box-shadow: var(--shadow-sm);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" aria-hidden="true" style="color: var(--accent);"><path d="M12 5v14M5 12h14"/></svg>Add connector</button>
+
+<div style="margin-top: 22px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); overflow: hidden;">
+<div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 8px 16px 16px; border-bottom: 1px solid var(--hair);">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--accent-soft); color: var(--text); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 8.2v7.6M18 10.2c0 4-6 3-11 6"/></svg></span>
+<div style="flex: 1; min-width: 0;">
+<div style="font-size: 16px; font-weight: 700;">Doc Map SAPA</div>
+<div style="font-size: 14px; color: var(--text-2); margin-top: 2px;">GitLab · 60 docs · 9 minutes ago</div>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; margin-top: 10px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--success-bg); color: var(--success); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Indexed</span>
+</div>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+<div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 8px 16px 16px; border-bottom: 1px solid var(--hair);">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5A1.5 1.5 0 016.5 4H19v14H6.5A1.5 1.5 0 005 19.5z"/><path d="M5 19.5A1.5 1.5 0 006.5 21H19"/></svg></span>
+<div style="flex: 1; min-width: 0;">
+<div style="font-size: 16px; font-weight: 700;">Engineering Wiki</div>
+<div style="font-size: 14px; color: var(--text-2); margin-top: 2px;">Confluence · just started</div>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; margin-top: 10px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--blue-soft); color: var(--text); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6"/></svg>Syncing</span>
+</div>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+<div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 8px 16px 16px;">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--surface-3); color: var(--text); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6H10l2 2.5h6.5A1.5 1.5 0 0120 10v7.5a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 17.5z"/></svg></span>
+<div style="flex: 1; min-width: 0;">
+<div style="font-size: 16px; font-weight: 700;">Team Drive</div>
+<div style="font-size: 14px; color: var(--text-2); margin-top: 2px;">Google Drive</div>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; margin-top: 10px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--surface-3); color: var(--text-2); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Paused</span>
+</div>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+</div>
+</main>
+</div><script>
+function LogePick(g,v){document.querySelectorAll('[data-group="'+g+'"]').forEach(function(e){e.hidden=e.getAttribute('data-val')!==v;});}
+</script></body></html>

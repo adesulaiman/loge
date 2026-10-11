@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.background.celery.tasks.cloud import tasks as cloud_tasks
+from loge.background.celery.tasks.cloud import tasks as cloud_tasks
 from onyx.configs.constants import ONYX_CLOUD_TENANT_ID
 from onyx.redis import redis_tenant_work_gating as twg
 from onyx.redis.redis_pool import get_redis_client

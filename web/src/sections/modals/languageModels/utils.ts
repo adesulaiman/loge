@@ -169,6 +169,15 @@ export function clampModelSettings<
 
 // ─── mergeFetchedModelConfigurations ──────────────────────────────────────
 
+export interface MergeFetchedModelOptions {
+  /**
+   * Visibility for models that appear in the fetch but not yet in the form.
+   * Default `false` (opt-in). OpenRouter uses `true` so the live catalog stays
+   * selectable after refetch.
+   */
+  defaultNewVisible?: boolean;
+}
+
 /**
  * Merges a freshly-fetched model list with the current form state so that
  * refreshing the model list does not clobber the user's selections. Call it
@@ -179,18 +188,22 @@ export function clampModelSettings<
  *   list is used with only settings clamped, so each provider's own default
  *   `is_visible` applies.
  * - Otherwise, models that already exist in the form keep their prior unsaved
- *   edits (visibility, rename, admin settings), and newly-discovered models are
- *   added unselected so the user can opt-in explicitly.
+ *   edits (visibility, rename, admin settings). Newly-discovered models use
+ *   `defaultNewVisible` (false unless the caller opts into a full catalog).
  */
 export function mergeFetchedModelConfigurations(
   fetched: ModelConfiguration[],
-  existing: ModelConfiguration[]
+  existing: ModelConfiguration[],
+  options: MergeFetchedModelOptions = {}
 ): ModelConfiguration[] {
+  const defaultNewVisible = options.defaultNewVisible ?? false;
   if (existing.length === 0) return fetched.map(clampModelSettings);
   const priorByName = new Map(existing.map((m) => [m.name, m]));
   return fetched.map((model) => {
     const prior = priorByName.get(model.name);
-    if (!prior) return clampModelSettings({ ...model, is_visible: false });
+    if (!prior) {
+      return clampModelSettings({ ...model, is_visible: defaultNewVisible });
+    }
     // Unsaved edits live only in form state, so a refetch has to carry them.
     return clampModelSettings({
       ...model,
@@ -206,12 +219,13 @@ export function mergeFetchedModelConfigurations(
 /** Functional `setValues` updater applying {@link mergeFetchedModelConfigurations}. */
 export function withFetchedModels<
   T extends { model_configurations: ModelConfiguration[] },
->(fetched: ModelConfiguration[]) {
+>(fetched: ModelConfiguration[], options: MergeFetchedModelOptions = {}) {
   return (prev: T): T => ({
     ...prev,
     model_configurations: mergeFetchedModelConfigurations(
       fetched,
-      prev.model_configurations
+      prev.model_configurations,
+      options
     ),
   });
 }

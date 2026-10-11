@@ -18,7 +18,7 @@ import pytest
 from sqlalchemy import LargeBinary, select, text
 from sqlalchemy.orm import Session
 
-from ee.onyx.utils.encryption import _decrypt_bytes, _encrypt_string, _get_trimmed_key
+from loge.utils.encryption import _decrypt_bytes, _encrypt_string, _get_trimmed_key
 from onyx.configs.constants import DocumentSource
 from onyx.db.models import (
     Credential,
@@ -35,7 +35,7 @@ from onyx.utils.variable_functionality import (
     global_version,
 )
 
-EE_MODULE = "ee.onyx.utils.encryption"
+EE_MODULE = "loge.utils.encryption"
 ROTATE_MODULE = "onyx.db.rotate_encryption_key"
 
 OLD_KEY = "o" * 16

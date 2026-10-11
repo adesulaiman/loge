@@ -4,7 +4,7 @@ import pytest
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ee.onyx.external_permissions.jira.doc_sync import jira_doc_sync
+from loge.external_permissions.jira.doc_sync import jira_doc_sync
 from onyx.access.models import DocExternalAccess
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.jira.connector import JiraConnector

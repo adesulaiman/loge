@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, create_autospec
 
 import pytest
 
-from ee.onyx.external_permissions.onedrive.permission_mapper import (
+from loge.external_permissions.onedrive.permission_mapper import (
     map_onedrive_permissions,
 )
 from onyx.access.models import ExternalAccess

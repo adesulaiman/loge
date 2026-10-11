@@ -18,12 +18,12 @@ auth.
 `anonymous_user.py`, `invited_users.py`, `captcha.py`, `signup_rate_limit.py`,
 `disposable_email_validator.py`, `sso_tenant_token.py`, `sso_url_guard.py`,
 `login_claims_capture.py`, `mobile_sso/`, `schemas.py`, `constants.py`),
-`backend/ee/onyx/auth/` (`users.py`, `sso_domain_verification.py`),
+`backend/loge/auth/` (`users.py`, `sso_domain_verification.py`),
 `backend/onyx/server/auth/`, `server/saml.py`, `server/saml_multi.py`,
 `server/oidc_multi.py`, `server/sso_discovery.py`, `server/auth_check.py`,
 `server/manage/sso/`, `server/manage/users.py`, `server/api_key/`,
-`server/pat/`, `server/security/`, `backend/ee/onyx/server/scim/`,
-`backend/ee/onyx/server/auth_check.py`,
+`server/pat/`, `server/security/`, `backend/loge/server/scim/`,
+`backend/loge/server/auth_check.py`,
 `backend/onyx/db/users.py`, `db/auth.py`, `db/api_key.py`, `db/pat.py`,
 `db/saml.py`, `db/sso_provider.py`, `db/permissions.py`,
 `db/scoped_permissions.py`, `db/oauth_config.py`, `server/features/user_oauth_token/`,
@@ -53,7 +53,7 @@ workspace exposes before showing them (`server/sso_discovery.py`). The first
 person to register in a fresh deployment becomes an implicit admin
 (`backend/onyx/auth/users.py:UserManager.create` checks `user_count == 0`).
 `get_default_admin_user_emails_` (`backend/onyx/auth/users.py` and
-`backend/ee/onyx/auth/users.py`) only adds configured admin emails; after that,
+`backend/loge/auth/users.py`) only adds configured admin emails; after that,
 new signups are ordinary users unless an admin invites them or a domain is
 configured to auto-provision.
 
@@ -112,11 +112,11 @@ the coding-agent sandbox).
 | GET | `/user/pats/scopes` | `server/pat/api.py:list_selectable_scopes` | `Permission.BASIC_ACCESS`. Drops `use:llm_gateway` from the list while the workspace `llm_gateway_enabled` setting is off. |
 | GET/POST/DELETE | `/user/pats` | `server/pat/api.py` | List/create needs `CREATE_USER_API_KEYS` (create) or `BASIC_ACCESS` (list/delete); a user only ever sees/revokes their own. Minting a PAT with `use:llm_gateway` while the setting is off is rejected with `INVALID_INPUT` (`server/pat/api.py:_validate_assignable_scopes`). |
 | GET/PUT | `/admin/security`, GET `/admin/security/pinned-fields` | `server/security/api.py` | `FULL_ADMIN_PANEL_ACCESS`. Workspace security overrides: password policy, `password_auth_enabled`, `valid_email_domains`, JWT validation fields, SSRF level, incognito availability, and `allow_connector_group_restrictions`. Env-pinned fields win over stored values. Turning on `allow_connector_group_restrictions` needs the Business tier. |
-| CRUD | `/admin/user-group*` | `ee/onyx/server/user_group/api.py` | See [[access-control]] §2; this is where group membership, and thus `PermissionGrant`-derived capability, is actually assigned. |
+| CRUD | `/admin/user-group*` | `loge/server/user_group/api.py` | See [[access-control]] §2; this is where group membership, and thus `PermissionGrant`-derived capability, is actually assigned. |
 | GET/POST/PATCH | `/admin/sso-providers*`, `/admin/sso-providers/{id}/domains` | `server/manage/sso/api.py` | `FULL_ADMIN_PANEL_ACCESS` (exact gating per route). Domain-routing SSO providers beyond the first require business tier (`_require_business_tier_for_additional_enabled_provider`). |
-| POST | `/admin/sso-providers/{id}/domains/{domain}/verify` | same file | Triggers `ee/onyx/auth/sso_domain_verification.py:verify_domain_via_dns`. |
+| POST | `/admin/sso-providers/{id}/domains/{domain}/verify` | same file | Triggers `loge/auth/sso_domain_verification.py:verify_domain_via_dns`. |
 | GET/PATCH/DELETE | `/users/me`, `/users/{id}` | fastapi-users users router | Declared public in `auth_check.py`'s spec list because the route's *own* dependency enforces identity (self, or admin for `{id}`); see §5. |
-| SCIM | `/scim/v2/*` | `ee/onyx/server/scim/api.py` | Bearer-token auth via `verify_scim_token` (`ee/onyx/server/scim/auth.py`), not user auth. Provisions/deprovisions users and groups from an IdP. |
+| SCIM | `/scim/v2/*` | `loge/server/scim/api.py` | Bearer-token auth via `verify_scim_token` (`loge/server/scim/auth.py`), not user auth. Provisions/deprovisions users and groups from an IdP. |
 
 ### Environment configuration
 
@@ -196,7 +196,7 @@ comment: `"# ONLY time we return the raw token!"`).
 `db/api_key.py:remove_all_api_keys__no_commit` removes every API key and the
 service-account user behind it, except the Discord bot's service key
 (`DISCORD_SERVICE_API_KEY_NAME` with no `owner_id`). The Community downgrade calls it
-(`ee/onyx/db/community_downgrade.py:disable_paid_features__no_commit`, see
+(`loge/db/community_downgrade.py:disable_paid_features__no_commit`, see
 [[billing]] §4.5).
 
 ### `SSOProvider` (`models.py`)
@@ -216,10 +216,10 @@ artifact, separate from the fastapi-users session token.
 
 `hashed_token` (SHA-256), `token_display`. Authenticates the IdP's SCIM
 client, not a `User`; `verify_scim_token` returns the `ScimToken` row itself,
-and `ee/onyx/server/scim/auth.py` is explicit that it does not carry a
+and `loge/server/scim/auth.py` is explicit that it does not carry a
 `User` dependency. `verify_scim_token` rejects a token whose `is_active` is
 false. The Community downgrade sets every token inactive
-(`ee/onyx/db/community_downgrade.py:disable_paid_features__no_commit`).
+(`loge/db/community_downgrade.py:disable_paid_features__no_commit`).
 
 ### `OAuthConfig` / `OAuthUserToken` (`models.py`)
 
@@ -303,7 +303,7 @@ POST /auth/sso/discover  (server/sso_discovery.py)
 
 ### 4.5 Domain-verified auto-provisioning (EE)
 
-An admin claims an email domain for their workspace; `ee/onyx/auth/
+An admin claims an email domain for their workspace; `loge/auth/
 sso_domain_verification.py:verification_record` returns a TXT record
 (`_onyx-verification.<domain>`) whose value is an HMAC of
 `(tenant_id, domain)` keyed on `USER_AUTH_SECRET`. `verify_domain_via_dns`
@@ -349,7 +349,7 @@ Authorization: Bearer <token>  or raw key (API keys only, historically)
     request.state.usage_credential set for billing/audit attribution
 ```
 
-SCIM is a separate lane: `verify_scim_token` (`ee/onyx/server/scim/auth.py`)
+SCIM is a separate lane: `verify_scim_token` (`loge/server/scim/auth.py`)
 hashes the bearer token and looks it up in `ScimToken` directly; it never
 goes through `optional_user`/`current_user` and does not resolve to a
 requesting `User` at all (the SCIM actor is the token, audited as such).
@@ -460,7 +460,7 @@ is marked as such.
    `_is_require_permission` marker attribute) or websocket auth dependency
    (detected via the `_is_websocket_auth_dependency` marker, set on
    `current_user_from_websocket_cookie`), unless the route's
-   `(path, methods)` is in `PUBLIC_ENDPOINT_SPECS` (`ee/onyx/server/
+   `(path, methods)` is in `PUBLIC_ENDPOINT_SPECS` (`loge/server/
    auth_check.py` extends this list for SCIM discovery and billing). **A new
    endpoint is protected by default only if you add a real dependency**;
    there is no fallback auth applied automatically. Verify this check still

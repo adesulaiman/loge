@@ -35,7 +35,7 @@ load_dotenv(env_path)
 # pylint: disable=E402
 # flake8: noqa: E402
 
-from ee.onyx.server.query_and_chat.models import (
+from loge.server.query_and_chat.models import (
     SearchFullResponse,
     SendSearchQueryRequest,
 )

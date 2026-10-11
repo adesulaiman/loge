@@ -1,4 +1,4 @@
-from ee.onyx.server.query_and_chat.models import (
+from loge.server.query_and_chat.models import (
     SearchFullResponse,
     SendSearchQueryRequest,
 )

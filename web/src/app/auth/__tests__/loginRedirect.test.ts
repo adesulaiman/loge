@@ -50,7 +50,7 @@ describe("proxy stamps the original path", () => {
       })
     );
     expect(res.headers.get("x-middleware-rewrite")).toBe(
-      `${APP_DOMAIN}/ee/admin/groups`
+      `${APP_DOMAIN}/admin/groups`
     );
     expect(res.headers.get(STAMPED)).toBe("/admin/groups?tab=members");
   });

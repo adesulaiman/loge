@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ee.onyx.background.celery.tasks.external_group_syncing.tasks import (
+from loge.background.celery.tasks.external_group_syncing.tasks import (
     _perform_external_group_sync,
 )
-from ee.onyx.db.external_perm import ExternalUserGroup
+from loge.db.external_perm import ExternalUserGroup
 from onyx.access.utils import build_ext_group_name_for_onyx
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.models import InputType
@@ -136,7 +136,7 @@ class TestPerformExternalGroupSync:
         assert len(_get_public_external_groups(db_session, cc_pair.id)) == 0
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()
@@ -204,7 +204,7 @@ class TestPerformExternalGroupSync:
         assert len(_get_user_external_groups(db_session, cc_pair.id)) == 0
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()
@@ -307,7 +307,7 @@ class TestPerformExternalGroupSync:
         assert len(_get_public_external_groups(db_session, cc_pair.id)) == 0
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()
@@ -388,7 +388,7 @@ class TestPerformExternalGroupSync:
             yield ExternalUserGroup(id="group1", user_emails=[user1.email])
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()
@@ -450,7 +450,7 @@ class TestPerformExternalGroupSync:
             )
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()
@@ -498,7 +498,7 @@ class TestPerformExternalGroupSync:
             )
 
         with patch(
-            "ee.onyx.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
+            "loge.background.celery.tasks.external_group_syncing.tasks.get_source_perm_sync_config"
         ) as mock_config:
             # Mock sync config
             mock_group_config = Mock()

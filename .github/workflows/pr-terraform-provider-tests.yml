@@ -84,7 +84,7 @@ jobs:
               # changes must run it: a tool-API masking change once slipped
               # through while only the provider directory was filtered.
               - 'backend/onyx/server/**'
-              - 'backend/ee/onyx/server/**'
+              - 'backend/loge/server/**'
               # The masking contract the provider mirrors lives here.
               - 'backend/onyx/utils/encryption.py'
               - 'backend/onyx/configs/constants.py'

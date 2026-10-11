@@ -64,7 +64,7 @@ def _build_user_group_cc_pair_access_clause(
     """CE has no user groups. The EE version grants pairs where the user is in
     a data-access group.
 
-    NOTE: EE version in ee.onyx.db.connector_credential_pair."""
+    NOTE: EE version in loge.db.connector_credential_pair."""
     return false()
 
 

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ee.onyx.external_permissions.confluence.doc_sync import confluence_doc_sync
+from loge.external_permissions.confluence.doc_sync import confluence_doc_sync
 from onyx.access.models import DocExternalAccess
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.confluence.connector import ConfluenceConnector
@@ -88,7 +88,7 @@ def test_confluence_connector_permissions(
     )
 
 
-@patch("ee.onyx.external_permissions.confluence.doc_sync.OnyxDBCredentialsProvider")
+@patch("loge.external_permissions.confluence.doc_sync.OnyxDBCredentialsProvider")
 @patch(
     "onyx.file_processing.extract_file_text.get_unstructured_api_key",
     return_value=None,

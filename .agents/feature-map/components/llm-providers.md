@@ -273,7 +273,7 @@ call fragments are keyed by `index`: an early chunk carries `id` and
 `function.name`, later chunks for the same index carry only
 `function.arguments` slices with `id`/`name` unset. Callers must accumulate by
 `index` (see `model_response.py:MessageAccumulator.add`, or
-`ee/onyx/server/gateway/stream_bridge.py:merge_tool_call_delta` for raw chunks);
+`loge/server/gateway/stream_bridge.py:merge_tool_call_delta` for raw chunks);
 reading any single chunk's `tool_calls` as complete
 truncates the call.
 

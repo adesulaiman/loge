@@ -1,6 +1,6 @@
 {
-  "version": "1.16",
-  "updated_at": "2026-10-05T00:00:00Z",
+  "version": "1.17",
+  "updated_at": "2026-10-11T00:00:00Z",
   "providers": {
     "openai": {
       "default_model": "gpt-6.1-sol",
@@ -63,6 +63,10 @@
         {
           "name": "deepseek/deepseek-v4-pro",
           "display_name": "DeepSeek V4 Pro 0423"
+        },
+        {
+          "name": "deepseek/deepseek-v4-flash",
+          "display_name": "DeepSeek V4 Flash"
         },
         {
           "name": "qwen/qwen3.7-plus",

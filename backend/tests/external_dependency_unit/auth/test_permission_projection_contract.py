@@ -14,13 +14,13 @@ from uuid import uuid4
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from ee.onyx.db.analytics import user_can_view_assistant_stats
-from ee.onyx.db.token_limit import insert_user_group_token_rate_limit
-from ee.onyx.server.token_rate_limits.api import (
+from loge.db.analytics import user_can_view_assistant_stats
+from loge.db.token_limit import insert_user_group_token_rate_limit
+from loge.server.token_rate_limits.api import (
     _authorize_group_token_rate_limit_write,
     get_group_token_limit_settings,
 )
-from ee.onyx.server.user_group.api import delete_user_group, set_user_group_permissions
+from loge.server.user_group.api import delete_user_group, set_user_group_permissions
 from onyx.auth.permission_projection import (
     CC_PAIR_ACTIONS,
     CUSTOM_SKILL_ACTIONS,
@@ -630,7 +630,7 @@ def test_group_share_gate_anchors_on_pre_update_public_state(
 ) -> None:
     """A public->private convert must be judged on the state from before the caller staged
     it — otherwise a scoped manager could pull a public agent into a group in one call."""
-    from ee.onyx.db.persona import update_persona_access
+    from loge.db.persona import update_persona_access
 
     managed = _make_group(db_session)
     manager = create_test_user(db_session, "b-anchor-mgr")

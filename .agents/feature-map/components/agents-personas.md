@@ -16,7 +16,7 @@ per-agent usage stats.
 `backend/onyx/server/features/persona/` (`api.py`, `models.py`, `constants.py`),
 `backend/onyx/server/features/default_assistant/`,
 `web/src/app/admin/agents/`, `web/src/app/app/agents/`,
-`web/src/app/ee/agents/stats/`, `web/src/lib/agents/`
+`web/src/app/agents/stats/`, `web/src/lib/agents/`
 
 ---
 
@@ -46,7 +46,7 @@ forward; existing chat history is untouched.
 
 An admin viewing `/admin/agents` sees every agent they may manage, can
 feature one (surfaces it in "trending" and seeds it into new users' pins),
-control its listing and display order, and delete it. `web/src/app/ee/agents/stats/[id]`
+control its listing and display order, and delete it. `web/src/app/agents/stats/[id]`
 shows that agent's daily message and unique-user counts (EE only).
 
 The **Assistant** is the seeded, ownerless, `builtin_persona=True` agent at
@@ -92,8 +92,8 @@ The naming split is real: the product says Agent, the router paths say
 | PATCH | `/admin/agents/display-priorities` | `api.py:patch_agents_display_priorities` | |
 | GET | `/admin/default-assistant/configuration` | `default_assistant/api.py:get_default_assistant_configuration` | |
 | PATCH | `/admin/default-assistant` | `default_assistant/api.py:update_default_assistant` | Only touches `tool_ids` and `system_prompt`. |
-| GET | `/analytics/assistant/{id}/stats` | `ee/onyx/server/analytics/api.py:get_assistant_stats` | Backs the stats page. EE only. |
-| GET | `/analytics/admin/persona/messages`, `/unique-users` | `ee/onyx/server/analytics/api.py` | Finer-grained analytics feeding the same page. |
+| GET | `/analytics/assistant/{id}/stats` | `loge/server/analytics/api.py:get_assistant_stats` | Backs the stats page. EE only. |
+| GET | `/analytics/admin/persona/messages`, `/unique-users` | `loge/server/analytics/api.py` | Finer-grained analytics feeding the same page. |
 
 Pinning lives in [[chat-preferences]] territory
 (`PATCH /user/pinned-assistants`, `onyx/server/manage/users.py`), not this
@@ -107,7 +107,7 @@ component's router, but it operates on `User__PinnedPersona`, owned here.
 | `/app/agents` | `web/src/app/app/agents/page.tsx` |
 | `/app/agents/create` | `web/src/app/app/agents/create/page.tsx` |
 | `/app/agents/edit/[id]` | `web/src/app/app/agents/edit/[id]/page.tsx` |
-| `/ee/agents/stats/[id]` | `web/src/app/ee/agents/stats/[id]/page.tsx`, renders `AgentStats.tsx` |
+| `/ee/agents/stats/[id]` | `web/src/app/agents/stats/[id]/page.tsx`, renders `AgentStats.tsx` |
 
 Shared frontend logic lives in `web/src/lib/agents/`: `svc.ts` (fetch calls,
 including `buildAgentUpsertRequest`, the client-to-wire field mapping),
@@ -325,13 +325,13 @@ vacant persona) may transfer.
 
 ### 4.8 Per-agent stats (EE)
 
-`web/src/app/ee/agents/stats/[id]/AgentStats.tsx` calls
+`web/src/app/agents/stats/[id]/AgentStats.tsx` calls
 `GET /analytics/assistant/{id}/stats`
-(`ee/onyx/server/analytics/api.py:get_assistant_stats`), gated by
+(`loge/server/analytics/api.py:get_assistant_stats`), gated by
 `_assert_may_view_agent_analytics` → `user_can_view_assistant_stats`
 (`READ_AGENT_ANALYTICS` plus the same ownership check as `can_delete_persona`).
 It returns daily message counts and daily/overall unique-user counts, sourced
-from `ee/onyx/db/analytics.py:fetch_assistant_message_analytics`,
+from `loge/db/analytics.py:fetch_assistant_message_analytics`,
 `fetch_assistant_unique_users`, `fetch_assistant_unique_users_total`, which
 read `ChatMessage`/`ChatSession` rows filtered by `persona_id`. The two
 `/analytics/admin/persona/{messages,unique-users}` endpoints expose the same
@@ -421,7 +421,7 @@ underlying counts at finer grain for the admin panel.
 | changes tool attachment (`Persona__Tool`) | [[tools-framework]]'s enabled/disabled distinction; `get_tool_ids_on_editable_personas` (rebuilds the tool-id set the editor round-trips); the MCP-access guard in `upsert_persona`. |
 | changes `search_start_date` or knowledge-scope fields | [[internal-search]]'s floor enforcement and `PersonaSearchInfo`'s field list must move together. |
 | changes pinning | `db/pinned_personas.py` and the `PATCH /user/pinned-assistants` route it backs; the seeded-pin logic in `seed_pinned_personas_from_featured`. |
-| changes per-agent stats | `ee/onyx/db/analytics.py` fetch functions and `AgentStats.tsx`; confirm `user_can_view_assistant_stats` still matches `can_delete_persona`'s ownership semantics. |
+| changes per-agent stats | `loge/db/analytics.py` fetch functions and `AgentStats.tsx`; confirm `user_can_view_assistant_stats` still matches `can_delete_persona`'s ownership semantics. |
 
 ---
 

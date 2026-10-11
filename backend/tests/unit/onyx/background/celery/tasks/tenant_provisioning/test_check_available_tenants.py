@@ -13,7 +13,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ee.onyx.background.celery.tasks.tenant_provisioning.tasks import (
+from loge.background.celery.tasks.tenant_provisioning.tasks import (
     _MAX_TENANTS_PER_RUN,
     check_available_tenants,
 )
@@ -26,7 +26,7 @@ _check_available_tenants = check_available_tenants.run
 @pytest.fixture()
 def _enable_multi_tenant(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.MULTI_TENANT",
+        "loge.background.celery.tasks.tenant_provisioning.tasks.MULTI_TENANT",
         True,
     )
 
@@ -40,7 +40,7 @@ def mock_redis(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
     mock_client.lock.return_value = mock_lock
 
     monkeypatch.setattr(
-        "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.get_redis_client",
+        "loge.background.celery.tasks.tenant_provisioning.tasks.get_redis_client",
         lambda tenant_id: mock_client,  # noqa: ARG005
     )
     return mock_client
@@ -50,7 +50,7 @@ def mock_redis(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
 def mock_pre_provision(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
     mock = MagicMock(return_value=True)
     monkeypatch.setattr(
-        "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.pre_provision_tenant",
+        "loge.background.celery.tasks.tenant_provisioning.tasks.pre_provision_tenant",
         mock,
     )
     return mock
@@ -64,7 +64,7 @@ def _mock_available_count(monkeypatch: pytest.MonkeyPatch, count: int) -> None:
     mock_session.query.return_value.count.return_value = count
 
     monkeypatch.setattr(
-        "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.get_session_with_shared_schema",
+        "loge.background.celery.tasks.tenant_provisioning.tasks.get_session_with_shared_schema",
         lambda: mock_session,
     )
 
@@ -78,7 +78,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """When pool has 2 and target is 5, should provision 3."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             5,
         )
         _mock_available_count(monkeypatch, 2)
@@ -94,7 +94,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """When pool needs more than _MAX_TENANTS_PER_RUN, cap the batch."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             20,
         )
         _mock_available_count(monkeypatch, 0)
@@ -110,7 +110,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """When pool already meets target, should not provision anything."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             5,
         )
         _mock_available_count(monkeypatch, 5)
@@ -126,7 +126,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """When pool exceeds target, should not provision anything."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             5,
         )
         _mock_available_count(monkeypatch, 8)
@@ -142,7 +142,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """If one provisioning fails, the rest should still be attempted."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             5,
         )
         _mock_available_count(monkeypatch, 0)
@@ -171,7 +171,7 @@ class TestCheckAvailableTenants:
     ) -> None:
         """Should not provision when multi-tenancy is disabled."""
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.MULTI_TENANT",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.MULTI_TENANT",
             False,
         )
 
@@ -201,7 +201,7 @@ class TestCheckAvailableTenants:
         from redis.exceptions import LockNotOwnedError
 
         monkeypatch.setattr(
-            "ee.onyx.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
+            "loge.background.celery.tasks.tenant_provisioning.tasks.TARGET_AVAILABLE_TENANTS",
             5,
         )
         _mock_available_count(monkeypatch, 4)

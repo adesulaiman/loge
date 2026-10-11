@@ -12,7 +12,7 @@ jest.mock("@/providers/UserProvider", () => ({
 jest.mock("@/lib/settings/hooks", () => ({
   useSettings: () => ({
     application_status: ApplicationStatus.GATED_ACCESS,
-    appName: "Onyx",
+    appName: "Loge",
   }),
 }));
 

@@ -9,10 +9,10 @@
 **Verified against:** `268e4d5a3d` (2026-10-05)
 **Domain:** platform (EE surface, consumed by Craft and by external tools)
 **Edition:** EE only. The router only exists when EE code loads
-(`backend/ee/onyx/main.py`), and the path prefix is gated at
+(`backend/loge/main.py`), and the path prefix is gated at
 `Tier.BUSINESS` (`backend/onyx/server/gateway/configs.py`).
 **Owns:**
-`backend/ee/onyx/server/gateway/api.py`, `openai_passthrough.py`,
+`backend/loge/server/gateway/api.py`, `openai_passthrough.py`,
 `anthropic_passthrough.py`, `stream_bridge.py`,
 `backend/onyx/server/gateway/configs.py`, `models.py`, `model_catalog.py`,
 `backend/onyx/server/features/build/craft_gateway.py`
@@ -59,7 +59,7 @@ the Craft-specific setting (§4.2).
 
 ## 2. Surfaces
 
-### HTTP endpoints (router prefix `/gateway`, `backend/ee/onyx/server/gateway/api.py`, `router`)
+### HTTP endpoints (router prefix `/gateway`, `backend/loge/server/gateway/api.py`, `router`)
 
 | Method | Path | Handler | Dialect | Notes |
 |---|---|---|---|---|
@@ -140,8 +140,8 @@ asynchronously from tracing spans, not synchronously by the gateway request.
 ### 4.1 One request's life
 
 ```
-POST /gateway/v1/chat/completions               ee/onyx/server/gateway/api.py
-  ├─ tier_gate middleware                             ee/onyx/server/middleware/tier_gate.py
+POST /gateway/v1/chat/completions               loge/server/gateway/api.py
+  ├─ tier_gate middleware                             loge/server/middleware/tier_gate.py
   │    PATH_PREFIX_MIN_TIER["/gateway"] = Tier.BUSINESS
   ├─ require_permission(Permission.USE_LLM_GATEWAY)   GATE 1 (FastAPI Depends)
   ├─ _authorize_gateway_request                       api.py
@@ -159,9 +159,9 @@ POST /gateway/v1/chat/completions               ee/onyx/server/gateway/api.py
 ```
 
 The tier check runs as ASGI middleware before the route body executes
-(`ee/onyx/server/middleware/tier_gate.py`), so an under-tier tenant
+(`loge/server/middleware/tier_gate.py`), so an under-tier tenant
 never reaches GATE 1 or GATE 2. `PATH_PREFIX_MIN_TIER[GATEWAY_PATH_PREFIX] =
-LLM_GATEWAY_MIN_TIER` (`ee/onyx/configs/license_enforcement_config.py`)
+LLM_GATEWAY_MIN_TIER` (`loge/configs/license_enforcement_config.py`)
 is the entry that ties `/gateway` to Business. On tier-resolution failure the
 middleware fails closed to `Tier.COMMUNITY` (`tier_gate.py`), which
 denies the gateway rather than allowing it.
@@ -231,12 +231,12 @@ attribution (§4.6).
 ### 4.3 Tier gating
 
 Enforced by `add_tier_gate_middleware`
-(`ee/onyx/server/middleware/tier_gate.py`) against the
+(`loge/server/middleware/tier_gate.py`) against the
 longest-matching-prefix entry in `PATH_PREFIX_MIN_TIER`
-(`ee/onyx/configs/license_enforcement_config.py`), where
+(`loge/configs/license_enforcement_config.py`), where
 `GATEWAY_PATH_PREFIX` maps to `LLM_GATEWAY_MIN_TIER = Tier.BUSINESS`
 (`onyx/server/gateway/configs.py`). The current tier is resolved by
-`ee/onyx/utils/tier.py:get_tier`, cloud tenants from a Redis-cached
+`loge/utils/tier.py:get_tier`, cloud tenants from a Redis-cached
 control-plane value, self-hosted from the license payload's `customer_tier`.
 See [[editions-and-gating]] for `Tier`/`tier_at_least` mechanics and
 [[billing]] for how a tenant's tier is set in the first place.
@@ -473,7 +473,7 @@ records the span before signalling `_STREAM_END`.
   `PATH_PREFIX_MIN_TIER` middleware mechanism this component's tier gate is
   one entry in.
 - [[billing]]: how a tenant's `Tier` is actually set (cloud subscription or
-  self-hosted license), which `ee/onyx/utils/tier.py:get_tier` resolves.
+  self-hosted license), which `loge/utils/tier.py:get_tier` resolves.
 - [[observability]]: the tracing spans this component opens, and the
   `user_usage` rollup they feed.
 
@@ -498,12 +498,12 @@ records the span before signalling `_STREAM_END`.
 |---|---|
 | adds an endpoint or a new dialect | wire it through both GATE 1 (`require_permission(Permission.USE_LLM_GATEWAY)`) and GATE 2 (`_authorize_gateway_request`); add `check_token_rate_limits` and resolve through `_resolve_metered_gateway_model` unless the endpoint generates nothing; open a `_gateway_trace`/`llm_generation_span` or call `_track_llm_cost` manually if it bypasses `LLM.invoke_raw`/`.stream_raw` |
 | changes scope checks (`gateway_request_flow`, `IMPLIED_PERMISSIONS`) | re-verify the asymmetry in §4.2 still holds: a bare `USE_LLM_GATEWAY` grant must not require Craft enablement, and a `CRAFT_SANDBOX` token must still require it; re-run `backend/tests/unit/onyx/server/features/craft/test_craft_gateway.py` |
-| changes the `llm_gateway_enabled` check (`_authorize_gateway_request`, `_validate_assignable_scopes`, `list_selectable_scopes`) | re-verify it still fails closed on a settings-read error, still exempts Craft sandbox traffic, and still blocks both new PAT minting and existing-PAT gateway calls; re-run `backend/tests/unit/ee/onyx/server/gateway/test_llm_gateway_api.py` and `backend/tests/unit/onyx/server/pat/test_pat_api.py` |
+| changes the `llm_gateway_enabled` check (`_authorize_gateway_request`, `_validate_assignable_scopes`, `list_selectable_scopes`) | re-verify it still fails closed on a settings-read error, still exempts Craft sandbox traffic, and still blocks both new PAT minting and existing-PAT gateway calls; re-run `backend/tests/unit/loge/server/gateway/test_llm_gateway_api.py` and `backend/tests/unit/onyx/server/pat/test_pat_api.py` |
 | changes model resolution (`resolve_gateway_model`, the `<provider_id>/<model_name>` wire format) | `model_catalog.py:build_gateway_model_catalog` (the id format `GET /v1/models` returns must still round-trip), and `onyx/server/features/build/session/llm_config.py` which parses the same id format for Craft's stored selection |
 | changes metering (`_gateway_trace`, `_track_llm_cost`, the `LLMFlow` tags) | [[observability]]'s dashboard grouping, and `backend/tests/integration/tests/streaming_endpoints/test_gateway_usage_tracking.py`, which asserts `user_usage` actually increases after a gateway call |
 | changes streaming (`stream_bridge.py`, either stream worker) | the contextvars-copy-then-open-span-in-thread pattern (§4.9) must be preserved for any new streaming branch; a naive `async def` generator that opens a span before yielding will silently produce untagged or cross-request-contaminated spans |
 | changes `store`/persistence handling on the OpenAI passthrough | re-confirm `store=False` is still forced and `previous_response_id`/`conversation` are still refused (§4.6); this is a cross-user data exposure risk under the shared organization key, not just a correctness nit |
-| changes tier gating (`PATH_PREFIX_MIN_TIER`, `LLM_GATEWAY_MIN_TIER`) | `ee/onyx/configs/license_enforcement_config.py`'s longest-prefix-wins ordering, and any nested path that should resolve to a stricter tier than `/gateway` itself |
+| changes tier gating (`PATH_PREFIX_MIN_TIER`, `LLM_GATEWAY_MIN_TIER`) | `loge/configs/license_enforcement_config.py`'s longest-prefix-wins ordering, and any nested path that should resolve to a stricter tier than `/gateway` itself |
 
 ---
 
@@ -513,7 +513,7 @@ records the span before signalling `_STREAM_END`.
 
 ```bash
 # Gateway request/scope/streaming unit tests
-uv run --env-file .vscode/.env pytest backend/tests/unit/ee/onyx/server/gateway/test_llm_gateway_api.py
+uv run --env-file .vscode/.env pytest backend/tests/unit/loge/server/gateway/test_llm_gateway_api.py
 # Craft policy asymmetry (GATE 2) unit tests
 uv run --env-file .vscode/.env pytest backend/tests/unit/onyx/server/features/craft/test_craft_gateway.py
 uv run --env-file .vscode/.env pytest backend/tests/unit/onyx/server/features/craft/test_session_gateway_config.py
@@ -547,7 +547,7 @@ See `backend/AGENTS.md` for required env and secrets.
    ~45 seconds (see `test_gateway_usage_tracking.py:_POLL_TIMEOUT_SECONDS`).
 6. Repeat on a deployment below the Business tier (a self-hosted deployment
    with no license resolves `Tier.COMMUNITY`,
-   `ee/onyx/utils/tier.py:_self_hosted_tier`) and confirm every `/gateway/*` call
+   `loge/utils/tier.py:_self_hosted_tier`) and confirm every `/gateway/*` call
    returns 402 with `error_code: "FEATURE_NOT_AVAILABLE"` before touching
    any provider.
 
@@ -584,7 +584,7 @@ See `backend/AGENTS.md` for required env and secrets.
   nothing; `craft_gateway.py` is a policy helper
   (`gateway_request_flow`/`is_craft_gateway_request`), not a second router,
   and Craft's sandboxes call the one router under `/gateway`, mounted only
-  from `backend/ee/onyx/main.py`.
+  from `backend/loge/main.py`.
 - **Native passthrough bypasses `LitellmLLM.invoke_raw`/`.stream_raw` entirely**, so
   it also bypasses their built-in cost-tracking hook. Both
   passthrough modules compensate with a manual `llm._track_llm_cost(usage)`

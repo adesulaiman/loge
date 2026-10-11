@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from ee.onyx.server.query_and_chat.search_backend import (
+from loge.server.query_and_chat.search_backend import (
     get_search_history,
     handle_send_search_message,
     search_flow_classification,

@@ -8,7 +8,7 @@ tests. Additive to the root `AGENTS.md`.
 - Use explicit validation in application code. Reserve `assert` for tests.
 - Declare owned protocol implementations through explicit inheritance.
 
-- Put ALL db operations under the `backend/onyx/db` / `backend/ee/onyx/db` directories. Don't run
+- Put ALL db operations under the `backend/onyx/db` / `backend/loge/db` directories. Don't run
   queries outside of those directories. Exception: `backend/onyx/cache/postgres_backend.py` is the
   PostgreSQL implementation of `CacheBackend`, so its queries belong there.
 - When creating new FastAPI APIs, do NOT use the `response_model` field. Instead, just type the
@@ -64,7 +64,7 @@ Key facts:
 ### Defining Tasks
 
 - Always use `@shared_task` rather than `@celery_app`
-- Put tasks under `background/celery/tasks/` or `ee/background/celery/tasks`
+- Put tasks under `background/celery/tasks/` or `loge/background/celery/tasks`
 - Never enqueue a task without an expiration. Always supply `expires=` when
   sending tasks, either from the beat schedule or directly from another task. It
   should never be acceptable to submit code which enqueues tasks without an

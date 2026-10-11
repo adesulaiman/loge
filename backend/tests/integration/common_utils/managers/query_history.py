@@ -5,7 +5,7 @@ from uuid import UUID
 
 import httpx
 
-from ee.onyx.server.query_history.models import ChatSessionMinimal, ChatSessionSnapshot
+from loge.server.query_history.models import ChatSessionMinimal, ChatSessionSnapshot
 from onyx.configs.constants import QAFeedbackType
 from onyx.db.enums import TaskStatus
 from onyx.server.documents.models import PaginatedReturn

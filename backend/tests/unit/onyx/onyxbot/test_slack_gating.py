@@ -515,12 +515,12 @@ class TestCheckSeatAvailability:
     """Tests for check_seat_availability function."""
 
     def _check(self, used: int, total: int) -> Any:
-        from ee.onyx.db.license import check_seat_availability
+        from loge.db.license import check_seat_availability
 
         metadata = MagicMock(seats=total)
         with (
-            patch("ee.onyx.db.license.get_used_seats", return_value=used),
-            patch("ee.onyx.db.license.get_license_metadata", return_value=metadata),
+            patch("loge.db.license.get_used_seats", return_value=used),
+            patch("loge.db.license.get_license_metadata", return_value=metadata),
         ):
             return check_seat_availability(MagicMock())
 
@@ -539,9 +539,9 @@ class TestCheckSeatAvailability:
         assert result.available is True
 
     def test_no_license_allows_unlimited(self) -> None:
-        from ee.onyx.db.license import check_seat_availability
+        from loge.db.license import check_seat_availability
 
-        with patch("ee.onyx.db.license.get_license_metadata", return_value=None):
+        with patch("loge.db.license.get_license_metadata", return_value=None):
             result = check_seat_availability(MagicMock())
             assert result.available is True
 
@@ -554,10 +554,10 @@ class TestCheckSeatAvailability:
 class TestGetUsedSeats:
     """Tests for get_used_seats — anonymous user exclusion."""
 
-    @patch("ee.onyx.db.license.MULTI_TENANT", False)
+    @patch("loge.db.license.MULTI_TENANT", False)
     @patch("onyx.db.engine.sql_engine.get_session_with_current_tenant")
     def test_excludes_anonymous_user(self, mock_get_session: MagicMock) -> None:
-        from ee.onyx.db.license import get_used_seats
+        from loge.db.license import get_used_seats
 
         mock_session = MagicMock()
         mock_get_session.return_value.__enter__ = MagicMock(return_value=mock_session)

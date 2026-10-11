@@ -1,6 +1,6 @@
 """Integration tests for the READ_AGENT_ANALYTICS permission gate.
 
-Covers the per-agent analytics routes in ``backend/ee/onyx/server/analytics/api.py``.
+Covers the per-agent analytics routes in ``backend/loge/server/analytics/api.py``.
 Org-wide analytics (``/analytics/admin/query|user|onyxbot``) stay FULL_ADMIN and are
 not this permission's business.
 

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>Loge · Admin shell · desktop</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Dela+Gothic+One&family=JetBrains+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="loge.css"><style>html,body{margin:0;background:#cfd6e4}[hidden]{display:none!important}</style></head><body><div data-theme="light" style="position: relative; width: 1440px; height: 900px; overflow: hidden; display: flex; flex-direction: column; font-family: var(--font-ui); color: var(--text); background: var(--paper);">
+
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 240px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); pointer-events: none;">
+<img class="loge-sky loge-sky--light" src="sky-light.svg" alt="" style="height: 900px; object-position: 50% 0;">
+<img class="loge-sky loge-sky--dark" src="sky-dark.svg" alt="" style="height: 900px; object-position: 50% 0;">
+</div>
+
+<header style="position: relative; z-index: 2; height: 76px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 32px;">
+<img src="mark.svg" alt="" width="38" height="38" style="display: block; flex: none;">
+<span style="font-family: var(--font-brand); font-size: 26px; line-height: 1; letter-spacing: .02em; text-transform: uppercase;">L<span style="color: var(--accent);">o</span>ge</span>
+<span style="height: 26px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px; background: var(--btn-bg); color: var(--btn-text); font-family: var(--font-hud); font-size: 12px; font-weight: 700; letter-spacing: .16em;">ADMIN</span>
+<span style="flex: 1;"></span>
+<a href="#chat" class="loge-chip" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); font-size: 15px; font-weight: 700; color: var(--text); box-shadow: var(--shadow-sm);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Back to chat</a>
+<span style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #2456E0, #0E1525); color: #FFFFFF; display: grid; place-items: center; font-family: var(--font-hud); font-weight: 700; font-size: 15px;">R</span>
+</header>
+
+<div style="position: relative; z-index: 2; flex: 1; min-height: 0; display: flex;">
+<nav aria-label="Admin" style="width: 232px; flex: none; padding: 16px 16px 24px 24px; display: flex; flex-direction: column; gap: 2px;">
+<div style="font-family: var(--font-hud); font-size: 11.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); padding: 8px 14px;">Workspace</div>
+<a href="#connectors" aria-current="page" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; background: var(--active); font-size: 15px; font-weight: 700; color: var(--text);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5M15 4v5M7 9h10v3a5 5 0 01-5 5 5 5 0 01-5-5V9zM12 17v3"/></svg><span style="flex: 1;">Connectors</span><span aria-hidden="true" style="width: 7px; height: 7px; background: var(--accent); transform: rotate(45deg);"></span></a>
+<a href="#agents" class="loge-item" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; font-size: 15px; color: var(--text-2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 2L4 14h7l-1.5 8L20 9.5h-7z"/></svg>Agents</a>
+<a href="#users" class="loge-item" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; font-size: 15px; color: var(--text-2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 3-5 5.5-5s4.9 1.8 5.5 5M16 5.5a3 3 0 010 6M17.5 14.2c1.8.7 3 2.3 3.5 4.8"/></svg>Users and groups</a>
+<a href="#models" class="loge-item" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; font-size: 15px; color: var(--text-2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9.5 3v3M14.5 3v3M9.5 18v3M14.5 18v3M3 9.5h3M3 14.5h3M18 9.5h3M18 14.5h3"/></svg>Models</a>
+<a href="#appearance" class="loge-item" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; font-size: 15px; color: var(--text-2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 000 16z" fill="currentColor"/></svg>Appearance</a>
+<a href="#settings" class="loge-item" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: 10px; font-size: 15px; color: var(--text-2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Settings</a>
+</nav>
+
+<main style="flex: 1; min-width: 0; padding: 20px 48px 0 24px;">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;">
+<div>
+<h1 style="margin: 0; font-family: var(--font-brand); font-size: 40px; line-height: 1.05; font-weight: 400; letter-spacing: .02em; text-transform: uppercase;">Connectors</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: var(--text-2);">Sources Loge can read. Documents are indexed in the background.</p>
+</div>
+<button class="loge-send" style="display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 22px 0 18px; border: 0; border-radius: 12px; background: var(--btn-bg); color: var(--btn-text); font-size: 15.5px; font-weight: 700; box-shadow: var(--shadow-sm);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" aria-hidden="true" style="color: var(--accent);"><path d="M12 5v14M5 12h14"/></svg>Add connector</button>
+</div>
+
+<div style="margin-top: 32px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); overflow: hidden;">
+<div style="display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.2fr) 56px; align-items: center; height: 48px; padding: 0 12px 0 24px; background: var(--surface-2); border-bottom: 1px solid var(--hair); font-family: var(--font-hud); font-size: 11.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3);">
+<span>Source</span><span>Status</span><span>Docs</span><span>Last indexed</span><span></span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.2fr) 56px; align-items: center; height: 80px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--hair);">
+<div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--accent-soft); color: var(--text); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 8.2v7.6M18 10.2c0 4-6 3-11 6"/></svg></span>
+<span style="min-width: 0;"><span style="display: block; font-size: 16px; font-weight: 700;">Doc Map SAPA</span><span style="display: block; font-size: 14px; color: var(--text-2);">GitLab</span></span>
+</div>
+<span><span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--success-bg); color: var(--success); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Indexed</span></span>
+<span style="font-family: var(--font-mono); font-size: 15px;">60</span>
+<span style="font-size: 15px; color: var(--text-2);">9 minutes ago</span>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.2fr) 56px; align-items: center; height: 80px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--hair);">
+<div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5A1.5 1.5 0 016.5 4H19v14H6.5A1.5 1.5 0 005 19.5z"/><path d="M5 19.5A1.5 1.5 0 006.5 21H19"/></svg></span>
+<span style="min-width: 0;"><span style="display: block; font-size: 16px; font-weight: 700;">Engineering Wiki</span><span style="display: block; font-size: 14px; color: var(--text-2);">Confluence</span></span>
+</div>
+<span><span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--blue-soft); color: var(--text); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6"/></svg>Syncing</span></span>
+<span style="font-family: var(--font-mono); font-size: 15px; color: var(--text-2);">&#8212;</span>
+<span style="font-size: 15px; color: var(--text-2);">Just started</span>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.2fr) 56px; align-items: center; height: 80px; padding: 0 12px 0 24px;">
+<div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: var(--surface-3); color: var(--text); display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6H10l2 2.5h6.5A1.5 1.5 0 0120 10v7.5a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 17.5z"/></svg></span>
+<span style="min-width: 0;"><span style="display: block; font-size: 16px; font-weight: 700;">Team Drive</span><span style="display: block; font-size: 14px; color: var(--text-2);">Google Drive</span></span>
+</div>
+<span><span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 10px; border-radius: 6px; background: var(--surface-3); color: var(--text-2); font-family: var(--font-hud); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Paused</span></span>
+<span style="font-family: var(--font-mono); font-size: 15px; color: var(--text-2);">&#8212;</span>
+<span style="font-size: 15px; color: var(--text-2);">&#8212;</span>
+<button class="loge-item" aria-label="Connector settings" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; color: var(--text-2); display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>
+</div>
+</div>
+</main>
+</div>
+</div><script>
+function LogePick(g,v){document.querySelectorAll('[data-group="'+g+'"]').forEach(function(e){e.hidden=e.getAttribute('data-val')!==v;});}
+</script></body></html>

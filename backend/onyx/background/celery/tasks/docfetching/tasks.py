@@ -258,15 +258,15 @@ def _docfetching_task(
             search_settings_id,
         )
 
-        # special bulletproofing ... truncate long exception messages
-        # for exception types that require more args, this will fail
-        # thus the try/except
+        # Truncate long exception messages. Types that need more than a
+        # message (e.g. botocore ClientError) cannot be rebuilt; re-raise them.
+        msg = str(e)[:1024]
         try:
-            sanitized_e = type(e)(str(e)[:1024])
-            sanitized_e.__traceback__ = e.__traceback__
-            raise sanitized_e
-        except Exception:
+            sanitized_e = type(e)(msg)
+        except TypeError:
             raise e
+        sanitized_e.__traceback__ = e.__traceback__
+        raise sanitized_e
 
     logger.info(
         "Indexing spawned task finished: attempt=%s cc_pair=%s search_settings=%s",

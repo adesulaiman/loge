@@ -449,31 +449,31 @@
       "type": "color"
     },
     "action-selection-06": {
-      "value": "{blue-40}",
+      "value": "{red-40}",
       "type": "color"
     },
     "action-selection-05": {
-      "value": "{blue-50}",
+      "value": "{red-45}",
       "type": "color"
     },
     "action-selection-04": {
-      "value": "{blue-60}",
+      "value": "{red-60}",
       "type": "color"
     },
     "action-selection-03": {
-      "value": "{blue-80}",
+      "value": "{red-80}",
       "type": "color"
     },
     "action-selection-02": {
-      "value": "{blue-85}",
+      "value": "{red-85}",
       "type": "color"
     },
     "action-selection-01": {
-      "value": "{blue-90}",
+      "value": "{red-90}",
       "type": "color"
     },
     "action-selection-00": {
-      "value": "{blue-95}",
+      "value": "{red-95}",
       "type": "color"
     },
     "action-danger-06": {

@@ -202,10 +202,10 @@ export function toSettings({
 export interface AppSettings extends Settings {
   /** Raw enterprise settings — null when EE is disabled or not yet loaded. */
   enterprise: EnterpriseSettings | null;
-  /** Resolved display name: enterprise.application_name || "Onyx". */
+  /** Resolved display name: enterprise.application_name || "Loge". */
   appName: string;
   /**
-   * URL of the logo image to render, or `null` to use the default Onyx SVG.
+   * URL of the logo image to render, or `null` to use the default Loge SVG.
    * Includes a cache-buster that updates whenever enterprise settings are
    * revalidated, forcing the browser to re-fetch after an admin uploads a
    * new logo.
