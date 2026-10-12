@@ -6,7 +6,6 @@
 components/agents-personas.md: seeding/personas.yaml
 components/background-jobs.md: apps/background.py
 components/editions-and-gating.md: backend/onyx/external_permissions/
-components/whitelabelling-and-theme.md: web/src/app/admin/theme/
 components/background-jobs.md: background.py
 components/craft-streaming.md: xterm.js
 

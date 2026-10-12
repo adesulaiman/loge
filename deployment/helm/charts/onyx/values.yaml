@@ -1687,6 +1687,10 @@ configMap:
   IDP_PROFILE_CLAIM_MAP: ""
   # 1 Day Default
   SESSION_EXPIRE_TIME_SECONDS: "86400"
+  # Failed password logins that lock the account until an admin unlocks it.
+  # Defaults: 5 attempts within 900 seconds. Set MAX_ATTEMPTS to 0 to disable.
+  LOGIN_LOCKOUT_MAX_ATTEMPTS: "5"
+  LOGIN_LOCKOUT_WINDOW_SECONDS: "900"
   # Can be something like onyx.app, as an extra double-check
   VALID_EMAIL_DOMAINS: ""
   # /metrics requires a bearer token by default and returns 401 until one is set

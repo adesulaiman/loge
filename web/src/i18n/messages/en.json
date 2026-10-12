@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "Cancel"
+        },
+        "confirmPassword": {
+          "label": "Confirm password",
+          "mismatch": "Passwords do not match",
+          "placeholder": "Re-enter password",
+          "required": "Confirm the password"
+        },
+        "description": "Create an active account with email and password. No invite email is sent.",
+        "email": {
+          "invalid": "Enter a valid email address",
+          "label": "Email",
+          "placeholder": "user@example.com",
+          "required": "Email is required"
+        },
+        "password": {
+          "label": "Password",
+          "minLength": "Password must be at least 8 characters",
+          "placeholder": "Enter password",
+          "required": "Password is required"
+        },
+        "submitButton": {
+          "label": "Create User"
+        },
+        "title": "Create User",
+        "toasts": {
+          "createFailed": "Failed to create user",
+          "created": "User created"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "Cancel"
@@ -8507,6 +8539,9 @@
         }
       },
       "page": {
+        "createButton": {
+          "label": "Create User"
+        },
         "inviteButton": {
           "label": "Invite Users"
         },
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "Admin access removed",
           "error": "An error occurred",
           "requestApproved": "Request approved"
+        },
+        "unlock": {
+          "label": "Unlock User"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "SCIM synced"
+          },
+          "locked": {
+            "label": "Locked"
           }
         },
         "toasts": {
           "downloadFailed": "Failed to download CSV"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> will be able to sign in with a password again. Failed attempt counters are cleared.",
+        "submit": {
+          "label": "Unlock"
+        },
+        "title": "Unlock User",
+        "toasts": {
+          "success": "User unlocked"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "Too many requests. Please try again later."
+      },
+      "accountLocked": {
+        "error": "This account is locked after too many failed sign-in attempts. Contact your workspace admin."
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "An account with this email already exists under a different sign-in method. Sign in the way you first did, or ask your admin to link this provider.",
         "serverError": "Your identity provider encountered an error. Please try again.",
         "staleSignIn": "This sign-in link has expired or is no longer valid. Please sign in again.",
-        "temporarilyUnavailable": "Your identity provider is temporarily unavailable. Please try again later."
+        "temporarilyUnavailable": "Your identity provider is temporarily unavailable. Please try again later.",
+        "accountLocked": "This account is locked after too many failed sign-in attempts. Contact your workspace admin."
       },
       "credentialsIssue": {
         "description": "Incorrect or expired login credentials"

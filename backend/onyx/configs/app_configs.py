@@ -1946,6 +1946,13 @@ SIGNUP_RATE_LIMIT_ENABLED = (
     os.environ.get("SIGNUP_RATE_LIMIT_ENABLED", "").lower() == "true"
 )
 
+# Password login lockout: after this many failed attempts within the window,
+# the user row is locked until an admin unlocks it.
+LOGIN_LOCKOUT_MAX_ATTEMPTS = int(os.environ.get("LOGIN_LOCKOUT_MAX_ATTEMPTS", "5"))
+LOGIN_LOCKOUT_WINDOW_SECONDS = int(
+    os.environ.get("LOGIN_LOCKOUT_WINDOW_SECONDS", "900")
+)
+
 MOCK_CONNECTOR_FILE_PATH = os.environ.get("MOCK_CONNECTOR_FILE_PATH")
 
 

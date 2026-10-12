@@ -37,6 +37,7 @@ export function apiKeyToMemberRow(
     status: UserStatus.ACTIVE,
     is_active: true,
     is_scim_synced: false,
+    login_locked: false,
     craft_enabled: null,
     personal_name: key.api_key_name ?? labels.unnamedKey,
     created_at: null,

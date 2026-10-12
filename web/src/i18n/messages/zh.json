@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "取消"
+        },
+        "confirmPassword": {
+          "label": "确认密码",
+          "mismatch": "两次输入的密码不一致",
+          "placeholder": "再次输入密码",
+          "required": "请确认密码"
+        },
+        "description": "使用电子邮箱和密码创建活跃账户。不会发送邀请邮件。",
+        "email": {
+          "invalid": "请输入有效的电子邮箱地址",
+          "label": "电子邮箱",
+          "placeholder": "user@example.com",
+          "required": "电子邮箱为必填项"
+        },
+        "password": {
+          "label": "密码",
+          "minLength": "密码至少需要 8 个字符",
+          "placeholder": "输入密码",
+          "required": "密码为必填项"
+        },
+        "submitButton": {
+          "label": "创建用户"
+        },
+        "title": "创建用户",
+        "toasts": {
+          "createFailed": "创建用户失败",
+          "created": "用户已创建"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "取消"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "邀请用户"
         },
-        "title": "用户与申请"
+        "title": "用户与申请",
+        "createButton": {
+          "label": "创建用户"
+        }
       },
       "permissionsNotice": {
         "description": "{appName} 现在使用基于用户组的权限。策展人和全局策展人角色已由可配置的用户组权限取代，并可为每个用户组指定管理者，实现范围化管理。",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "已移除管理员权限",
           "error": "发生错误",
           "requestApproved": "申请已批准"
+        },
+        "unlock": {
+          "label": "解锁用户"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "SCIM 已同步"
+          },
+          "locked": {
+            "label": "已锁定"
           }
         },
         "toasts": {
           "downloadFailed": "下载 CSV 失败"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> 将可以再次使用密码登录。失败尝试计数器已清除。",
+        "submit": {
+          "label": "解锁"
+        },
+        "title": "解锁用户",
+        "toasts": {
+          "success": "用户已解锁"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "请求过多。请稍后重试。"
+      },
+      "accountLocked": {
+        "error": "登录失败次数过多，此账户已被锁定。请联系工作区管理员。"
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "使用此邮箱的账户已通过其他登录方式存在。请使用您首次使用的方式登录，或请管理员关联此提供方。",
         "serverError": "您的身份提供方遇到错误。请重试。",
         "staleSignIn": "此登录链接已过期或已失效。请重新登录。",
-        "temporarilyUnavailable": "您的身份提供方暂时不可用。请稍后重试。"
+        "temporarilyUnavailable": "您的身份提供方暂时不可用。请稍后重试。",
+        "accountLocked": "登录失败次数过多，此账户已被锁定。请联系工作区管理员。"
       },
       "credentialsIssue": {
         "description": "登录凭据不正确或已过期"

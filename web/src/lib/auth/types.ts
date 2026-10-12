@@ -36,6 +36,8 @@ export interface AuthTypeMetadata {
   oauthEnabled: boolean;
   // Admin kill switch (single-tenant). False hides password login and signup.
   passwordAuthEnabled: boolean;
+  // When true (and the install already has users), hide open Create Account.
+  inviteOnlyEnabled: boolean;
   // Enabled DB-backed SSO providers, one login button each. Empty on cloud
   // and when no provider rows exist.
   ssoProviders?: SSOProviderOption[];

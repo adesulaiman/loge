@@ -8,6 +8,7 @@ import jwt
 from email_validator import EmailNotValidError, EmailUndeliverableError, validate_email
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import StreamingResponse
+from fastapi_users.exceptions import InvalidPasswordException, UserAlreadyExists
 from pydantic import BaseModel, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -24,6 +25,7 @@ from onyx.auth.permissions import (
     has_global_permission,
     require_permission,
 )
+from onyx.auth.schemas import UserCreate
 from onyx.auth.scoped_permissions import get_scoped_groups
 from onyx.auth.session_tokens import (
     SessionRejection,
@@ -31,8 +33,10 @@ from onyx.auth.session_tokens import (
     classify_session_token_value,
 )
 from onyx.auth.users import (
+    UserManager,
     anonymous_user_enabled,
     enforce_seat_limit_locked,
+    get_user_manager,
     optional_user,
     scope_exempt,
 )
@@ -112,6 +116,7 @@ from onyx.server.manage.models import (
     AutoScrollRequest,
     BulkInviteResponse,
     ChatBackgroundRequest,
+    CreateUserRequest,
     DefaultAppModeRequest,
     EmailInviteStatus,
     LanguageRequest,
@@ -582,6 +587,107 @@ def download_users_csv(
     )
 
 
+@router.post("/manage/admin/create-user", tags=PUBLIC_API_TAGS)
+async def create_user(
+    create_request: CreateUserRequest,
+    current_user: User = Depends(
+        require_permission(Permission.FULL_ADMIN_PANEL_ACCESS)
+    ),
+    user_manager: UserManager = Depends(get_user_manager),
+    db_session: Session = Depends(get_session),
+) -> FullUserSnapshot:
+    """Create an active user with a known password (admin provisioning).
+
+    Bypasses the public invite-list / open-signup gates. Password auth must be
+    enabled (same gate as public register). Invite remains a separate flow.
+    """
+    if not MULTI_TENANT and not get_security_settings().password_auth_enabled:
+        raise OnyxError(
+            OnyxErrorCode.REGISTRATION_DISABLED,
+            "Password authentication is disabled. Enable it to create users with passwords.",
+        )
+
+    try:
+        email_info = validate_email(create_request.email, check_deliverability=False)
+        normalized_email = email_info.normalized
+    except (EmailUndeliverableError, EmailNotValidError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid email address: {create_request.email} - {str(e)}",
+        )
+
+    if get_user_by_email(email=normalized_email, db_session=db_session):
+        raise OnyxError(
+            OnyxErrorCode.DUPLICATE_RESOURCE,
+            "A user with this email already exists",
+        )
+
+    try:
+        created = await user_manager.create(
+            UserCreate(
+                email=normalized_email,
+                password=create_request.password,
+                is_verified=True,
+                is_active=True,
+            ),
+            safe=False,
+            request=None,
+            skip_invite_check=True,
+        )
+    except UserAlreadyExists:
+        raise OnyxError(
+            OnyxErrorCode.DUPLICATE_RESOURCE,
+            "A user with this email already exists",
+        )
+    except InvalidPasswordException as e:
+        raise HTTPException(status_code=400, detail=str(e.reason))
+
+    # Re-bind to the request session so membership reads and admin grant see
+    # the row UserManager wrote in its own session.
+    created = get_user_by_email(email=normalized_email, db_session=db_session)
+    if not created:
+        raise OnyxError(
+            OnyxErrorCode.NOT_FOUND,
+            "User was created but could not be loaded",
+        )
+
+    if create_request.is_admin and not user_is_admin(created):
+        set_user_admin_access(
+            db_session=db_session,
+            actor=current_user,
+            target=created,
+            is_admin=True,
+        )
+        db_session.refresh(created)
+
+    groups_by_user = batch_get_user_groups(
+        db_session, [created.id], include_default=True
+    )
+    snapshot = FullUserSnapshot.from_user_model(
+        created,
+        groups=[
+            UserGroupInfo(id=gid, name=gname)
+            for gid, gname in groups_by_user.get(created.id, [])
+        ],
+        is_admin=user_is_admin(created),
+    )
+
+    emit_audit_event(
+        AuditAction.USER_CREATE,
+        AuditOutcome.SUCCESS,
+        actor=actor_from_user(current_user),
+        resource_type="user",
+        resource_id=str(created.id),
+        extra={
+            "target_email": created.email,
+            "is_admin": snapshot.is_admin,
+            "provisioned": True,
+        },
+    )
+
+    return snapshot
+
+
 @router.put("/manage/admin/users", tags=PUBLIC_API_TAGS)
 def bulk_invite_users(
     emails: list[str] = Body(..., embed=True),
@@ -931,6 +1037,39 @@ def activate_user_api(
         fetch_ee_implementation_or_noop(
             "onyx.db.license", "invalidate_license_cache", None
         )()
+
+
+@router.patch("/manage/admin/unlock-user", tags=PUBLIC_API_TAGS)
+def unlock_user_api(
+    user_email: UserByEmail,
+    current_user: User = Depends(
+        require_permission(Permission.FULL_ADMIN_PANEL_ACCESS)
+    ),
+    db_session: Session = Depends(get_session),
+) -> None:
+    """Clear password-login lockout after failed attempts."""
+    from onyx.auth.login_lockout import unlock_user_login
+
+    user_to_unlock = get_user_by_email(
+        email=user_email.user_email, db_session=db_session
+    )
+    if not user_to_unlock:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user_to_unlock.login_locked_at is None:
+        logger.warning("%s is not login-locked", user_to_unlock.email)
+        return
+
+    unlock_user_login(user_to_unlock, db_session)
+
+    emit_audit_event(
+        AuditAction.USER_UNLOCK,
+        AuditOutcome.SUCCESS,
+        actor=actor_from_user(current_user),
+        resource_type="user",
+        resource_id=str(user_to_unlock.id),
+        extra={"target_email": user_to_unlock.email},
+    )
 
 
 @router.get("/manage/admin/valid-domains")

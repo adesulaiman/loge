@@ -22,6 +22,8 @@ export interface FullUserSnapshot {
   is_scim_synced: boolean;
   /** Per-user Craft override; null = follow the workspace default. */
   craft_enabled: boolean | null;
+  /** True when password login is locked after failed attempts. */
+  login_locked: boolean;
 }
 
 export interface UserRow {
@@ -32,6 +34,8 @@ export interface UserRow {
   status: UserStatus;
   is_active: boolean;
   is_scim_synced: boolean;
+  /** True when password login is locked after failed attempts. */
+  login_locked: boolean;
   /** Per-user Craft override; null = follow the workspace default (also
    * null for rows that aren't real users: invited/requested, API keys). */
   craft_enabled: boolean | null;

@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "취소"
+        },
+        "confirmPassword": {
+          "label": "비밀번호 확인",
+          "mismatch": "비밀번호가 일치하지 않습니다",
+          "placeholder": "비밀번호를 다시 입력하세요",
+          "required": "비밀번호를 확인하세요"
+        },
+        "description": "이메일과 비밀번호로 활성 계정을 만듭니다. 초대 이메일은 전송되지 않습니다.",
+        "email": {
+          "invalid": "유효한 이메일 주소를 입력하세요",
+          "label": "이메일",
+          "placeholder": "user@example.com",
+          "required": "이메일은 필수입니다"
+        },
+        "password": {
+          "label": "비밀번호",
+          "minLength": "비밀번호는 최소 8자여야 합니다",
+          "placeholder": "비밀번호를 입력하세요",
+          "required": "비밀번호는 필수입니다"
+        },
+        "submitButton": {
+          "label": "사용자 만들기"
+        },
+        "title": "사용자 만들기",
+        "toasts": {
+          "createFailed": "사용자를 만들지 못했습니다",
+          "created": "사용자가 생성되었습니다"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "취소"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "사용자 초대"
         },
-        "title": "사용자 및 요청"
+        "title": "사용자 및 요청",
+        "createButton": {
+          "label": "사용자 만들기"
+        }
       },
       "permissionsNotice": {
         "description": "{appName}는 이제 그룹 기반 권한을 사용합니다. Curator와 Global Curator 역할은 구성 가능한 그룹 권한으로 대체되었으며, 그룹별 관리자가 제한된 범위에서 관리합니다.",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "관리자 권한이 해제되었습니다",
           "error": "오류가 발생했습니다",
           "requestApproved": "요청이 승인되었습니다"
+        },
+        "unlock": {
+          "label": "사용자 잠금 해제"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "SCIM 동기화됨"
+          },
+          "locked": {
+            "label": "잠김"
           }
         },
         "toasts": {
           "downloadFailed": "CSV를 다운로드하지 못했습니다"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> 이(가) 다시 비밀번호로 로그인할 수 있습니다. 실패한 시도 카운터가 초기화됩니다.",
+        "submit": {
+          "label": "잠금 해제"
+        },
+        "title": "사용자 잠금 해제",
+        "toasts": {
+          "success": "사용자 잠금이 해제되었습니다"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "요청이 너무 많습니다. 나중에 다시 시도해 주세요."
+      },
+      "accountLocked": {
+        "error": "로그인 실패가 너무 많아 이 계정이 잠겼습니다. 워크스페이스 관리자에게 문의하세요."
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "이 이메일로 다른 로그인 방식의 계정이 이미 있습니다. 처음 사용한 방식으로 로그인하거나, 관리자에게 이 공급자의 연결을 요청하세요.",
         "serverError": "ID 공급자에서 오류가 발생했습니다. 다시 시도하세요.",
         "staleSignIn": "이 로그인 링크가 만료되었거나 더 이상 유효하지 않습니다. 다시 로그인하세요.",
-        "temporarilyUnavailable": "ID 공급자를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요."
+        "temporarilyUnavailable": "ID 공급자를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요.",
+        "accountLocked": "로그인 실패가 너무 많아 이 계정이 잠겼습니다. 워크스페이스 관리자에게 문의하세요."
       },
       "credentialsIssue": {
         "description": "잘못되었거나 만료된 로그인 자격 증명"

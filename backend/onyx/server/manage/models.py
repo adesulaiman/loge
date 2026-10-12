@@ -81,6 +81,9 @@ class AuthConfigResponse(BaseModel):
     oauth_enabled: bool = False
     # Kill switch (single-tenant). UI hint only, the backend guards enforce.
     password_auth_enabled: bool = True
+    # When true, open Create Account is off (invite list required). UI hint;
+    # the first user on an empty install may still register.
+    invite_only_enabled: bool = True
     # Enabled DB-backed SSO providers, one login button each. Empty on cloud and
     # on instances with no provider rows, so the page falls back to the built-in
     # password (and Google when oauth_enabled) login.
@@ -254,6 +257,14 @@ class UserInfo(BaseModel):
 
 class UserByEmail(BaseModel):
     user_email: str
+
+
+class CreateUserRequest(BaseModel):
+    """Admin provisioning: create an active user with a known password."""
+
+    email: str
+    password: str
+    is_admin: bool = False
 
 
 class UserAdminAccessUpdateRequest(BaseModel):

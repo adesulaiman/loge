@@ -17,6 +17,7 @@ import {
   SvgUserX,
   SvgKey,
   SvgUserManage,
+  SvgLock,
 } from "@opal/icons";
 import Text from "@/refresh-components/texts/Text";
 import { AccountType, UserStatus } from "@/lib/types";
@@ -30,6 +31,7 @@ import {
   ActivateUserModal,
   DeleteUserModal,
   ResetPasswordModal,
+  UnlockUserModal,
 } from "./UserActionModals";
 import type { UserRow } from "./types";
 
@@ -44,6 +46,7 @@ enum Modal {
   CANCEL_INVITE = "cancelInvite",
   EDIT_GROUPS = "editGroups",
   RESET_PASSWORD = "resetPassword",
+  UNLOCK = "unlock",
 }
 
 interface UserRowActionsProps {
@@ -126,6 +129,17 @@ export default function UserRowActions({
     title: t("rowActions.resetPassword.label"),
     onSelect: () => openModal(Modal.RESET_PASSWORD),
   };
+  const unlockItem: DropdownMenuRow[] = user.login_locked
+    ? [
+        {
+          kind: "action",
+          id: "unlock",
+          icon: SvgLock,
+          title: t("rowActions.unlock.label"),
+          onSelect: () => openModal(Modal.UNLOCK),
+        },
+      ]
+    : [];
 
   // Status-aware action menus. A line sits between groups.
   const menuItems: DropdownMenuItem[] = (() => {
@@ -211,7 +225,12 @@ export default function UserRowActions({
         return [
           {
             kind: "group",
-            items: [...editGroupsItem, ...adminAccessItem, resetPasswordItem],
+            items: [
+              ...editGroupsItem,
+              ...adminAccessItem,
+              resetPasswordItem,
+              ...unlockItem,
+            ],
           },
           {
             kind: "group",
@@ -232,7 +251,12 @@ export default function UserRowActions({
         return [
           {
             kind: "group",
-            items: [...editGroupsItem, ...adminAccessItem, resetPasswordItem],
+            items: [
+              ...editGroupsItem,
+              ...adminAccessItem,
+              resetPasswordItem,
+              ...unlockItem,
+            ],
           },
           {
             kind: "group",
@@ -326,6 +350,14 @@ export default function UserRowActions({
 
       {modal === Modal.RESET_PASSWORD && (
         <ResetPasswordModal email={user.email} onClose={closeModal} />
+      )}
+
+      {modal === Modal.UNLOCK && (
+        <UnlockUserModal
+          email={user.email}
+          onClose={closeModal}
+          onMutate={onMutate}
+        />
       )}
     </>
   );

@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "Cancelar"
+        },
+        "confirmPassword": {
+          "label": "Confirmar contraseña",
+          "mismatch": "Las contraseñas no coinciden",
+          "placeholder": "Vuelva a introducir la contraseña",
+          "required": "Confirme la contraseña"
+        },
+        "description": "Cree una cuenta activa con correo y contraseña. No se envía un correo de invitación.",
+        "email": {
+          "invalid": "Introduzca una dirección de correo válida",
+          "label": "Correo electrónico",
+          "placeholder": "user@example.com",
+          "required": "El correo electrónico es obligatorio"
+        },
+        "password": {
+          "label": "Contraseña",
+          "minLength": "La contraseña debe tener al menos 8 caracteres",
+          "placeholder": "Introduzca la contraseña",
+          "required": "La contraseña es obligatoria"
+        },
+        "submitButton": {
+          "label": "Crear usuario"
+        },
+        "title": "Crear usuario",
+        "toasts": {
+          "createFailed": "No se pudo crear el usuario",
+          "created": "Usuario creado"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "Cancelar"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "Invitar usuarios"
         },
-        "title": "Usuarios y solicitudes"
+        "title": "Usuarios y solicitudes",
+        "createButton": {
+          "label": "Crear usuario"
+        }
       },
       "permissionsNotice": {
         "description": "{appName} ahora usa permisos por grupo. Los roles de Curador y Curador global se han sustituido por permisos de grupo configurables, con responsables por grupo para una administración acotada.",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "Acceso de administrador retirado",
           "error": "Ocurrió un error",
           "requestApproved": "Solicitud aprobada"
+        },
+        "unlock": {
+          "label": "Desbloquear usuario"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "Sincronizado por SCIM"
+          },
+          "locked": {
+            "label": "Bloqueado"
           }
         },
         "toasts": {
           "downloadFailed": "No se pudo descargar el CSV"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> podrá iniciar sesión con contraseña de nuevo. Se borran los contadores de intentos fallidos.",
+        "submit": {
+          "label": "Desbloquear"
+        },
+        "title": "Desbloquear usuario",
+        "toasts": {
+          "success": "Usuario desbloqueado"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "Demasiadas solicitudes. Inténtalo de nuevo más tarde."
+      },
+      "accountLocked": {
+        "error": "Esta cuenta está bloqueada tras demasiados intentos fallidos de inicio de sesión. Contacta al administrador del espacio de trabajo."
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "Ya existe una cuenta con este correo con otro método de inicio de sesión. Inicia sesión como lo hiciste la primera vez, o pide a tu administrador que vincule este proveedor.",
         "serverError": "Tu proveedor de identidad encontró un error. Inténtalo de nuevo.",
         "staleSignIn": "Este enlace de inicio de sesión caducó o ya no es válido. Vuelve a iniciar sesión.",
-        "temporarilyUnavailable": "Tu proveedor de identidad no está disponible temporalmente. Inténtalo de nuevo más tarde."
+        "temporarilyUnavailable": "Tu proveedor de identidad no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+        "accountLocked": "Esta cuenta está bloqueada tras demasiados intentos fallidos de inicio de sesión. Contacta al administrador del espacio de trabajo."
       },
       "credentialsIssue": {
         "description": "Credenciales de acceso incorrectas o caducadas"

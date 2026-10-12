@@ -183,7 +183,7 @@ so verify the callers rather than a single component.
 | `web/src/app/admin/bots/`, `admin/discord-bot/` | slack-bot, discord-bot |
 | `web/src/app/admin/sso-providers/`, `admin/security/`, `admin/oauth-test/` | auth-and-identity |
 | `web/src/app/admin/token-rate-limits/` | rate-and-usage-limits |
-| `web/src/app/admin/` | **a second admin route tree**, reached by a rewrite. `web/src/proxy.ts:EE_ROUTES` lists the paths that get rewritten to `/ee/...`: the `/admin/*` paths groups, performance/usage, performance/analytics, performance/query-history, performance/custom-analytics, theme, standard-answer, and export-logs, plus `/agents/stats`. A page under `ee/admin/` can also load directly at `/ee/admin/...`. Only the `/admin/...` alias needs an `EE_ROUTES` entry. Check `EE_ROUTES` before assuming which copy handles an `/admin/...` path. |
+| `web/src/app/admin/` | Admin UI route tree. Paid surfaces (groups, performance, theme, standard-answer, export-logs) wrap with `web/src/loge/app/PaidFeatureLayout.tsx`. |
 | `web/src/lib/admin-routes.ts` | the authoritative list of admin routes. Changing it changes the admin panel's surface, so re-check coverage against this map. |
 | `web/src/app/admin/craft/` | craft-admin |
 | `web/src/app/admin/tracing/`, `admin/systeminfo/` | observability |

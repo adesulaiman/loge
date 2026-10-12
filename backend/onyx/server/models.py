@@ -51,6 +51,8 @@ class FullUserSnapshot(BaseModel):
     is_scim_synced: bool
     # Per-user Craft override; None = follow the workspace default.
     craft_enabled: bool | None
+    # True when password login is locked after failed attempts.
+    login_locked: bool = False
 
     @classmethod
     def from_user_model(
@@ -75,6 +77,7 @@ class FullUserSnapshot(BaseModel):
             groups=groups or [],
             is_scim_synced=is_scim_synced,
             craft_enabled=user.craft_enabled,
+            login_locked=user.login_locked_at is not None,
         )
 
 

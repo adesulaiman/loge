@@ -126,13 +126,24 @@ export default function CreateCredential({
     );
 
     try {
-      const response = await submitCredential({
+      const credentialPayload: {
+        credential_json: typeof filteredCredentialValues;
+        source: typeof sourceType;
+        private_key: TypedFile | undefined;
+        name?: string;
+        admin_public?: boolean;
+        curator_public?: boolean;
+        groups?: number[];
+      } = {
         credential_json: filteredCredentialValues,
         ...shareAccountPayload({ share, groups }),
-        ...(trimmedName ? { name: trimmedName } : {}),
         source: sourceType,
         private_key: privateKey || undefined,
-      });
+      };
+      if (trimmedName) {
+        credentialPayload.name = trimmedName;
+      }
+      const response = await submitCredential(credentialPayload);
 
       const { message, isSuccess, credential } = response;
 

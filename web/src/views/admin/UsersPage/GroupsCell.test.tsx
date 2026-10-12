@@ -29,6 +29,7 @@ const user: UserRow = {
   status: UserStatus.ACTIVE,
   is_active: true,
   is_scim_synced: false,
+  login_locked: false,
   craft_enabled: null,
   personal_name: null,
   created_at: null,

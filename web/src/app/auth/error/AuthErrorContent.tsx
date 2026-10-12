@@ -14,6 +14,7 @@ import { isStaleSsoStateError } from "@/lib/auth/utils";
 const KNOWN_ERROR_CODES = [
   "OAUTH_USER_ALREADY_EXISTS",
   "LOGIN_BAD_CREDENTIALS",
+  "ACCOUNT_LOCKED",
   "access_denied",
   "login_required",
   "consent_required",
@@ -48,6 +49,7 @@ function AuthErrorContent({ message: rawMessage }: AuthErrorContentProps) {
   const errorCodeMessages = {
     OAUTH_USER_ALREADY_EXISTS: t("error.code.oauthUserAlreadyExists"),
     LOGIN_BAD_CREDENTIALS: t("error.code.loginBadCredentials"),
+    ACCOUNT_LOCKED: t("error.code.accountLocked"),
     access_denied: t("error.code.accessDenied"),
     login_required: t("error.code.loginRequired"),
     consent_required: t("error.code.consentRequired"),

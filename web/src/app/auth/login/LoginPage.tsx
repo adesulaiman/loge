@@ -42,6 +42,10 @@ export default function LoginPage({
   const ssoProviders = authTypeMetadata?.ssoProviders ?? [];
   // Kill switch off: hide password login/signup. Backend refuses regardless.
   const passwordAuthEnabled = authTypeMetadata?.passwordAuthEnabled !== false;
+  // Invite-only with users already present: hide open Create Account.
+  const showCreateAccount =
+    passwordAuthEnabled &&
+    !(authTypeMetadata?.inviteOnlyEnabled && authTypeMetadata.hasUsers);
   const autoStartSso = shouldAutoStartSso(authTypeMetadata, autoRedirectToSso);
   const orDivider = t("login.orDivider.text");
 
@@ -102,7 +106,7 @@ export default function LoginPage({
         </div>
       )}
 
-      {!hidePageRedirect && passwordAuthEnabled && (
+      {!hidePageRedirect && showCreateAccount && (
         <p className="text-center mt-4">
           {t("login.signupPrompt.text")}{" "}
           <button

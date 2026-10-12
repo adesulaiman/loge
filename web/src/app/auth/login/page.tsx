@@ -80,10 +80,13 @@ export default async function Page(props: PageProps) {
 
   return (
     <div className="flex flex-col ">
-      {/* Kill switch off: omit authState so the signup footer drops. */}
+      {/* Kill switch / invite-only: omit authState so the signup footer drops. */}
       <AuthFlowContainer
         authState={
-          authTypeMetadata?.passwordAuthEnabled !== false ? "login" : undefined
+          authTypeMetadata?.passwordAuthEnabled !== false &&
+          !(authTypeMetadata?.inviteOnlyEnabled && authTypeMetadata?.hasUsers)
+            ? "login"
+            : undefined
         }
       >
         <LoginPage

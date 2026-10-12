@@ -47,7 +47,10 @@ class Settings(BaseModel):
     gpu_enabled: bool | None = None
     application_status: ApplicationStatus = ApplicationStatus.ACTIVE
     anonymous_user_enabled: bool | None = None
-    invite_only_enabled: bool = False
+    # New workspaces start invite-only so open Create Account is off until an
+    # admin widens it. The first user on a empty single-tenant install still
+    # registers (create skips the invite gate when user_count == 0).
+    invite_only_enabled: bool = True
     deep_research_enabled: bool | None = None
     multi_model_chat_enabled: bool | None = True
     search_ui_enabled: bool | None = True

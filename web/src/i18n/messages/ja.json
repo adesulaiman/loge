@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "キャンセル"
+        },
+        "confirmPassword": {
+          "label": "パスワードの確認",
+          "mismatch": "パスワードが一致しません",
+          "placeholder": "パスワードを再入力",
+          "required": "パスワードを確認してください"
+        },
+        "description": "メールとパスワードで有効なアカウントを作成します。招待メールは送信されません。",
+        "email": {
+          "invalid": "有効なメールアドレスを入力してください",
+          "label": "メール",
+          "placeholder": "user@example.com",
+          "required": "メールは必須です"
+        },
+        "password": {
+          "label": "パスワード",
+          "minLength": "パスワードは8文字以上である必要があります",
+          "placeholder": "パスワードを入力",
+          "required": "パスワードは必須です"
+        },
+        "submitButton": {
+          "label": "ユーザーを作成"
+        },
+        "title": "ユーザーを作成",
+        "toasts": {
+          "createFailed": "ユーザーの作成に失敗しました",
+          "created": "ユーザーを作成しました"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "キャンセル"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "ユーザーを招待"
         },
-        "title": "ユーザーとリクエスト"
+        "title": "ユーザーとリクエスト",
+        "createButton": {
+          "label": "ユーザーを作成"
+        }
       },
       "permissionsNotice": {
         "description": "{appName} はグループベースの権限を使用するようになりました。Curator と Global Curator のロールは、設定可能なグループ権限に置き換えられました。グループごとの管理者が、範囲を限定した管理を行います。",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "管理者権限を削除しました",
           "error": "エラーが発生しました",
           "requestApproved": "リクエストを承認しました"
+        },
+        "unlock": {
+          "label": "ユーザーのロック解除"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "SCIM 同期済み"
+          },
+          "locked": {
+            "label": "ロック中"
           }
         },
         "toasts": {
           "downloadFailed": "CSV のダウンロードに失敗しました"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> は再びパスワードでサインインできます。失敗回数のカウンターはクリアされます。",
+        "submit": {
+          "label": "ロック解除"
+        },
+        "title": "ユーザーのロック解除",
+        "toasts": {
+          "success": "ユーザーのロックを解除しました"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "リクエストが多すぎます。しばらくしてからもう一度お試しください。"
+      },
+      "accountLocked": {
+        "error": "サインインの失敗が多すぎるため、このアカウントはロックされています。ワークスペースの管理者に連絡してください。"
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "このメールアドレスのアカウントは、別のサインイン方法で既に存在します。最初に使用した方法でサインインするか、管理者にこのプロバイダーの連携を依頼してください。",
         "serverError": "ID プロバイダーでエラーが発生しました。もう一度お試しください。",
         "staleSignIn": "このログインリンクは期限切れか、無効になっています。もう一度ログインしてください。",
-        "temporarilyUnavailable": "ID プロバイダーは一時的に利用できません。しばらくしてからもう一度お試しください。"
+        "temporarilyUnavailable": "ID プロバイダーは一時的に利用できません。しばらくしてからもう一度お試しください。",
+        "accountLocked": "サインインの失敗が多すぎるため、このアカウントはロックされています。ワークスペースの管理者に連絡してください。"
       },
       "credentialsIssue": {
         "description": "ログイン認証情報の誤りまたは期限切れ"
