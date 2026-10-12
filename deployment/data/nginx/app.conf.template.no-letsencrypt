@@ -117,6 +117,12 @@ server {
 
         proxy_http_version 1.1;
 
+        # Next.js can emit a very large Link: preload header (font preloads).
+        # Default proxy_buffer_size (~4k) then returns 502 "too big header".
+        proxy_buffer_size 32k;
+        proxy_buffers 8 32k;
+        proxy_busy_buffers_size 64k;
+
         # we don't want nginx trying to do something clever with
         # redirects, we set the Host: header above already.
         proxy_redirect off;

@@ -1,0 +1,66 @@
+# Local override: build app images from this repo. Do not pull onyxdotapp/*.
+# Auto-merged by `docker compose` when present next to docker-compose.yml.
+#
+# Memory note: the web image `next build` (Turbopack) needs a Docker Desktop VM
+# with at least ~12GB RAM. With 8GB the build is OOM-killed. Build web alone:
+#   docker build --build-arg NODE_OPTIONS=--max-old-space-size=4096 \
+#     --build-arg SKIP_TYPE_CHECK=1 -t onyx-web-server:local ../../web
+#
+# Usage:
+#   docker compose build web_server
+#   docker compose up -d --build --wait
+
+services:
+  api_server:
+    image: onyx-backend:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+      target: runtime
+
+  background:
+    image: onyx-backend:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+      target: runtime
+
+  web_server:
+    image: onyx-web-server:local
+    pull_policy: missing
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_DISABLE_LOGOUT: ${NEXT_PUBLIC_DISABLE_LOGOUT:-}
+        NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED: ${NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED:-}
+        NEXT_PUBLIC_THEME: ${NEXT_PUBLIC_THEME:-}
+        # No quotes around the default — compose would pass literal " chars through
+        # and Node would ignore the heap limit (then OOM-kill next build).
+        NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=4096}
+        # Skip tsc during image build; saves several GB of RAM for local builds.
+        SKIP_TYPE_CHECK: ${SKIP_TYPE_CHECK:-1}
+
+  inference_model_server:
+    image: onyx-model-server:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.model_server
+
+  indexing_model_server:
+    image: onyx-model-server:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.model_server
+
+  object-store-copy:
+    image: onyx-backend:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+      target: runtime
