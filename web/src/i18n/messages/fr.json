@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "Annuler"
+        },
+        "confirmPassword": {
+          "label": "Confirmer le mot de passe",
+          "mismatch": "Les mots de passe ne correspondent pas",
+          "placeholder": "Saisir à nouveau le mot de passe",
+          "required": "Confirmez le mot de passe"
+        },
+        "description": "Créez un compte actif avec e-mail et mot de passe. Aucun e-mail d'invitation n'est envoyé.",
+        "email": {
+          "invalid": "Saisissez une adresse e-mail valide",
+          "label": "E-mail",
+          "placeholder": "user@example.com",
+          "required": "L'e-mail est obligatoire"
+        },
+        "password": {
+          "label": "Mot de passe",
+          "minLength": "Le mot de passe doit contenir au moins 8 caractères",
+          "placeholder": "Saisir le mot de passe",
+          "required": "Le mot de passe est obligatoire"
+        },
+        "submitButton": {
+          "label": "Créer l'utilisateur"
+        },
+        "title": "Créer un utilisateur",
+        "toasts": {
+          "createFailed": "Échec de la création de l'utilisateur",
+          "created": "Utilisateur créé"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "Annuler"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "Inviter des utilisateurs"
         },
-        "title": "Utilisateurs et demandes"
+        "title": "Utilisateurs et demandes",
+        "createButton": {
+          "label": "Créer un utilisateur"
+        }
       },
       "permissionsNotice": {
         "description": "{appName} utilise désormais des autorisations basées sur les groupes. Les rôles Curator et Global Curator sont remplacés par des autorisations de groupe configurables, avec des gestionnaires par groupe pour une administration limitée à leur périmètre.",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "Accès administrateur retiré",
           "error": "Une erreur est survenue",
           "requestApproved": "Demande approuvée"
+        },
+        "unlock": {
+          "label": "Déverrouiller l'utilisateur"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "Synchronisé par SCIM"
+          },
+          "locked": {
+            "label": "Verrouillé"
           }
         },
         "toasts": {
           "downloadFailed": "Échec du téléchargement du CSV"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> pourra à nouveau se connecter avec un mot de passe. Les compteurs d'échecs sont réinitialisés.",
+        "submit": {
+          "label": "Déverrouiller"
+        },
+        "title": "Déverrouiller l'utilisateur",
+        "toasts": {
+          "success": "Utilisateur déverrouillé"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "Trop de requêtes. Veuillez réessayer plus tard."
+      },
+      "accountLocked": {
+        "error": "Ce compte est verrouillé après trop de tentatives de connexion échouées. Contactez l'administrateur de votre espace de travail."
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "Un compte avec cette adresse e-mail existe déjà avec une autre méthode de connexion. Connectez-vous comme la première fois, ou demandez à votre administrateur d'associer ce fournisseur.",
         "serverError": "Votre fournisseur d'identité a rencontré une erreur. Veuillez réessayer.",
         "staleSignIn": "Ce lien de connexion a expiré ou n'est plus valide. Veuillez vous reconnecter.",
-        "temporarilyUnavailable": "Votre fournisseur d'identité est temporairement indisponible. Veuillez réessayer plus tard."
+        "temporarilyUnavailable": "Votre fournisseur d'identité est temporairement indisponible. Veuillez réessayer plus tard.",
+        "accountLocked": "Ce compte est verrouillé après trop de tentatives de connexion échouées. Contactez l'administrateur de votre espace de travail."
       },
       "credentialsIssue": {
         "description": "Identifiants de connexion incorrects ou expirés"

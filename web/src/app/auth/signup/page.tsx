@@ -58,6 +58,16 @@ const Page = async (props: {
     return redirect("/auth/login");
   }
 
+  // Invite-only with an existing user base: open Create Account is off.
+  // Empty installs still reach this page for bootstrap (hasUsers === false).
+  if (
+    !cloud &&
+    authTypeMetadata?.inviteOnlyEnabled &&
+    authTypeMetadata.hasUsers
+  ) {
+    return redirect("/auth/login");
+  }
+
   let authUrl: string | null = null;
   if (cloud && authTypeMetadata) {
     authUrl = await getAuthUrlSS(authTypeMetadata.multiTenant, null);

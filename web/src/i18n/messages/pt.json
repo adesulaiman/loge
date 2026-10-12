@@ -8479,6 +8479,38 @@
           "label": "+{count}"
         }
       },
+      "createModal": {
+        "cancelButton": {
+          "label": "Cancelar"
+        },
+        "confirmPassword": {
+          "label": "Confirmar senha",
+          "mismatch": "As senhas não coincidem",
+          "placeholder": "Digite a senha novamente",
+          "required": "Confirme a senha"
+        },
+        "description": "Crie uma conta ativa com e-mail e senha. Nenhum e-mail de convite é enviado.",
+        "email": {
+          "invalid": "Digite um endereço de e-mail válido",
+          "label": "E-mail",
+          "placeholder": "user@example.com",
+          "required": "O e-mail é obrigatório"
+        },
+        "password": {
+          "label": "Senha",
+          "minLength": "A senha deve ter pelo menos 8 caracteres",
+          "placeholder": "Digite a senha",
+          "required": "A senha é obrigatória"
+        },
+        "submitButton": {
+          "label": "Criar usuário"
+        },
+        "title": "Criar usuário",
+        "toasts": {
+          "createFailed": "Falha ao criar o usuário",
+          "created": "Usuário criado"
+        }
+      },
       "inviteModal": {
         "cancelButton": {
           "label": "Cancelar"
@@ -8510,7 +8542,10 @@
         "inviteButton": {
           "label": "Convidar usuários"
         },
-        "title": "Usuários e solicitações"
+        "title": "Usuários e solicitações",
+        "createButton": {
+          "label": "Criar usuário"
+        }
       },
       "permissionsNotice": {
         "description": "O {appName} agora usa permissões baseadas em grupos. As funções Curador e Curador global foram substituídas por permissões de grupo configuráveis, com gerentes por grupo para administração delimitada.",
@@ -8576,6 +8611,9 @@
           "adminAccessRemoved": "Acesso de administrador removido",
           "error": "Ocorreu um erro",
           "requestApproved": "Solicitação aprovada"
+        },
+        "unlock": {
+          "label": "Desbloquear usuário"
         }
       },
       "status": {
@@ -8651,10 +8689,23 @@
         "status": {
           "scimSynced": {
             "label": "Sincronizado por SCIM"
+          },
+          "locked": {
+            "label": "Bloqueado"
           }
         },
         "toasts": {
           "downloadFailed": "Falha ao baixar o CSV"
+        }
+      },
+      "unlockModal": {
+        "description": "<strong>{email}</strong> poderá entrar com senha novamente. Os contadores de tentativas falhas são limpos.",
+        "submit": {
+          "label": "Desbloquear"
+        },
+        "title": "Desbloquear usuário",
+        "toasts": {
+          "success": "Usuário desbloqueado"
         }
       }
     },
@@ -9541,6 +9592,9 @@
       },
       "tooManyRequests": {
         "error": "Muitas solicitações. Tente novamente mais tarde."
+      },
+      "accountLocked": {
+        "error": "Esta conta está bloqueada após muitas tentativas de login falhas. Contate o administrador do espaço de trabalho."
       }
     },
     "error": {
@@ -9560,7 +9614,8 @@
         "oauthUserAlreadyExists": "Já existe uma conta com este e-mail usando outro método de login. Entre da forma que usou pela primeira vez, ou peça ao seu administrador para vincular este provedor.",
         "serverError": "Seu provedor de identidade encontrou um erro. Tente novamente.",
         "staleSignIn": "Este link de acesso expirou ou não é mais válido. Entre novamente.",
-        "temporarilyUnavailable": "Seu provedor de identidade está temporariamente indisponível. Tente novamente mais tarde."
+        "temporarilyUnavailable": "Seu provedor de identidade está temporariamente indisponível. Tente novamente mais tarde.",
+        "accountLocked": "Esta conta está bloqueada após muitas tentativas de login falhas. Contate o administrador do espaço de trabalho."
       },
       "credentialsIssue": {
         "description": "Credenciais de login incorretas ou expiradas"

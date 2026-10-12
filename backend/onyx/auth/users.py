@@ -72,6 +72,13 @@ from onyx.auth.email_utils import (
 from onyx.auth.invited_users import get_invited_users, remove_user_from_invited_users
 from onyx.auth.jwt import verify_jwt_token
 from onyx.auth.login_claims_capture import capture_oauth_login_claims
+from onyx.auth.login_lockout import (
+    clear_failed_login_attempts,
+    is_user_login_locked,
+    record_failed_login_attempt,
+    should_lock_after_failures,
+    utc_now,
+)
 from onyx.auth.mobile_sso.sso_completion import (
     apply_mobile_state,
     complete_mobile_sso,
@@ -700,6 +707,8 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         user_create: schemas.UC | UserCreate,
         safe: bool = False,
         request: Optional[Request] = None,
+        *,
+        skip_invite_check: bool = False,
     ) -> User:
         # Check for disposable emails FIRST so obvious throwaway domains are
         # rejected before hitting Google's siteverify API. Cheap local check.
@@ -786,17 +795,16 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         token = CURRENT_TENANT_ID_CONTEXTVAR.set(tenant_id)
         try:
             async with get_async_session_context_manager(tenant_id) as db_session:
-                # Check invite list based on deployment mode
-                if MULTI_TENANT:
-                    # Multi-tenant: Only require invite for existing tenants
-                    # New tenant creation (first user) doesn't require an invite
+                # Check invite list based on deployment mode. Admin provisioning
+                # skips this gate — the caller already authorized the create.
+                if not skip_invite_check:
+                    # First user on an empty install may always register so
+                    # bootstrap is not blocked when invite-only defaults on.
+                    # For later users: multi-tenant always requires invite;
+                    # single-tenant gate self-skips when invite-only is off.
                     user_count = await get_user_count()
                     if user_count > 0:
-                        # Tenant already has users - require invite for new users
                         verify_email_is_invited(user_create.email)
-                else:
-                    # Single-tenant: the gate self-skips when invite-only is off
-                    verify_email_is_invited(user_create.email)
                 if MULTI_TENANT:
                     tenant_user_db = SQLAlchemyUserDatabase[User, uuid.UUID](
                         db_session, User, OAuthAccount
@@ -1593,12 +1601,26 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
                     detail="NO_WEB_LOGIN_AND_HAS_NO_PASSWORD",
                 )
 
+            if is_user_login_locked(user):
+                _audit_login_failure(AuditOutcome.DENIED)
+                raise BasicAuthenticationError(detail="ACCOUNT_LOCKED")
+
             verified, updated_password_hash = self.password_helper.verify_and_update(
                 credentials.password, user.hashed_password
             )
             if not verified:
+                failure_count = record_failed_login_attempt(email)
+                if should_lock_after_failures(failure_count):
+                    await self.user_db.update(
+                        user, {"login_locked_at": utc_now()}
+                    )
+                    clear_failed_login_attempts(email)
+                    _audit_login_failure(AuditOutcome.DENIED)
+                    raise BasicAuthenticationError(detail="ACCOUNT_LOCKED")
                 _audit_login_failure()
                 return None
+
+            clear_failed_login_attempts(email)
 
             if updated_password_hash is not None:
                 await self.user_db.update(

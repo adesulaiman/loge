@@ -54,6 +54,11 @@ function renderStatusColumn(
       <Text as="span" mainUiBody text03>
         {labels.status[value] ?? value}
       </Text>
+      {row.login_locked && (
+        <Text as="span" secondaryBody text03>
+          {labels.locked}
+        </Text>
+      )}
       {row.is_scim_synced && (
         <Text as="span" secondaryBody text03>
           {labels.scimSynced}
@@ -82,6 +87,7 @@ interface ColumnLabels {
   lastActive: string;
   statusHeader: string;
   status: Record<UserStatus, string>;
+  locked: string;
   scimSynced: string;
 }
 
@@ -207,6 +213,7 @@ export default function UsersTable({
             [UserStatus.INVITED]: t("status.invited.label"),
             [UserStatus.REQUESTED]: t("status.requested.label"),
           },
+          locked: t("table.status.locked.label"),
           scimSynced: t("table.status.scimSynced.label"),
         },
         locale

@@ -428,8 +428,8 @@ not.
   (`ADMIN_ROUTES.BILLING`, `web/src/lib/admin-routes.ts`) is not in `EE_ROUTES`.
   The page lives in `web/src/app/admin/billing/`: `page.tsx`, `PlansView.tsx`,
   `CheckoutView.tsx`, `BillingDetailsView.tsx` and `LicenseActivationCard.tsx`.
-  Theme is the opposite case: `/admin/theme` is in `EE_ROUTES`, so the
-  `/ee/admin/theme` tree is the live page (see [[whitelabelling-and-theme]] §9).
+  Theme is served from `web/src/app/admin/theme/` and gated by
+  `PaidFeatureLayout` (see [[whitelabelling-and-theme]] §9).
 - **`GatedContentWrapper` exempts `/admin/billing` and `/admin/users` from
   the gated-access lockout by pathname string match**
   (`web/src/components/GatedContentWrapper.tsx:ALLOWED_GATED_PATHS`), so a

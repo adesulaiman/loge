@@ -32,6 +32,7 @@ from onyx.server.manage.models import (
 )
 from onyx.server.models import StatusResponse
 from onyx.server.security.store import get_security_settings
+from onyx.server.settings.store import load_settings
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import MULTI_TENANT
 
@@ -220,6 +221,12 @@ async def get_auth_type(response: Response) -> AuthConfigResponse:
     )
 
     security = get_security_settings()
+    # Invite-only rides workspace settings (not security KV). Fail closed when
+    # the store is unavailable so open signup cannot leak open.
+    try:
+        invite_only_enabled = load_settings(raise_on_error=True).invite_only_enabled
+    except Exception:
+        invite_only_enabled = True
     return AuthConfigResponse(
         multi_tenant=MULTI_TENANT,
         requires_verification=user_needs_to_be_verified(),
@@ -233,6 +240,7 @@ async def get_auth_type(response: Response) -> AuthConfigResponse:
         has_users=has_users,
         oauth_enabled=OAUTH_ENABLED,
         password_auth_enabled=security.password_auth_enabled,
+        invite_only_enabled=invite_only_enabled,
         sso_providers=await run_in_threadpool(_fetch_sso_provider_options),
     )
 

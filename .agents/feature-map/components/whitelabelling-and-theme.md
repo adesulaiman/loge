@@ -346,17 +346,14 @@ exists for logo upload specifically.
 
 ## 9. Footguns
 
-- **`web/src/app/admin/theme/` is the live page.** `web/src/proxy.ts:EE_ROUTES`
-  lists `"/admin/theme"` and rewrites it to `/ee/admin/theme`, and there is no
-  `web/src/app/admin/theme/` to shadow it. A directory under `ee/admin/` that is
-  not in `EE_ROUTES` is unreachable. Check `EE_ROUTES` and whether a CE-tree
-  sibling exists before you decide which copy of an admin surface runs.
-- **The rewrite always fires. The license gate is in the `/ee` layout.**
-  `web/src/app/layout.tsx` fetches `/settings`. When `ee_features_enabled`
-  is false and the status is not `gated_access`, it renders
-  `web/src/app/EEFeatureRedirect.tsx`, which shows a toast and sends the
-  user to `/app`. There is no degraded CE version of `/admin/theme`. If the
-  settings fetch fails, the layout renders the page (fail open).
+- **`web/src/app/admin/theme/` is the live page.** Paid admin surfaces
+  (theme, groups, performance, standard-answer, export-logs) live under
+  `web/src/app/admin/` and wrap with `web/src/loge/app/PaidFeatureLayout.tsx`.
+  That layout loads `/settings` and, when `ee_features_enabled` is false and
+  the status is not `gated_access`, renders
+  `web/src/loge/app/FeatureRedirect.tsx` (toast + redirect to `/app`). There
+  is no degraded CE version of `/admin/theme`. If the settings fetch fails,
+  the layout renders the page (fail open).
 - **`createLogoIcon` is a false lead for "where is the custom logo
   rendered."** It is real, it is the one sanctioned exception in
   `web/AGENTS.md` to the `web/src/components/` import ban and the `dark:`

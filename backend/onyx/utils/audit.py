@@ -69,6 +69,7 @@ class AuditAction(str, Enum):
     USER_DELETE = "user.delete"
     USER_DEACTIVATE = "user.deactivate"
     USER_REACTIVATE = "user.reactivate"
+    USER_UNLOCK = "user.unlock"
 
     # User access management
     USER_ROLE_CHANGE = "user.role_change"
@@ -122,6 +123,7 @@ _OCSF_CLASS_BY_ACTION: dict[AuditAction, OCSFEventClass] = {
     AuditAction.USER_DELETE: OCSFEventClass.ACCOUNT_CHANGE,
     AuditAction.USER_DEACTIVATE: OCSFEventClass.ACCOUNT_CHANGE,
     AuditAction.USER_REACTIVATE: OCSFEventClass.ACCOUNT_CHANGE,
+    AuditAction.USER_UNLOCK: OCSFEventClass.ACCOUNT_CHANGE,
     AuditAction.USER_ROLE_CHANGE: OCSFEventClass.USER_ACCESS_MANAGEMENT,
     AuditAction.USER_CRAFT_ACCESS_CHANGE: OCSFEventClass.USER_ACCESS_MANAGEMENT,
     AuditAction.USER_GROUP_CHANGE: OCSFEventClass.GROUP_MANAGEMENT,

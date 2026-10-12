@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useAuthTypeMetadata } from "@/lib/auth/hooks";
 import { useSettings } from "@/lib/settings/hooks";
 import { SvgExternalLink, SvgUser, SvgUserPlus } from "@opal/icons";
 import { Button, MessageCard } from "@opal/components";
@@ -16,6 +17,7 @@ import type { StatusFilter } from "./types";
 import UsersSummary from "./UsersSummary";
 import UsersTable from "./UsersTable";
 import InviteUsersModal from "./InviteUsersModal";
+import CreateUserModal from "./CreateUserModal";
 
 // ---------------------------------------------------------------------------
 // Users page content
@@ -74,22 +76,37 @@ function UsersContent() {
 export default function UsersPage() {
   const t = useTranslations("admin.users");
   const { appName } = useSettings();
+  const { authTypeMetadata } = useAuthTypeMetadata();
+  const passwordAuthEnabled = authTypeMetadata?.passwordAuthEnabled !== false;
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const headerActions = [
+    passwordAuthEnabled ? (
+      <Button
+        key="create"
+        prominence="secondary"
+        icon={SvgUserPlus}
+        onClick={() => setCreateOpen(true)}
+      >
+        {t("page.createButton.label")}
+      </Button>
+    ) : null,
+    <Button
+      key="invite"
+      icon={SvgUserPlus}
+      onClick={() => setInviteOpen(true)}
+    >
+      {t("page.inviteButton.label")}
+    </Button>,
+  ].filter(Boolean);
 
   return (
     <SettingsLayouts.Root width="lg">
       <SettingsLayouts.Header
         title={t("page.title")}
         icon={SvgUser}
-        actions={[
-          <Button
-            key="primary"
-            icon={SvgUserPlus}
-            onClick={() => setInviteOpen(true)}
-          >
-            {t("page.inviteButton.label")}
-          </Button>,
-        ]}
+        actions={headerActions}
       >
         <MessageCard
           variant="info"
@@ -116,6 +133,9 @@ export default function UsersPage() {
       </SettingsLayouts.Body>
 
       <InviteUsersModal open={inviteOpen} onOpenChange={setInviteOpen} />
+      {passwordAuthEnabled && (
+        <CreateUserModal open={createOpen} onOpenChange={setCreateOpen} />
+      )}
     </SettingsLayouts.Root>
   );
 }

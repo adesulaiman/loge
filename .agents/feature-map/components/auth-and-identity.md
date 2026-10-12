@@ -16,8 +16,9 @@ auth.
 `permission_projection.py`, `api_key.py`, `pat.py`, `jwt.py`, `session_tokens.py`,
 `oidc_client.py`, `pkce.py`, `oauth_refresher.py`, `oauth_token_manager.py`,
 `anonymous_user.py`, `invited_users.py`, `captcha.py`, `signup_rate_limit.py`,
-`disposable_email_validator.py`, `sso_tenant_token.py`, `sso_url_guard.py`,
-`login_claims_capture.py`, `mobile_sso/`, `schemas.py`, `constants.py`),
+`login_lockout.py`, `disposable_email_validator.py`, `sso_tenant_token.py`,
+`sso_url_guard.py`, `login_claims_capture.py`, `mobile_sso/`, `schemas.py`,
+`constants.py`),
 `backend/loge/auth/` (`users.py`, `sso_domain_verification.py`),
 `backend/onyx/server/auth/`, `server/saml.py`, `server/saml_multi.py`,
 `server/oidc_multi.py`, `server/sso_discovery.py`, `server/auth_check.py`,
@@ -66,13 +67,28 @@ Native mobile clients get the same session in a header instead of a cookie
 anonymous visitor can still use chat if an admin turned that on, with public
 documents only.
 
+New workspaces default to invite-only (`Settings.invite_only_enabled=True`),
+so open Create Account is off until an admin turns **Restrict Open Sign-Up**
+off. The first user on an empty install still registers (`UserManager.create`
+skips the invite gate when `user_count == 0`). Auth metadata (`/auth/type`)
+exposes invite-only so the login UI can hide signup and redirect `/auth/signup`.
+
+Repeated failed password logins lock the account (`User.login_locked_at`) after
+`LOGIN_LOCKOUT_MAX_ATTEMPTS` failures inside `LOGIN_LOCKOUT_WINDOW_SECONDS`
+(defaults 5 / 900). Attempt counts live in CacheBackend; the lock is durable
+and stays until an admin unlocks. SSO is not locked by password failures.
+Lockout is separate from activate/deactivate (`is_active`).
+
 An admin manages users and their capabilities from the admin panel: inviting
-by email, assigning a user to groups (which is what actually grants
-capabilities, see §3), configuring SSO providers, and issuing non-human
-credentials (API keys for service integrations, personal access tokens for
-scripts, SCIM for IdP-driven provisioning). There is no "set this user's
-role" control that does anything: role assignment as a concept was replaced
-by group membership plus account type (§3, §9).
+by email, creating an active user with a password
+(`POST /manage/admin/create-user`, password auth must be on), unlocking a
+password-locked account (`PATCH /manage/admin/unlock-user`), assigning a
+user to groups (which is what actually grants capabilities, see §3),
+configuring SSO providers, and issuing non-human credentials (API keys for
+service integrations, personal access tokens for scripts, SCIM for
+IdP-driven provisioning). There is no "set this user's role" control that
+does anything: role assignment as a concept was replaced by group membership
+plus account type (§3, §9).
 
 A developer or script authenticates the same way over HTTP with a bearer
 token instead of a cookie: an API key (admin-issued, tied to a service
@@ -89,7 +105,8 @@ the coding-agent sandbox).
 | Method | Path | Handler | Notes |
 |---|---|---|---|
 | POST | `/auth/register` | fastapi-users register router | Public. Captcha, disposable-email, invite-list, and signup rate-limit checks run inside `UserManager.create` (`auth/users.py`). |
-| POST | `/auth/login` | fastapi-users cookie/JWT/Redis login router | Public. Issues the session token per `AUTH_BACKEND`. |
+| POST | `/manage/admin/create-user` | `server/manage/users.py:create_user` | `FULL_ADMIN_PANEL_ACCESS`. Provisions an active user with email+password via `UserManager.create(..., skip_invite_check=True)`. Rejects when password auth is off; duplicate email → `DUPLICATE_RESOURCE`. |
+| POST | `/auth/login` | fastapi-users cookie/JWT/Redis login router | Public. Issues the session token per `AUTH_BACKEND`. Password failures feed `login_lockout.py`; a locked user gets `ACCOUNT_LOCKED`. |
 | POST | `/auth/logout` | same router | Writes a tombstone value instead of deleting the Redis key (`session_tokens.py:build_session_tombstone_value`). |
 | POST | `/auth/forgot-password`, `/auth/reset-password` | fastapi-users | Public, signed with `USER_AUTH_SECRET`. |
 | POST | `/auth/request-verify-token`, `/auth/verify` | fastapi-users | Public. |
@@ -111,7 +128,8 @@ the coding-agent sandbox).
 | CRUD | `/admin/api-key*` | `server/api_key/api.py` | `Permission.MANAGE_SERVICE_ACCOUNT_API_KEYS`. Creating or updating a key is **admin-equivalent by design**: `group_ids` is uncapped, so a holder can add a key to the Admin group (`api.py:create_api_key` comment). |
 | GET | `/user/pats/scopes` | `server/pat/api.py:list_selectable_scopes` | `Permission.BASIC_ACCESS`. Drops `use:llm_gateway` from the list while the workspace `llm_gateway_enabled` setting is off. |
 | GET/POST/DELETE | `/user/pats` | `server/pat/api.py` | List/create needs `CREATE_USER_API_KEYS` (create) or `BASIC_ACCESS` (list/delete); a user only ever sees/revokes their own. Minting a PAT with `use:llm_gateway` while the setting is off is rejected with `INVALID_INPUT` (`server/pat/api.py:_validate_assignable_scopes`). |
-| GET/PUT | `/admin/security`, GET `/admin/security/pinned-fields` | `server/security/api.py` | `FULL_ADMIN_PANEL_ACCESS`. Workspace security overrides: password policy, `password_auth_enabled`, `valid_email_domains`, JWT validation fields, SSRF level, incognito availability, and `allow_connector_group_restrictions`. Env-pinned fields win over stored values. Turning on `allow_connector_group_restrictions` needs the Business tier. |
+| GET/PUT | `/admin/security`, GET `/admin/security/pinned-fields` | `server/security/api.py` | `FULL_ADMIN_PANEL_ACCESS`. Workspace security overrides: password policy, `password_auth_enabled`, `valid_email_domains`, JWT validation fields, SSRF level, incognito availability, and `allow_connector_group_restrictions`. Env-pinned fields win over stored values. Turning on `allow_connector_group_restrictions` needs the Business tier. Invite-only / open signup is controlled via workspace settings (`invite_only_enabled`), not this security store. |
+| PATCH | `/manage/admin/unlock-user` | `server/manage/users.py:unlock_user_api` | `FULL_ADMIN_PANEL_ACCESS`. Clears `User.login_locked_at` and CacheBackend failure counters (`login_lockout.unlock_user_login`). Same permission as activate/deactivate. |
 | CRUD | `/admin/user-group*` | `loge/server/user_group/api.py` | See [[access-control]] §2; this is where group membership, and thus `PermissionGrant`-derived capability, is actually assigned. |
 | GET/POST/PATCH | `/admin/sso-providers*`, `/admin/sso-providers/{id}/domains` | `server/manage/sso/api.py` | `FULL_ADMIN_PANEL_ACCESS` (exact gating per route). Domain-routing SSO providers beyond the first require business tier (`_require_business_tier_for_additional_enabled_provider`). |
 | POST | `/admin/sso-providers/{id}/domains/{domain}/verify` | same file | Triggers `loge/auth/sso_domain_verification.py:verify_domain_via_dns`. |
@@ -127,6 +145,8 @@ the coding-agent sandbox).
 | `AUTH_BACKEND` | `configs/app_configs.py` | `redis` | `redis` \| `postgres` \| `jwt`; selects `TenantAwareRedisStrategy` / `RefreshableDatabaseStrategy` / `SingleTenantJWTStrategy` (`auth/users.py`). |
 | `SIGNUP_RATE_LIMIT_ENABLED` | `configs/app_configs.py` | | Gates `signup_rate_limit.py`; only enforced under `MULTI_TENANT`. |
 | `CAPTCHA_ENABLED`, `RECAPTCHA_*` | `configs/app_configs.py` | | reCAPTCHA Enterprise on signup and pre-OAuth. |
+| `LOGIN_LOCKOUT_MAX_ATTEMPTS` | `configs/app_configs.py` | `5` | Failed password logins in the window that lock the account. `<= 0` disables lockout. |
+| `LOGIN_LOCKOUT_WINDOW_SECONDS` | `configs/app_configs.py` | `900` | TTL for the per-email failure counter in CacheBackend. |
 | `DISPOSABLE_EMAIL_DOMAINS_URL` | `configs/app_configs.py` | | Remote disposable-domain blocklist, refreshed stale-while-revalidate. |
 | `MOBILE_ALLOWED_REDIRECT_URIS` | `configs/app_configs.py` | | Allowlist mobile SSO completion redirects against. |
 | `OIDC_DISCOVERY_CACHE_TTL_SECONDS` | `auth/oauth_refresher.py` | 3600 | OIDC discovery-document cache for token-refresh endpoint resolution. |
@@ -166,6 +186,7 @@ ScimToken   ── hashed bearer token for IdP-driven provisioning
 | `is_group_manager` | Cached bool: does this user manage at least one non-default group. Refreshed in the same write as `effective_permissions`. The live equivalent of "curator." |
 | `prior_emails` | Addresses this user was renamed away from; still match indexed document ACLs, so kept for [[access-control]]. |
 | `oidc_expiry` | OIDC token expiry; `double_check_user` rejects an expired-and-not-explicitly-allowed session (`auth/users.py`). |
+| `login_locked_at` | Nullable timestamptz. Set when password failures hit the lockout threshold; cleared only by admin unlock. While set, `UserManager.authenticate` rejects with `ACCOUNT_LOCKED` (even with the correct password). Independent of `is_active`. |
 
 ### `PermissionGrant` (`models.py`)
 
@@ -237,13 +258,21 @@ to login SSO. `client_id`/`client_secret` and the token blob are
 POST /auth/register  → UserManager.create (auth/users.py)
   ├─ enforce_signup_rate_limit (signup_rate_limit.py)
   ├─ verify_email_is_invited / verify_email_domain (auth/users.py)
+  │   (invite-only defaults ON for new Settings; first user skips invite gate)
   ├─ DisposableEmailValidator check
   └─ captcha token verification (auth/captcha.py), if CAPTCHA_ENABLED
 
-POST /auth/login     → fastapi-users login router
-  └─ password check → cookie_transport / bearer_transport issues a session
-     token via TenantAwareRedisStrategy (default) | RefreshableDatabaseStrategy
+POST /auth/login     → UserManager.authenticate (auth/users.py)
+  ├─ reject if login_locked_at set → ACCOUNT_LOCKED
+  ├─ password verify
+  │   ├─ fail → record_failed_login_attempt (login_lockout.py / CacheBackend)
+  │   │         threshold hit → set login_locked_at, ACCOUNT_LOCKED
+  │   └─ ok → clear_failed_login_attempts
+  └─ cookie_transport / bearer_transport issues a session token via
+     TenantAwareRedisStrategy (default) | RefreshableDatabaseStrategy
      | SingleTenantJWTStrategy, keyed by AUTH_BACKEND
+
+PATCH /manage/admin/unlock-user → unlock_user_login (clears lock + counter)
 ```
 
 ### 4.2 OAuth / OIDC (single- and multi-provider)
@@ -587,7 +616,9 @@ is marked as such.
 | changes session or cookie handling (`session_tokens.py`, `cookie_transport`, the strategy classes) | logout tombstoning, the grace-period math, and every `AUTH_BACKEND` variant (Redis/Postgres/JWT), not just the default |
 | adds a new SSO provider or protocol | `sso_url_guard.py` validation on every new admin-configurable URL, `auth_check.py`'s public-route list if it adds a new pre-session endpoint, and [[multi-tenancy]] if it touches cloud discovery |
 | changes API key or PAT issuance/validation | confirm the raw value is still returned exactly once, the stored value is still hashed, and `require_permission`'s token-scope capping still applies to the new code path |
-| changes `UserManager.create` or any signup gate (captcha, disposable email, invite list, rate limit) | test both the enabled and disabled path for each gate independently; they are independent checks, not one pipeline |
+| changes `UserManager.create` or any signup gate (captcha, disposable email, invite list, rate limit) | test both the enabled and disabled path for each gate independently; they are independent checks, not one pipeline; confirm invite-only default and first-user bootstrap still work |
+| changes password lockout (`login_lockout.py`, `authenticate`, unlock API) | EDU: N failures lock; correct password still denied; admin unlock restores login and clears counters |
+| changes admin `POST /manage/admin/create-user` or its `skip_invite_check` path | integration: admin can create and log in; non-admin denied; duplicate email fails |
 | touches `fetch_versioned_implementation`/EE dispatch anywhere in this component | verify the CE fallback narrows rather than widens, mirroring the rule in [[access-control]] §5.9 |
 | adds a new non-human credential type (beyond API key / PAT / SCIM) | it needs its own hashed-storage table, its own `optional_user`/`_resolve_optional_user` resolution branch, and its own entry in `auth_check.py`'s recognized-dependency list if it introduces a new FastAPI dependency |
 

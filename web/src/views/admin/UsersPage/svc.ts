@@ -22,6 +22,17 @@ export async function activateUser(email: string): Promise<void> {
   }
 }
 
+export async function unlockUser(email: string): Promise<void> {
+  const res = await fetch("/api/manage/admin/unlock-user", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_email: email }),
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorDetail(res, "Failed to unlock user"));
+  }
+}
+
 export async function deleteUser(email: string): Promise<void> {
   const res = await fetch("/api/manage/admin/delete-user", {
     method: "DELETE",
@@ -107,6 +118,25 @@ export async function approveRequest(email: string): Promise<void> {
 }
 
 const INVITE_REQUEST_TIMEOUT_MS = 30_000;
+
+export async function createUser(params: {
+  email: string;
+  password: string;
+  is_admin?: boolean;
+}): Promise<void> {
+  const res = await fetch("/api/manage/admin/create-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: params.email,
+      password: params.password,
+      is_admin: params.is_admin ?? false,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorDetail(res, "Failed to create user"));
+  }
+}
 
 export async function inviteUsers(emails: string[]): Promise<void> {
   let res: Response;

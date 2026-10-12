@@ -4,7 +4,13 @@ import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { useSettings } from "@/lib/settings/hooks";
 import { Button, CopyButton, InputTypeIn } from "@opal/components";
-import { SvgUserPlus, SvgUserX, SvgXCircle, SvgKey } from "@opal/icons";
+import {
+  SvgUserPlus,
+  SvgUserX,
+  SvgXCircle,
+  SvgKey,
+  SvgLock,
+} from "@opal/icons";
 import { ConfirmationModalLayout } from "@opal/layouts";
 import Text from "@/refresh-components/texts/Text";
 import { toast } from "@opal/layouts";
@@ -14,6 +20,7 @@ import {
   deleteUser,
   cancelInvite,
   resetPassword,
+  unlockUser,
 } from "./svc";
 
 // ---------------------------------------------------------------------------
@@ -271,6 +278,59 @@ export function DeleteUserModal({
           email,
           strong: emailTag,
           appName,
+        })}
+      </Text>
+    </ConfirmationModalLayout>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Unlock User Modal
+// ---------------------------------------------------------------------------
+
+interface UnlockUserModalProps {
+  email: string;
+  onClose: () => void;
+  onMutate: () => void;
+}
+
+export function UnlockUserModal({
+  email,
+  onClose,
+  onMutate,
+}: UnlockUserModalProps) {
+  const t = useTranslations("admin.users");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  return (
+    <ConfirmationModalLayout
+      icon={SvgLock}
+      title={t("unlockModal.title")}
+      onClose={isSubmitting ? undefined : onClose}
+      submit={
+        <Button
+          disabled={isSubmitting}
+          onClick={() =>
+            runAction(
+              () => unlockUser(email),
+              t("unlockModal.toasts.success"),
+              t("modals.toasts.error"),
+              () => {
+                onMutate();
+                onClose();
+              },
+              setIsSubmitting
+            )
+          }
+        >
+          {t("unlockModal.submit.label")}
+        </Button>
+      }
+    >
+      <Text as="p" text03>
+        {t.rich("unlockModal.description", {
+          email,
+          strong: emailTag,
         })}
       </Text>
     </ConfirmationModalLayout>

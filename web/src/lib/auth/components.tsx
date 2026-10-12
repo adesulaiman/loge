@@ -417,6 +417,8 @@ export function EmailPasswordForm({
         errorMsg = t("emailPasswordForm.tooManyRequests.error");
       } else if (errorDetail === "LOGIN_BAD_CREDENTIALS") {
         errorMsg = t("emailPasswordForm.invalidCredentials.error");
+      } else if (errorDetail === "ACCOUNT_LOCKED") {
+        errorMsg = t("emailPasswordForm.accountLocked.error");
       } else if (errorDetail === "NO_WEB_LOGIN_AND_HAS_NO_PASSWORD") {
         errorMsg = t("emailPasswordForm.noPassword.error");
       } else if (errorDetail === "PASSWORD_LOGIN_DISABLED") {
