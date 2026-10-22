@@ -9765,7 +9765,7 @@
         "title": "مرحبًا بك في {appName}"
       },
       "welcomeSubtitle": {
-        "text": "منصة الذكاء الاصطناعي مفتوحة المصدر لعملك"
+        "text": "منصة الذكاء الاصطناعي لعملك"
       },
       "workEmailField": {
         "label": "البريد الإلكتروني للعمل"
@@ -10734,6 +10734,26 @@
             "status": "جارٍ توليد الخطة"
           }
         },
+        "document": {
+          "default": {
+            "status": "مستند"
+          },
+          "writing": {
+            "status": "جارٍ كتابة المستند"
+          },
+          "saved": {
+            "status": "تم حفظ المستند"
+          },
+          "failed": {
+            "status": "فشل إجراء المستند"
+          },
+          "open": {
+            "label": "فتح"
+          },
+          "version": {
+            "label": "الإصدار {version}"
+          }
+        },
         "doneStep": {
           "header": "تم"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "جارٍ تحديث الذاكرة..."
+          },
+          "writingDocument": {
+            "label": "كتابة المستند"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "مفسر الأكواد",
           "codingAgent": "وكيل البرمجة",
           "customTool": "أداة مخصصة",
+          "document": "مستند",
           "generateImage": "توليد صورة",
           "generatePlan": "توليد خطة",
           "internalSearch": "بحث داخلي",
@@ -12013,12 +12037,18 @@
         "text": "المستخدمون"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "الشعار"
       },
       "poweredBy": {
-        "label": "مدعوم من Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "ذاكرة JVM",
     "vectorMemoryTitle": "ذاكرة المتجهات",
     "viewDetails": "عرض التفاصيل"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "مستند بلا عنوان"
+      },
+      "mode": {
+        "edit": {
+          "label": "تحرير"
+        },
+        "preview": {
+          "label": "معاينة"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "جارٍ الحفظ…"
+        },
+        "saved": {
+          "label": "تم الحفظ · الإصدار {version}"
+        },
+        "unsaved": {
+          "label": "تغييرات غير محفوظة"
+        }
+      },
+      "close": {
+        "label": "إغلاق"
+      },
+      "loading": {
+        "label": "جارٍ تحميل المستند…"
+      },
+      "loadFailed": {
+        "label": "تعذر تحميل المستند."
+      },
+      "conflict": {
+        "title": "تغيّر المستند",
+        "body": "حفظ المساعد أو علامة تبويب أخرى إصدارًا أحدث.",
+        "loadLatest": {
+          "label": "تحميل الأحدث"
+        },
+        "keepMine": {
+          "label": "الاحتفاظ بتغييراتي"
+        }
+      },
+      "history": {
+        "label": "السجل",
+        "restore": {
+          "label": "استعادة"
+        },
+        "entry": {
+          "label": "الإصدار {version} · {author}"
+        },
+        "author": {
+          "user": "أنت",
+          "agent": "المساعد"
+        }
+      },
+      "export": {
+        "label": "تصدير",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "تعذر عرض المخطط."
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "تعليمات للذكاء الاصطناعي (اختياري)"
+        },
+        "knowledge": {
+          "label": "البحث في قاعدة المعرفة"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "تعليق الذكاء الاصطناعي"
+        },
+        "continue": {
+          "label": "متابعة"
+        },
+        "rewrite": {
+          "label": "إعادة الصياغة"
+        },
+        "instruct": {
+          "placeholder": "اطلب من الذكاء الاصطناعي ما يكتبه من النص المحدد…",
+          "label": "إنشاء"
+        }
+      },
+      "comments": {
+        "label": "التعليقات",
+        "empty": {
+          "label": "لا توجد تعليقات بعد. حدّد نصًا واختر تعليق الذكاء الاصطناعي."
+        },
+        "detached": {
+          "label": "النص المقتبس لم يعد موجودًا في المستند."
+        },
+        "author": {
+          "user": "أنت",
+          "ai": "الذكاء الاصطناعي"
+        },
+        "reply": {
+          "placeholder": "اكتب ردًا",
+          "label": "رد"
+        },
+        "askAi": {
+          "label": "اسأل الذكاء الاصطناعي"
+        },
+        "asking": {
+          "label": "جارٍ السؤال…"
+        },
+        "resolve": {
+          "label": "تم الحل"
+        },
+        "reopen": {
+          "label": "إعادة فتح"
+        },
+        "delete": {
+          "label": "حذف"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "متابعة من الذكاء الاصطناعي"
+        },
+        "rewrite": {
+          "title": "إعادة صياغة من الذكاء الاصطناعي"
+        },
+        "accept": {
+          "label": "قبول"
+        },
+        "reject": {
+          "label": "رفض"
+        },
+        "stop": {
+          "label": "إيقاف"
+        },
+        "error": {
+          "label": "فشل طلب الذكاء الاصطناعي."
+        },
+        "instruct": {
+          "title": "نتيجة الذكاء الاصطناعي"
+        },
+        "replace": {
+          "label": "استبدال التحديد"
+        },
+        "insertBelow": {
+          "label": "إدراج أسفل"
+        }
+      }
+    }
   }
 }

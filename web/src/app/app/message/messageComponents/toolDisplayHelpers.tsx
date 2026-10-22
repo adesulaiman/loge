@@ -18,6 +18,7 @@ import {
   SvgSlowTime,
   SvgXCircle,
   SvgCode,
+  SvgFileText,
 } from "@opal/icons";
 
 /**
@@ -107,6 +108,8 @@ export function getToolName(packets: Packet[], t: TimelineTranslate): string {
     }
     case PacketType.PYTHON_TOOL_START:
       return t("toolNames.codeInterpreter");
+    case PacketType.DOCUMENT_TOOL_START:
+      return t("toolNames.document");
     case PacketType.FETCH_TOOL_START:
       return t("toolNames.openUrls");
     case PacketType.CUSTOM_TOOL_START:
@@ -149,6 +152,8 @@ export function getToolIcon(packets: Packet[]): React.ReactNode {
     }
     case PacketType.PYTHON_TOOL_START:
       return <SvgTerminal className="w-3.5 h-3.5" />;
+    case PacketType.DOCUMENT_TOOL_START:
+      return <SvgFileText className="w-3.5 h-3.5" />;
     case PacketType.FETCH_TOOL_START:
       return <SvgLink className="w-3.5 h-3.5" />;
     case PacketType.CUSTOM_TOOL_START:

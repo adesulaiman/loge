@@ -11,6 +11,7 @@ import { useSendAuthRequiredMessage } from "@/lib/extension/hooks";
 import { Button, MessageCard } from "@opal/components";
 import { AuthLayouts } from "@opal/layouts";
 import { useTranslations } from "next-intl";
+import OwnerBadge from "@/refresh-components/OwnerBadge";
 
 interface LoginPageProps {
   authUrl: string | null;
@@ -124,6 +125,8 @@ export default function LoginPage({
           </button>
         </p>
       )}
+
+      <OwnerBadge />
     </div>
   );
 }

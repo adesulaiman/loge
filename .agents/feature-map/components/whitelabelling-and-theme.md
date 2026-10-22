@@ -36,6 +36,18 @@ default rather than rendering broken or blank.
 
 ## 2. Surfaces
 
+### Tier-free theme routes (`backend/onyx/server/features/theme/api.py`)
+
+The web app reads and writes theming through these MIT routes. They need no tier. The
+`/enterprise-settings` routes below stay for custom analytics and SCIM only.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/theme` | Public. Returns `ThemeSettings` (same fields as `EnterpriseSettings`). Stored under KV key `loge_theme_settings`. |
+| GET | `/theme/logo` | Public. 404 if none uploaded. |
+| PUT | `/admin/theme` | `FULL_ADMIN_PANEL_ACCESS`. |
+| PUT | `/admin/theme/logo` | `FULL_ADMIN_PANEL_ACCESS`. PNG, JPEG or WebP, 2 MB maximum. |
+
 ### Admin endpoints (router prefix `/admin/enterprise-settings`,
 `backend/loge/server/enterprise_settings/api.py`)
 

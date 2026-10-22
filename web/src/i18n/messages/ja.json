@@ -9765,7 +9765,7 @@
         "title": "{appName} へようこそ"
       },
       "welcomeSubtitle": {
-        "text": "仕事のためのオープンソース AI プラットフォーム"
+        "text": "仕事のための AI プラットフォーム"
       },
       "workEmailField": {
         "label": "職場のメールアドレス"
@@ -10734,6 +10734,26 @@
             "status": "プランを生成中"
           }
         },
+        "document": {
+          "default": {
+            "status": "ドキュメント"
+          },
+          "writing": {
+            "status": "ドキュメントを作成中"
+          },
+          "saved": {
+            "status": "ドキュメントを保存しました"
+          },
+          "failed": {
+            "status": "ドキュメント操作に失敗しました"
+          },
+          "open": {
+            "label": "開く"
+          },
+          "version": {
+            "label": "バージョン {version}"
+          }
+        },
         "doneStep": {
           "header": "完了"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "メモリを更新中..."
+          },
+          "writingDocument": {
+            "label": "ドキュメントを作成中"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "コードインタープリター",
           "codingAgent": "コーディングエージェント",
           "customTool": "カスタムツール",
+          "document": "ドキュメント",
           "generateImage": "画像生成",
           "generatePlan": "プラン生成",
           "internalSearch": "社内検索",
@@ -12013,12 +12037,18 @@
         "text": "ユーザー"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "ロゴ"
       },
       "poweredBy": {
-        "label": "Powered by Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "JVMメモリ",
     "vectorMemoryTitle": "ベクトルメモリ",
     "viewDetails": "詳細を表示"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "無題のドキュメント"
+      },
+      "mode": {
+        "edit": {
+          "label": "編集"
+        },
+        "preview": {
+          "label": "プレビュー"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "保存中…"
+        },
+        "saved": {
+          "label": "保存済み · バージョン {version}"
+        },
+        "unsaved": {
+          "label": "未保存の変更"
+        }
+      },
+      "close": {
+        "label": "閉じる"
+      },
+      "loading": {
+        "label": "ドキュメントを読み込み中…"
+      },
+      "loadFailed": {
+        "label": "ドキュメントを読み込めませんでした。"
+      },
+      "conflict": {
+        "title": "ドキュメントが変更されました",
+        "body": "アシスタントまたは別のタブが新しいバージョンを保存しました。",
+        "loadLatest": {
+          "label": "最新を読み込む"
+        },
+        "keepMine": {
+          "label": "自分の変更を保持"
+        }
+      },
+      "history": {
+        "label": "履歴",
+        "restore": {
+          "label": "復元"
+        },
+        "entry": {
+          "label": "バージョン {version} · {author}"
+        },
+        "author": {
+          "user": "あなた",
+          "agent": "アシスタント"
+        }
+      },
+      "export": {
+        "label": "エクスポート",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "図を表示できませんでした。"
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "AIへの指示（任意）"
+        },
+        "knowledge": {
+          "label": "ナレッジベースを検索"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "AIコメント"
+        },
+        "continue": {
+          "label": "続きを書く"
+        },
+        "rewrite": {
+          "label": "書き直す"
+        },
+        "instruct": {
+          "placeholder": "選択部分から何を書くかAIに指示…",
+          "label": "生成"
+        }
+      },
+      "comments": {
+        "label": "コメント",
+        "empty": {
+          "label": "コメントはまだありません。テキストを選択してAIコメントを選んでください。"
+        },
+        "detached": {
+          "label": "引用したテキストは文書内に見つかりません。"
+        },
+        "author": {
+          "user": "あなた",
+          "ai": "AI"
+        },
+        "reply": {
+          "placeholder": "返信を書く",
+          "label": "返信"
+        },
+        "askAi": {
+          "label": "AIに質問"
+        },
+        "asking": {
+          "label": "問い合わせ中…"
+        },
+        "resolve": {
+          "label": "解決"
+        },
+        "reopen": {
+          "label": "再開"
+        },
+        "delete": {
+          "label": "削除"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "AIによる続き"
+        },
+        "rewrite": {
+          "title": "AIによる書き直し"
+        },
+        "accept": {
+          "label": "採用"
+        },
+        "reject": {
+          "label": "却下"
+        },
+        "stop": {
+          "label": "停止"
+        },
+        "error": {
+          "label": "AIへのリクエストに失敗しました。"
+        },
+        "instruct": {
+          "title": "AIの結果"
+        },
+        "replace": {
+          "label": "選択範囲を置換"
+        },
+        "insertBelow": {
+          "label": "下に挿入"
+        }
+      }
+    }
   }
 }

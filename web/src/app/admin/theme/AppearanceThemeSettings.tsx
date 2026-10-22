@@ -9,12 +9,10 @@ import {
   InputTypeIn,
   InputSwitch,
   Tabs,
-  Tag,
 } from "@opal/components";
 import Preview from "@/app/admin/theme/Preview";
 import CharacterCount from "@/refresh-components/CharacterCount";
 import { InputImage } from "@opal/components";
-import { Disabled } from "@opal/core";
 import { useFormikContext } from "formik";
 import {
   forwardRef,
@@ -26,9 +24,6 @@ import {
 } from "react";
 import type { PreviewHighlightTarget } from "./Preview";
 import { SvgEdit } from "@opal/icons";
-import { useTierAtLeast } from "@/hooks/useTierAtLeast";
-import { Tier } from "@/lib/settings/types";
-import { planTagProps } from "@/lib/tier-badge";
 
 interface AppearanceThemeSettingsProps {
   selectedLogo: File | null;
@@ -62,7 +57,6 @@ export const AppearanceThemeSettings = forwardRef<
   const t = useTranslations("admin.theme");
   const tAuth = useTranslations("auth");
   const { values, errors, setFieldValue } = useFormikContext<any>();
-  const enterpriseTier = useTierAtLeast(Tier.ENTERPRISE);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const applicationNameInputRef = useRef<HTMLInputElement>(null);
   const greetingMessageInputRef = useRef<HTMLInputElement>(null);
@@ -224,7 +218,7 @@ export const AppearanceThemeSettings = forwardRef<
       return logoObjectUrl;
     }
     if (values.use_custom_logo) {
-      return `/api/enterprise-settings/logo?v=${logoVersion}`;
+      return `/api/theme/logo?v=${logoVersion}`;
     }
     return undefined;
   }, [logoObjectUrl, values.use_custom_logo, logoVersion]);
@@ -519,10 +513,7 @@ export const AppearanceThemeSettings = forwardRef<
         />
       </FormField>
 
-      <Disabled
-        disabled={!enterpriseTier}
-        tooltip={t("helpLink.enterpriseTooltip")}
-      >
+      <div>
         <div className="flex gap-2 items-start">
           <FormField
             state={errors.custom_help_link_url ? "error" : "idle"}
@@ -530,9 +521,6 @@ export const AppearanceThemeSettings = forwardRef<
           >
             <FormField.Label>
               {t("helpLink.label")}
-              {!enterpriseTier && (
-                <Tag {...planTagProps("enterprise")} size="sm" />
-              )}
             </FormField.Label>
             <FormField.Control asChild>
               <InputTypeIn
@@ -540,13 +528,7 @@ export const AppearanceThemeSettings = forwardRef<
                 data-label="custom-help-link-url-input"
                 clearButton
                 placeholder="https://docs.onyx.app"
-                variant={
-                  !enterpriseTier
-                    ? "disabled"
-                    : errors.custom_help_link_url
-                      ? "error"
-                      : undefined
-                }
+                variant={errors.custom_help_link_url ? "error" : undefined}
                 value={values.custom_help_link_url}
                 onChange={(e) =>
                   setFieldValue("custom_help_link_url", e.target.value)
@@ -570,7 +552,6 @@ export const AppearanceThemeSettings = forwardRef<
                 data-label="custom-help-link-label-input"
                 clearButton
                 placeholder={t("helpLinkLabel.placeholder")}
-                variant={!enterpriseTier ? "disabled" : undefined}
                 value={values.custom_help_link_label}
                 onChange={(e) =>
                   setFieldValue("custom_help_link_label", e.target.value)
@@ -579,7 +560,7 @@ export const AppearanceThemeSettings = forwardRef<
             </FormField.Control>
           </FormField>
         </div>
-      </Disabled>
+      </div>
 
       <Divider />
 

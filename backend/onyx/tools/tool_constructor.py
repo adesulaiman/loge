@@ -39,6 +39,7 @@ from onyx.tools.tool_implementations.coding_agent.coding_agent_tool import (
 from onyx.tools.tool_implementations.custom.custom_tool import (
     build_custom_tools_from_openapi_schema_and_headers,
 )
+from onyx.tools.tool_implementations.document.document_tool import DocumentTool
 from onyx.tools.tool_implementations.file_reader.file_reader_tool import FileReaderTool
 from onyx.tools.tool_implementations.images.image_generation_tool import (
     ImageGenerationTool,
@@ -347,6 +348,21 @@ def _construct_tools_impl(
                         emitter=emitter,
                         chat_session_id=_require_chat_session_id(
                             custom_tool_config, PythonTool.__name__
+                        ),
+                    )
+                ]
+
+            # Handle Document Tool
+            elif tool_cls.__name__ == DocumentTool.__name__:
+                tool_dict[db_tool_model.id] = [
+                    DocumentTool(
+                        tool_id=db_tool_model.id,
+                        emitter=emitter,
+                        user_id=user.id,
+                        chat_session_id=(
+                            custom_tool_config.chat_session_id
+                            if custom_tool_config
+                            else None
                         ),
                     )
                 ]

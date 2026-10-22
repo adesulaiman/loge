@@ -3,6 +3,7 @@ from typing import Type, Union
 from onyx.tools.tool_implementations.coding_agent.coding_agent_tool import (
     CodingAgentTool,
 )
+from onyx.tools.tool_implementations.document.document_tool import DocumentTool
 from onyx.tools.tool_implementations.file_reader.file_reader_tool import FileReaderTool
 from onyx.tools.tool_implementations.images.image_generation_tool import (
     ImageGenerationTool,
@@ -30,6 +31,7 @@ BUILT_IN_TOOL_TYPES = Union[
     FileReaderTool,
     MemoryTool,
     CodingAgentTool,
+    DocumentTool,
 ]
 
 BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
@@ -42,6 +44,7 @@ BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
     FileReaderTool.__name__: FileReaderTool,
     MemoryTool.__name__: MemoryTool,
     CodingAgentTool.__name__: CodingAgentTool,
+    DocumentTool.__name__: DocumentTool,
 }
 
 STOPPING_TOOLS_NAMES: list[str] = [ImageGenerationTool.NAME]

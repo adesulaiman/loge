@@ -152,6 +152,39 @@
     margin-inline-start: 0;
   }
 
+  /* Document editor and preview: map the typography plugin's palette to the
+     app tokens so text stays readable in both themes. */
+  .document-prose .doc-comment {
+    background-color: var(--status-warning-01);
+    border-bottom: 2px solid var(--status-warning-05);
+    cursor: pointer;
+  }
+
+  .document-prose .doc-comment--resolved {
+    background-color: transparent;
+    border-bottom: 1px dotted var(--text-03);
+  }
+
+  .document-prose {
+    --tw-prose-body: var(--text-04);
+    --tw-prose-headings: var(--text-05);
+    --tw-prose-lead: var(--text-03);
+    --tw-prose-links: var(--text-05);
+    --tw-prose-bold: var(--text-05);
+    --tw-prose-counters: var(--text-03);
+    --tw-prose-bullets: var(--text-03);
+    --tw-prose-hr: var(--border-01);
+    --tw-prose-quotes: var(--text-04);
+    --tw-prose-quote-borders: var(--border-02);
+    --tw-prose-captions: var(--text-03);
+    --tw-prose-code: var(--text-05);
+    --tw-prose-pre-code: var(--text-04);
+    --tw-prose-pre-bg: var(--background-neutral-02);
+    --tw-prose-th-borders: var(--border-02);
+    --tw-prose-td-borders: var(--border-01);
+    caret-color: var(--text-05);
+  }
+
   .prose li {
     margin-top: 0.25em;
     margin-bottom: 0.25em;

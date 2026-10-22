@@ -9765,7 +9765,7 @@
         "title": "Welcome to {appName}"
       },
       "welcomeSubtitle": {
-        "text": "Your open source AI platform for work"
+        "text": "Your AI platform for work"
       },
       "workEmailField": {
         "label": "Work Email"
@@ -10734,6 +10734,26 @@
             "status": "Generating plan"
           }
         },
+        "document": {
+          "default": {
+            "status": "Document"
+          },
+          "writing": {
+            "status": "Writing document"
+          },
+          "saved": {
+            "status": "Document saved"
+          },
+          "failed": {
+            "status": "Document action failed"
+          },
+          "open": {
+            "label": "Open"
+          },
+          "version": {
+            "label": "Version {version}"
+          }
+        },
         "doneStep": {
           "header": "Done"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "Updating memory..."
+          },
+          "writingDocument": {
+            "label": "Writing document"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "Code Interpreter",
           "codingAgent": "Coding agent",
           "customTool": "Custom Tool",
+          "document": "Document",
           "generateImage": "Generate Image",
           "generatePlan": "Generate plan",
           "internalSearch": "Internal Search",
@@ -12013,12 +12037,18 @@
         "text": "Users"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "Logo"
       },
       "poweredBy": {
-        "label": "Powered by Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "JVM memory",
     "vectorMemoryTitle": "Vector memory",
     "viewDetails": "View details"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "Untitled document"
+      },
+      "mode": {
+        "edit": {
+          "label": "Edit"
+        },
+        "preview": {
+          "label": "Preview"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "Saving…"
+        },
+        "saved": {
+          "label": "Saved · version {version}"
+        },
+        "unsaved": {
+          "label": "Unsaved changes"
+        }
+      },
+      "close": {
+        "label": "Close"
+      },
+      "loading": {
+        "label": "Loading document…"
+      },
+      "loadFailed": {
+        "label": "Could not load the document."
+      },
+      "conflict": {
+        "title": "The document changed",
+        "body": "The assistant or another tab saved a newer version.",
+        "loadLatest": {
+          "label": "Load latest"
+        },
+        "keepMine": {
+          "label": "Keep my changes"
+        }
+      },
+      "history": {
+        "label": "History",
+        "restore": {
+          "label": "Restore"
+        },
+        "entry": {
+          "label": "Version {version} · {author}"
+        },
+        "author": {
+          "user": "You",
+          "agent": "Assistant"
+        }
+      },
+      "export": {
+        "label": "Export",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "Could not render the diagram."
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "Instruction for the AI (optional)"
+        },
+        "knowledge": {
+          "label": "Search knowledge base"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "AI comment"
+        },
+        "continue": {
+          "label": "Continue"
+        },
+        "rewrite": {
+          "label": "Rewrite"
+        },
+        "instruct": {
+          "placeholder": "Tell the AI what to write from the selection…",
+          "label": "Generate"
+        }
+      },
+      "comments": {
+        "label": "Comments",
+        "empty": {
+          "label": "No comments yet. Select text and choose AI comment."
+        },
+        "detached": {
+          "label": "The quoted text is no longer in the document."
+        },
+        "author": {
+          "user": "You",
+          "ai": "AI"
+        },
+        "reply": {
+          "placeholder": "Write a reply",
+          "label": "Reply"
+        },
+        "askAi": {
+          "label": "Ask AI"
+        },
+        "asking": {
+          "label": "Asking…"
+        },
+        "resolve": {
+          "label": "Resolve"
+        },
+        "reopen": {
+          "label": "Reopen"
+        },
+        "delete": {
+          "label": "Delete"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "AI continuation"
+        },
+        "rewrite": {
+          "title": "AI rewrite"
+        },
+        "accept": {
+          "label": "Accept"
+        },
+        "reject": {
+          "label": "Reject"
+        },
+        "stop": {
+          "label": "Stop"
+        },
+        "error": {
+          "label": "The AI request failed."
+        },
+        "instruct": {
+          "title": "AI result"
+        },
+        "replace": {
+          "label": "Replace selection"
+        },
+        "insertBelow": {
+          "label": "Insert below"
+        }
+      }
+    }
   }
 }

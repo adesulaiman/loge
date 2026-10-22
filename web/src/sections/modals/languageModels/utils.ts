@@ -129,6 +129,7 @@ export function buildValidationSchema(
 export interface BaseLLMFormValues {
   id?: number;
   name?: string;
+  provider?: string;
   api_key?: string;
   api_base?: string;
   /** Model name used for the test request — automatically derived. */

@@ -9765,7 +9765,7 @@
         "title": "Willkommen bei {appName}"
       },
       "welcomeSubtitle": {
-        "text": "Ihre Open-Source-KI-Plattform für die Arbeit"
+        "text": "Ihre KI-Plattform für die Arbeit"
       },
       "workEmailField": {
         "label": "Geschäftliche E-Mail"
@@ -10734,6 +10734,26 @@
             "status": "Erstellt Plan"
           }
         },
+        "document": {
+          "default": {
+            "status": "Dokument"
+          },
+          "writing": {
+            "status": "Dokument wird geschrieben"
+          },
+          "saved": {
+            "status": "Dokument gespeichert"
+          },
+          "failed": {
+            "status": "Dokumentaktion fehlgeschlagen"
+          },
+          "open": {
+            "label": "Öffnen"
+          },
+          "version": {
+            "label": "Version {version}"
+          }
+        },
         "doneStep": {
           "header": "Fertig"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "Aktualisiert Erinnerung..."
+          },
+          "writingDocument": {
+            "label": "Dokument wird geschrieben"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "Code-Interpreter",
           "codingAgent": "Coding-Agent",
           "customTool": "Benutzerdefiniertes Werkzeug",
+          "document": "Dokument",
           "generateImage": "Bild generieren",
           "generatePlan": "Plan erstellen",
           "internalSearch": "Interne Suche",
@@ -12013,12 +12037,18 @@
         "text": "Benutzer"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "Logo"
       },
       "poweredBy": {
-        "label": "Bereitgestellt von Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "JVM-Arbeitsspeicher",
     "vectorMemoryTitle": "Vektorspeicher",
     "viewDetails": "Details anzeigen"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "Unbenanntes Dokument"
+      },
+      "mode": {
+        "edit": {
+          "label": "Bearbeiten"
+        },
+        "preview": {
+          "label": "Vorschau"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "Speichern…"
+        },
+        "saved": {
+          "label": "Gespeichert · Version {version}"
+        },
+        "unsaved": {
+          "label": "Nicht gespeicherte Änderungen"
+        }
+      },
+      "close": {
+        "label": "Schließen"
+      },
+      "loading": {
+        "label": "Dokument wird geladen…"
+      },
+      "loadFailed": {
+        "label": "Das Dokument konnte nicht geladen werden."
+      },
+      "conflict": {
+        "title": "Das Dokument wurde geändert",
+        "body": "Der Assistent oder ein anderer Tab hat eine neuere Version gespeichert.",
+        "loadLatest": {
+          "label": "Neueste laden"
+        },
+        "keepMine": {
+          "label": "Meine Änderungen behalten"
+        }
+      },
+      "history": {
+        "label": "Verlauf",
+        "restore": {
+          "label": "Wiederherstellen"
+        },
+        "entry": {
+          "label": "Version {version} · {author}"
+        },
+        "author": {
+          "user": "Sie",
+          "agent": "Assistent"
+        }
+      },
+      "export": {
+        "label": "Exportieren",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "Das Diagramm konnte nicht dargestellt werden."
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "Anweisung für die KI (optional)"
+        },
+        "knowledge": {
+          "label": "Wissensdatenbank durchsuchen"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "KI-Kommentar"
+        },
+        "continue": {
+          "label": "Fortsetzen"
+        },
+        "rewrite": {
+          "label": "Umschreiben"
+        },
+        "instruct": {
+          "placeholder": "Sagen Sie der KI, was sie aus der Auswahl schreiben soll…",
+          "label": "Erzeugen"
+        }
+      },
+      "comments": {
+        "label": "Kommentare",
+        "empty": {
+          "label": "Noch keine Kommentare. Text markieren und KI-Kommentar wählen."
+        },
+        "detached": {
+          "label": "Der zitierte Text ist nicht mehr im Dokument."
+        },
+        "author": {
+          "user": "Sie",
+          "ai": "KI"
+        },
+        "reply": {
+          "placeholder": "Antwort schreiben",
+          "label": "Antworten"
+        },
+        "askAi": {
+          "label": "KI fragen"
+        },
+        "asking": {
+          "label": "Frage läuft…"
+        },
+        "resolve": {
+          "label": "Erledigt"
+        },
+        "reopen": {
+          "label": "Wieder öffnen"
+        },
+        "delete": {
+          "label": "Löschen"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "KI-Fortsetzung"
+        },
+        "rewrite": {
+          "title": "KI-Umschreibung"
+        },
+        "accept": {
+          "label": "Übernehmen"
+        },
+        "reject": {
+          "label": "Verwerfen"
+        },
+        "stop": {
+          "label": "Stopp"
+        },
+        "error": {
+          "label": "Die KI-Anfrage ist fehlgeschlagen."
+        },
+        "instruct": {
+          "title": "KI-Ergebnis"
+        },
+        "replace": {
+          "label": "Auswahl ersetzen"
+        },
+        "insertBelow": {
+          "label": "Darunter einfügen"
+        }
+      }
+    }
   }
 }

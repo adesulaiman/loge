@@ -23,7 +23,7 @@ const CustomLogoHeaderIcon = ({ className, size = 24 }: IconProps) => {
 
   return (
     <img
-      src="/api/enterprise-settings/logo"
+      src="/api/theme/logo"
       alt={t("logoIcon.alt")}
       style={{ width: size, height: size, objectFit: "contain" }}
       className={className}

@@ -472,6 +472,8 @@ Relevant existing e2e coverage: `web/tests/e2e/agents/create_and_edit_agent.spec
 
 ## 9. Footguns
 
+- `prompts/document_assist.py` is not an agent prompt. It serves the document panel ([[chat-documents]]) and ignores personas.
+
 - **Persona versus Agent.** The database table, most Python identifiers, and
   the older router (`/persona`) all say Persona. The product, the newer
   router (`/agents`, `/admin/agents`), and every user-facing string say

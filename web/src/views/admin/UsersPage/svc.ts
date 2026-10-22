@@ -64,7 +64,7 @@ export async function addUserToGroup(
   groupId: number,
   userId: string
 ): Promise<void> {
-  const res = await fetch(`/api/manage/admin/user-group/${groupId}/add-users`, {
+  const res = await fetch(`/api/manage/groups/${groupId}/add-users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_ids: [userId] }),
@@ -80,7 +80,7 @@ export async function removeUserFromGroup(
   userIdToRemove: string,
   ccPairIds: number[]
 ): Promise<void> {
-  const res = await fetch(`/api/manage/admin/user-group/${groupId}`, {
+  const res = await fetch(`/api/manage/groups/${groupId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

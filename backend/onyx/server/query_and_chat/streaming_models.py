@@ -30,6 +30,8 @@ class StreamingType(Enum):
     IMAGE_GENERATION_FINAL = "image_generation_final"
     PYTHON_TOOL_START = "python_tool_start"
     PYTHON_TOOL_DELTA = "python_tool_delta"
+    DOCUMENT_TOOL_START = "document_tool_start"
+    DOCUMENT_TOOL_FINAL = "document_tool_final"
     CUSTOM_TOOL_START = "custom_tool_start"
     CUSTOM_TOOL_ARGS = "custom_tool_args"
     CUSTOM_TOOL_DELTA = "custom_tool_delta"
@@ -256,6 +258,21 @@ class PythonToolDelta(BaseObj):
     file_ids: list[str] = []
 
 
+class DocumentToolStart(BaseObj):
+    type: Literal["document_tool_start"] = StreamingType.DOCUMENT_TOOL_START.value
+
+
+class DocumentToolFinal(BaseObj):
+    type: Literal["document_tool_final"] = StreamingType.DOCUMENT_TOOL_FINAL.value
+
+    # create | read | replace | patch
+    action: str
+    doc_id: str | None = None
+    version: int | None = None
+    title: str | None = None
+    error: str | None = None
+
+
 # Custom tool being called, first allocate a placeholder block for it on the UI
 class CustomToolStart(BaseObj):
     type: Literal["custom_tool_start"] = StreamingType.CUSTOM_TOOL_START.value
@@ -444,6 +461,8 @@ PacketObj = Union[
     OpenUrlDocuments,
     PythonToolStart,
     PythonToolDelta,
+    DocumentToolStart,
+    DocumentToolFinal,
     CustomToolStart,
     CustomToolArgs,
     CustomToolDelta,

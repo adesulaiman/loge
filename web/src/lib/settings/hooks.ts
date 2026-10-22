@@ -14,7 +14,6 @@ import {
   QueryHistoryType,
   Settings,
 } from "@/lib/settings/types";
-import { EE_ENABLED } from "@/lib/constants";
 
 const SETTINGS_ERROR_RETRY_INTERVAL = 5_000;
 
@@ -67,12 +66,8 @@ export function useSettings(): AppSettings {
   );
 
   const core = rawSettings ?? DEFAULT_SETTINGS;
-  // Auth pages need branding pre-sign-in but standard web images lack the EE
-  // flag, so probe the endpoint.
-  const shouldFetchEnterprise =
-    EE_ENABLED ||
-    onAuthPath ||
-    (!settingsLoading && !settingsError && core.ee_features_enabled !== false);
+  // Theme settings are core: always fetch them, including before sign-in.
+  const shouldFetchEnterprise = true;
 
   const {
     data: enterprise,
@@ -107,7 +102,7 @@ export function useSettings(): AppSettings {
     enterprise: enterprise ?? null,
     appName: enterprise?.application_name?.trim() || "Loge",
     logoUrl: enterprise?.use_custom_logo
-      ? `/api/enterprise-settings/logo?v=${logoBuster}`
+      ? `/api/theme/logo?v=${logoBuster}`
       : null,
     vectorDbEnabled:
       !settingsLoading && !settingsError && core.vector_db_enabled !== false,

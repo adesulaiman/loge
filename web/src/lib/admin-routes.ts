@@ -370,7 +370,7 @@ export const ADMIN_ROUTES = {
     sidebarLabel: "Groups",
     requiredPermission: Permission.MANAGE_USER_GROUPS,
     section: "Permissions",
-    requiredTier: Tier.BUSINESS,
+    requiredTier: null,
     visibleWhen: null,
   },
   SCIM: {
@@ -413,7 +413,7 @@ export const ADMIN_ROUTES = {
     sidebarLabel: "Appearance & Theming",
     requiredPermission: Permission.FULL_ADMIN_PANEL_ACCESS,
     section: "Organization",
-    requiredTier: Tier.BUSINESS,
+    requiredTier: null,
     visibleWhen: null,
   },
   SECURITY_HARDENING: {

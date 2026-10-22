@@ -30,7 +30,7 @@ export default function AgentAvatar({
       >
         <Image
           alt={t("logo.alt")}
-          src="/api/enterprise-settings/logo"
+          src="/api/theme/logo"
           fill
           className="object-cover object-center"
           sizes={`${size}px`}

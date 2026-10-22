@@ -35,6 +35,8 @@ import { SourceMetadata } from "@/lib/search/types";
 import { FederatedConnectorDetail } from "@/lib/types";
 import { ValidSources } from "@/lib/connectors/types/source";
 import DocumentsSidebar from "@/sections/document-sidebar/DocumentsSidebar";
+import DocumentPanel from "@/sections/document-panel/DocumentPanel";
+import { useDocumentPanelStore } from "@/lib/documents/store";
 import useChatController from "@/hooks/useChatController";
 import useMultiModelChat from "@/hooks/useMultiModelChat";
 import MultiModelSelector from "@/sections/model-selector/MultiModelSelector";
@@ -299,6 +301,8 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
   const currentChatState = useCurrentChatState();
   const isReady = useIsReady();
   const documentSidebarVisible = useDocumentSidebarVisible();
+  const openDocumentId = useDocumentPanelStore((s) => s.openDocumentId);
+  const closeDocument = useDocumentPanelStore((s) => s.closeDocument);
   const updateCurrentDocumentSidebarVisible = useChatSessionStore(
     (state) => state.updateCurrentDocumentSidebarVisible
   );
@@ -736,7 +740,25 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
 
       <FederatedOAuthModal />
 
+      {openDocumentId &&
+        (isMobile ? (
+          <Modal open onOpenChange={() => closeDocument()}>
+            <Modal.Content>
+              <Modal.Body>
+                <DocumentPanel documentId={openDocumentId} />
+              </Modal.Body>
+            </Modal.Content>
+          </Modal>
+        ) : (
+          <RootLayout.RightPanel>
+            <div className="h-full w-160 max-w-[50vw]">
+              <DocumentPanel documentId={openDocumentId} />
+            </div>
+          </RootLayout.RightPanel>
+        ))}
+
       {retrievalEnabled &&
+        !openDocumentId &&
         (isMobile ? (
           documentSidebarVisible && (
             <Modal

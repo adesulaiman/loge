@@ -85,6 +85,7 @@ here. Read the component that documents the setting in its env table.
 |---|---|
 | `backend/onyx/db/persona.py`, `db/persona_sharing.py`, `db/pinned_personas.py`, `server/features/persona/`, `server/features/default_assistant/` | agents-personas |
 | `backend/onyx/db/projects.py`, `server/features/projects/` | projects |
+| `backend/onyx/db/chat_document.py`, `server/features/documents/`, `backend/onyx/tools/tool_implementations/document/`, `web/src/lib/documents/`, `web/src/sections/document-panel/` | chat-documents |
 | `backend/onyx/skills/`, `backend/onyx/db/skill.py`, `server/features/skill/` | skills |
 | `backend/onyx/db/mcp.py`, `server/features/mcp/`, `server/features/tool/`, `db/tools.py` | mcp-and-custom-tools |
 | `backend/onyx/db/input_prompt.py`, `db/user_preferences.py`, `server/features/input_prompt/` | chat-preferences |

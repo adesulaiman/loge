@@ -9765,7 +9765,7 @@
         "title": "{appName}에 오신 것을 환영합니다"
       },
       "welcomeSubtitle": {
-        "text": "업무를 위한 오픈 소스 AI 플랫폼"
+        "text": "업무를 위한 AI 플랫폼"
       },
       "workEmailField": {
         "label": "회사 이메일"
@@ -10734,6 +10734,26 @@
             "status": "계획 생성 중"
           }
         },
+        "document": {
+          "default": {
+            "status": "문서"
+          },
+          "writing": {
+            "status": "문서 작성 중"
+          },
+          "saved": {
+            "status": "문서가 저장되었습니다"
+          },
+          "failed": {
+            "status": "문서 작업에 실패했습니다"
+          },
+          "open": {
+            "label": "열기"
+          },
+          "version": {
+            "label": "버전 {version}"
+          }
+        },
         "doneStep": {
           "header": "완료"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "메모리 업데이트 중..."
+          },
+          "writingDocument": {
+            "label": "문서 작성 중"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "코드 인터프리터",
           "codingAgent": "코딩 에이전트",
           "customTool": "사용자 지정 도구",
+          "document": "문서",
           "generateImage": "이미지 생성",
           "generatePlan": "계획 생성",
           "internalSearch": "내부 검색",
@@ -12013,12 +12037,18 @@
         "text": "사용자"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "로고"
       },
       "poweredBy": {
-        "label": "Powered by Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "JVM 메모리",
     "vectorMemoryTitle": "벡터 메모리",
     "viewDetails": "세부 정보 보기"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "제목 없는 문서"
+      },
+      "mode": {
+        "edit": {
+          "label": "편집"
+        },
+        "preview": {
+          "label": "미리보기"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "저장 중…"
+        },
+        "saved": {
+          "label": "저장됨 · 버전 {version}"
+        },
+        "unsaved": {
+          "label": "저장되지 않은 변경 사항"
+        }
+      },
+      "close": {
+        "label": "닫기"
+      },
+      "loading": {
+        "label": "문서를 불러오는 중…"
+      },
+      "loadFailed": {
+        "label": "문서를 불러오지 못했습니다."
+      },
+      "conflict": {
+        "title": "문서가 변경되었습니다",
+        "body": "어시스턴트 또는 다른 탭이 더 새로운 버전을 저장했습니다.",
+        "loadLatest": {
+          "label": "최신 버전 불러오기"
+        },
+        "keepMine": {
+          "label": "내 변경 사항 유지"
+        }
+      },
+      "history": {
+        "label": "기록",
+        "restore": {
+          "label": "복원"
+        },
+        "entry": {
+          "label": "버전 {version} · {author}"
+        },
+        "author": {
+          "user": "나",
+          "agent": "어시스턴트"
+        }
+      },
+      "export": {
+        "label": "내보내기",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "다이어그램을 표시하지 못했습니다."
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "AI에게 지시 (선택)"
+        },
+        "knowledge": {
+          "label": "지식 베이스 검색"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "AI 댓글"
+        },
+        "continue": {
+          "label": "이어 쓰기"
+        },
+        "rewrite": {
+          "label": "다시 쓰기"
+        },
+        "instruct": {
+          "placeholder": "선택한 내용으로 AI가 쓸 내용을 지시하세요…",
+          "label": "생성"
+        }
+      },
+      "comments": {
+        "label": "댓글",
+        "empty": {
+          "label": "댓글이 없습니다. 텍스트를 선택하고 AI 댓글을 선택하세요."
+        },
+        "detached": {
+          "label": "인용한 텍스트가 문서에 더 이상 없습니다."
+        },
+        "author": {
+          "user": "나",
+          "ai": "AI"
+        },
+        "reply": {
+          "placeholder": "답글 작성",
+          "label": "답글"
+        },
+        "askAi": {
+          "label": "AI에게 묻기"
+        },
+        "asking": {
+          "label": "묻는 중…"
+        },
+        "resolve": {
+          "label": "해결"
+        },
+        "reopen": {
+          "label": "다시 열기"
+        },
+        "delete": {
+          "label": "삭제"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "AI 이어 쓰기"
+        },
+        "rewrite": {
+          "title": "AI 다시 쓰기"
+        },
+        "accept": {
+          "label": "수락"
+        },
+        "reject": {
+          "label": "거부"
+        },
+        "stop": {
+          "label": "중지"
+        },
+        "error": {
+          "label": "AI 요청에 실패했습니다."
+        },
+        "instruct": {
+          "title": "AI 결과"
+        },
+        "replace": {
+          "label": "선택 영역 바꾸기"
+        },
+        "insertBelow": {
+          "label": "아래에 삽입"
+        }
+      }
+    }
   }
 }

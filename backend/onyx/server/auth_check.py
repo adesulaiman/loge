@@ -26,6 +26,9 @@ PUBLIC_ENDPOINT_SPECS = [
     ("/redoc", {"GET", "HEAD"}),
     # should always be callable, will just return 401 if not authenticated
     ("/me", {"GET"}),
+    # public workspace appearance (name, logo, login text)
+    ("/theme", {"GET"}),
+    ("/theme/logo", {"GET"}),
     # liveness: just returns 200 to validate that the process is up
     ("/health", {"GET"}),
     # readiness: 200 while the server can serve traffic, 503 when saturated

@@ -1,8 +1,6 @@
 import { useUser } from "@/providers/UserProvider";
 import { hasPermission } from "@/lib/permissions";
 import { Permission } from "@/lib/types";
-import { useTierAtLeast } from "@/hooks/useTierAtLeast";
-import { Tier } from "@/lib/settings/types";
 
 export interface PermissionAuthority {
   /** Holds the permission outright, or is an admin — unrestricted org-wide. */
@@ -35,11 +33,7 @@ export function usePermissionAuthority(
   };
 }
 
-/**
- * Mirrors the backend BUSINESS gate on `/manage/admin/user-group`. Gate edit
- * affordances on this, not `settings.enterprise` — that only means "EE build",
- * and below Business the endpoint 402s.
- */
+/** Group management has no tier gate. */
 export function useCanManageGroups(): boolean {
-  return useTierAtLeast(Tier.BUSINESS);
+  return true;
 }

@@ -40,7 +40,7 @@ answers side by side, then mark one as preferred.
 | GET | `/chat/chat-session/{id}/resume-stream` | `resume_chat_stream` | Replays the durable buffer, then tails the live stream. |
 | POST | `/chat/stop-chat-session/{id}` | `stop_chat_session` | Sets the stop fence for one stream. Optional `stream_id` query parameter. Without it, the endpoint stops the stream in the processing fence. |
 | POST | `/chat/create-chat-session` | `create_new_chat_session` | |
-| GET | `/chat/get-chat-session/{id}` | `get_chat_session` | Replays saved packets for a loaded session. |
+| GET | `/chat/get-chat-session/{id}` | `get_chat_session` | Replays saved packets for a loaded session. Each tool needs a branch in `session_loading.py`, including `DocumentTool` (see [[chat-documents]]). |
 | GET | `/chat/get-user-chat-sessions` | `get_user_chat_sessions` | |
 | PUT | `/chat/rename-chat-session`, `PATCH /chat/chat-session/{id}` | `rename_chat_session`, `patch_chat_session` | |
 | DELETE | `/chat/delete-chat-session/{id}`, `/chat/delete-all-chat-sessions` | `delete_chat_session_by_id`, `delete_all_chat_sessions` | |

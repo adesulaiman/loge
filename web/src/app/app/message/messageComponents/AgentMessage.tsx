@@ -17,6 +17,7 @@ import { useMessageSwitching } from "@/app/app/message/messageComponents/hooks/u
 import { RendererComponent } from "@/app/app/message/messageComponents/renderMessageComponent";
 import { usePacketProcessor } from "@/app/app/message/messageComponents/timeline/hooks/usePacketProcessor";
 import { usePacedTurnGroups } from "@/app/app/message/messageComponents/timeline/hooks/usePacedTurnGroups";
+import DocumentCards from "@/app/app/message/messageComponents/DocumentCards";
 import MessageToolbar from "@/app/app/message/messageComponents/MessageToolbar";
 import { LlmDescriptor, LlmManager } from "@/lib/hooks";
 import { Message } from "@/app/app/interfaces";
@@ -360,6 +361,10 @@ const AgentMessage = React.memo(function AgentMessage({
               {t("agentMessage.stoppedGeneration.text")}
             </Text>
           )}
+      </div>
+
+      <div className={cn(!fullWidthChat && "px-3")}>
+        <DocumentCards rawPackets={rawPackets} packetCount={packetCount} />
       </div>
 
       {/* Feedback buttons - only show when streaming and rendering complete */}

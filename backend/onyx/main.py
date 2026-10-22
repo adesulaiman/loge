@@ -89,6 +89,8 @@ from onyx.server.features.default_assistant.api import (
     router as default_assistant_router,
 )
 from onyx.server.features.document_set.api import router as document_set_router
+from onyx.server.features.documents.api import router as documents_router
+from onyx.server.features.groups.api import router as groups_router
 from onyx.server.features.hierarchy.api import router as hierarchy_router
 from onyx.server.features.image_generation.api import router as image_generation_router
 from onyx.server.features.input_prompt.api import (
@@ -109,6 +111,8 @@ from onyx.server.features.persona.api import basic_router as persona_router
 from onyx.server.features.projects.api import router as projects_router
 from onyx.server.features.search.api import router as search_api_router
 from onyx.server.features.skill.api import user_router as skill_router
+from onyx.server.features.theme.api import admin_router as theme_admin_router
+from onyx.server.features.theme.api import router as theme_router
 from onyx.server.features.tool.api import admin_router as admin_tool_router
 from onyx.server.features.tool.api import router as tool_router
 from onyx.server.features.usage.api import admin_usage_router, user_usage_router
@@ -562,6 +566,10 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     register_onyx_exception_handlers(application)
 
     include_router_with_global_prefix_prepended(application, password_router)
+    include_router_with_global_prefix_prepended(application, theme_router)
+    include_router_with_global_prefix_prepended(application, groups_router)
+    include_router_with_global_prefix_prepended(application, documents_router)
+    include_router_with_global_prefix_prepended(application, theme_admin_router)
     include_router_with_global_prefix_prepended(application, chat_router)
     include_router_with_global_prefix_prepended(application, query_router)
     include_router_with_global_prefix_prepended(application, document_router)

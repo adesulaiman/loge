@@ -17,6 +17,7 @@ function model(
 ): ModelConfiguration {
   return {
     name,
+    effectiveDisplayName: name,
     is_visible: true,
     max_input_tokens: null,
     supports_image_input: false,

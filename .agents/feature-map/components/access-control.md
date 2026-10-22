@@ -71,6 +71,7 @@ and §9).
 
 | Method | Path | Handler | Notes |
 |---|---|---|---|
+| GET/POST/PATCH/DELETE | `/manage/groups[/{id}]`, `/manage/groups/minimal`, `/manage/groups/{id}/{add-users,agents,document-sets}` | `backend/onyx/server/features/groups/api.py` | Tier-free group management used by the web app. `MANAGE_USER_GROUPS` (global only, no scoped managers) for writes, `READ_USER_GROUPS` for the list, `BASIC_ACCESS` for `/minimal`. Default groups keep members only. No permission toggles, managers, token limits or connector links. DB code: `backend/onyx/db/group_management.py`. |
 | GET/POST/PATCH/DELETE | `/admin/user-group[/{id}]` | `loge/server/user_group/api.py` | EE only. Gated by `Permission.MANAGE_USER_GROUPS` / `READ_USER_GROUPS`, several with `allow_scope=True` so a curator (group manager) can reach the handler; the handler itself must then re-check scope (GATE 2). |
 | GET | `/user-groups/minimal` | same file | `Permission.BASIC_ACCESS`; any authenticated user can list group names (not membership) for persona/document-set configuration UIs. |
 | PUT | `/admin/user-group/{id}/permissions` | same file | `Permission.MANAGE_USER_GROUPS` / `FULL_ADMIN_PANEL_ACCESS` depending on the specific route; sets what a group's members can do, not document access. |

@@ -1,1 +1,7 @@
-export { default } from "@/loge/app/PaidFeatureLayout";
+export default function ThemeLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
+}

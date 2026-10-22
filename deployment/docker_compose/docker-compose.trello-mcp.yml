@@ -1,0 +1,23 @@
+# Trello MCP server, exposed over streamable HTTP for Onyx/Loge.
+# Loge cannot use STDIO MCP servers, so supergateway wraps the STDIO server.
+#
+# Set TRELLO_API_KEY and TRELLO_TOKEN in .env, then run:
+#   docker compose -f docker-compose.yml -f docker-compose.trello-mcp.yml up -d trello_mcp
+# MCP URL for Loge (same Docker network): http://trello_mcp:8000/mcp
+name: onyx
+
+services:
+  trello_mcp:
+    image: node:22-slim
+    restart: unless-stopped
+    command: >
+      npx -y supergateway@4.1.0
+      --stdio "npx -y @delorenj/mcp-server-trello@1.8.1"
+      --outputTransport streamableHttp
+      --port 8000
+      --streamableHttpPath /mcp
+    environment:
+      - TRELLO_API_KEY=${TRELLO_API_KEY:-}
+      - TRELLO_TOKEN=${TRELLO_TOKEN:-}
+    expose:
+      - "8000"

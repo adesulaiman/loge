@@ -99,6 +99,14 @@ export function useTimelineHeader(
       };
     }
 
+    if (packetType === PacketType.DOCUMENT_TOOL_START) {
+      return {
+        headerText: t("header.writingDocument.label"),
+        hasPackets,
+        userStopped,
+      };
+    }
+
     if (packetType === PacketType.IMAGE_GENERATION_TOOL_START) {
       return {
         headerText: t("header.generatingImages.label"),

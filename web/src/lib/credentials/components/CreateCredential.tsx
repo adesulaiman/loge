@@ -111,8 +111,7 @@ export default function CreateCredential({
     formikHelpers.setSubmitting(true);
 
     const { share, groups, name, ...credentialValues } = values;
-    const trimmedName =
-      typeof name === "string" ? name.trim() : "";
+    const trimmedName = typeof name === "string" ? name.trim() : "";
 
     let privateKey: TypedFile | null = null;
     const filteredCredentialValues = Object.fromEntries(
@@ -129,21 +128,23 @@ export default function CreateCredential({
       const credentialPayload: {
         credential_json: typeof filteredCredentialValues;
         source: typeof sourceType;
-        private_key: TypedFile | undefined;
         name?: string;
-        admin_public?: boolean;
+        admin_public: boolean;
         curator_public?: boolean;
         groups?: number[];
       } = {
         credential_json: filteredCredentialValues,
         ...shareAccountPayload({ share, groups }),
         source: sourceType,
-        private_key: privateKey || undefined,
       };
       if (trimmedName) {
         credentialPayload.name = trimmedName;
       }
-      const response = await submitCredential(credentialPayload);
+      const response = await submitCredential(
+        privateKey
+          ? { ...credentialPayload, private_key: privateKey }
+          : credentialPayload
+      );
 
       const { message, isSuccess, credential } = response;
 

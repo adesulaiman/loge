@@ -114,6 +114,7 @@ string values.
 | Open URL tool | `OpenUrlStart`, `OpenUrlUrls`, `OpenUrlDocuments` | Three-stage sequence: start, the URLs to crawl, the crawled documents. |
 | Image tool | `ImageGenerationToolStart`, `ImageGenerationToolHeartbeat`, `ImageGenerationFinal` | Placeholder, keepalive during generation, then all images at once (`GeneratedImage` list). |
 | Python tool | `PythonToolStart`, `PythonToolDelta` | Code block, then `stdout`/`stderr`/`file_ids` as they arrive. |
+| Document tool | `DocumentToolStart`, `DocumentToolFinal` | A document card with title and version. `DocumentToolFinal` carries `action`, `doc_id`, `version`, `title`. See [[chat-documents]]. |
 | Custom tool | `CustomToolStart`, `CustomToolArgs`, `CustomToolDelta` | Placeholder, args, then a typed response (`data` or `file_ids`, optionally `CustomToolErrorInfo`). |
 | File reader tool | `FileReaderStart`, `FileReaderResult` | Placeholder, then the retrieved excerpt (`file_id`, char range, text previews). |
 | Memory tool | `MemoryToolStart`, `MemoryToolDelta`, `MemoryToolNoAccess` | Placeholder, an add/update memory op, or a no-access notice. |

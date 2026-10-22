@@ -11,7 +11,7 @@ export async function generateFaviconMetadata(): Promise<Metadata["icons"]> {
   const enterprise = await fetchEnterpriseSettingsSS();
   return {
     icon: enterprise?.use_custom_logo
-      ? "/api/enterprise-settings/logo"
+      ? "/api/theme/logo"
       : "/loge/mark.svg",
   };
 }

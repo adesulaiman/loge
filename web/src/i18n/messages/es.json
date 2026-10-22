@@ -9765,7 +9765,7 @@
         "title": "Te damos la bienvenida a {appName}"
       },
       "welcomeSubtitle": {
-        "text": "Tu plataforma de IA de código abierto para el trabajo"
+        "text": "Tu plataforma de IA para el trabajo"
       },
       "workEmailField": {
         "label": "Correo de trabajo"
@@ -10734,6 +10734,26 @@
             "status": "Generando plan"
           }
         },
+        "document": {
+          "default": {
+            "status": "Documento"
+          },
+          "writing": {
+            "status": "Escribiendo documento"
+          },
+          "saved": {
+            "status": "Documento guardado"
+          },
+          "failed": {
+            "status": "Falló la acción del documento"
+          },
+          "open": {
+            "label": "Abrir"
+          },
+          "version": {
+            "label": "Versión {version}"
+          }
+        },
         "doneStep": {
           "header": "Listo"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "Actualizando memoria..."
+          },
+          "writingDocument": {
+            "label": "Escribiendo documento"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "Intérprete de código",
           "codingAgent": "Agente de código",
           "customTool": "Herramienta personalizada",
+          "document": "Documento",
           "generateImage": "Generar imagen",
           "generatePlan": "Generar plan",
           "internalSearch": "Búsqueda interna",
@@ -12013,12 +12037,18 @@
         "text": "Usuarios"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "Logotipo"
       },
       "poweredBy": {
-        "label": "Con tecnología de Loge"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "Memoria de JVM",
     "vectorMemoryTitle": "Memoria de vectores",
     "viewDetails": "Ver detalles"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "Documento sin título"
+      },
+      "mode": {
+        "edit": {
+          "label": "Editar"
+        },
+        "preview": {
+          "label": "Vista previa"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "Guardando…"
+        },
+        "saved": {
+          "label": "Guardado · versión {version}"
+        },
+        "unsaved": {
+          "label": "Cambios sin guardar"
+        }
+      },
+      "close": {
+        "label": "Cerrar"
+      },
+      "loading": {
+        "label": "Cargando documento…"
+      },
+      "loadFailed": {
+        "label": "No se pudo cargar el documento."
+      },
+      "conflict": {
+        "title": "El documento cambió",
+        "body": "El asistente u otra pestaña guardó una versión más reciente.",
+        "loadLatest": {
+          "label": "Cargar la última"
+        },
+        "keepMine": {
+          "label": "Conservar mis cambios"
+        }
+      },
+      "history": {
+        "label": "Historial",
+        "restore": {
+          "label": "Restaurar"
+        },
+        "entry": {
+          "label": "Versión {version} · {author}"
+        },
+        "author": {
+          "user": "Tú",
+          "agent": "Asistente"
+        }
+      },
+      "export": {
+        "label": "Exportar",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "No se pudo representar el diagrama."
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "Instrucción para la IA (opcional)"
+        },
+        "knowledge": {
+          "label": "Buscar en la base de conocimiento"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "Comentario de IA"
+        },
+        "continue": {
+          "label": "Continuar"
+        },
+        "rewrite": {
+          "label": "Reescribir"
+        },
+        "instruct": {
+          "placeholder": "Dile a la IA qué escribir a partir de la selección…",
+          "label": "Generar"
+        }
+      },
+      "comments": {
+        "label": "Comentarios",
+        "empty": {
+          "label": "Aún no hay comentarios. Selecciona texto y elige Comentario de IA."
+        },
+        "detached": {
+          "label": "El texto citado ya no está en el documento."
+        },
+        "author": {
+          "user": "Tú",
+          "ai": "IA"
+        },
+        "reply": {
+          "placeholder": "Escribe una respuesta",
+          "label": "Responder"
+        },
+        "askAi": {
+          "label": "Preguntar a la IA"
+        },
+        "asking": {
+          "label": "Preguntando…"
+        },
+        "resolve": {
+          "label": "Resolver"
+        },
+        "reopen": {
+          "label": "Reabrir"
+        },
+        "delete": {
+          "label": "Eliminar"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "Continuación de IA"
+        },
+        "rewrite": {
+          "title": "Reescritura de IA"
+        },
+        "accept": {
+          "label": "Aceptar"
+        },
+        "reject": {
+          "label": "Rechazar"
+        },
+        "stop": {
+          "label": "Detener"
+        },
+        "error": {
+          "label": "La solicitud a la IA falló."
+        },
+        "instruct": {
+          "title": "Resultado de IA"
+        },
+        "replace": {
+          "label": "Reemplazar selección"
+        },
+        "insertBelow": {
+          "label": "Insertar debajo"
+        }
+      }
+    }
   }
 }

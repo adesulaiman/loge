@@ -29,6 +29,7 @@ class LLMFlow(StrEnum):
     SELECT_SECTIONS_FOR_EXPANSION = "select_sections_for_expansion"
     CHAT_SESSION_NAMING = "chat_session_naming"
     MEMORY_UPDATE = "memory_update"
+    DOCUMENT_ASSIST = "document_assist"
 
     # Build session (assistants)
     BUILD_SESSION_NAMING = "build_session_naming"

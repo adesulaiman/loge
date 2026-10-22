@@ -60,7 +60,7 @@ export default function ThemePage() {
   async function updateEnterpriseSettings(
     newValues: EnterpriseSettings
   ): Promise<boolean> {
-    const response = await fetch("/api/admin/enterprise-settings", {
+    const response = await fetch("/api/admin/theme", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -259,7 +259,7 @@ export default function ThemePage() {
         if (selectedLogo) {
           const formData = new FormData();
           formData.append("file", selectedLogo);
-          const response = await fetch("/api/admin/enterprise-settings/logo", {
+          const response = await fetch("/api/admin/theme/logo", {
             method: "PUT",
             body: formData,
           });

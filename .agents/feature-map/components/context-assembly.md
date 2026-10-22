@@ -11,7 +11,7 @@
 **Owns:**
 `backend/onyx/chat/prompt_utils.py`, `backend/onyx/llm/token_budget.py`, `compression.py`,
 `COMPRESSION.md`, `incognito.py`, `incognito_context.py`,
-`backend/onyx/prompts/`, `backend/loge/prompts/`
+`backend/onyx/prompts/` (`document_assist.py` holds the standalone prompts of [[chat-documents]]; they are not part of chat assembly), `backend/loge/prompts/`
 
 **Read first:** `backend/onyx/chat/README.md`. Its "Reasons / Experiments" section
 is the rationale behind the ordering and the reminder placement in this document.

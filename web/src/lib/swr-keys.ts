@@ -15,9 +15,15 @@ export const SWR_KEYS = {
   opensearchResourceHealth: "/api/manage/admin/opensearch-health",
   version: "/api/version",
 
+  // ── Documents ─────────────────────────────────────────────────────────────
+  documents: "/api/documents",
+  document: (id: string) => `/api/documents/${id}`,
+  documentVersions: (id: string) => `/api/documents/${id}/versions`,
+  documentComments: (id: string) => `/api/documents/${id}/comments`,
+
   // ── Settings ──────────────────────────────────────────────────────────────
   settings: "/api/settings",
-  enterpriseSettings: "/api/enterprise-settings",
+  enterpriseSettings: "/api/theme",
   customAnalyticsScript: "/api/enterprise-settings/custom-analytics-script",
   authType: "/api/auth/type",
   adminSecuritySettings: "/api/admin/security",
@@ -155,10 +161,9 @@ export const SWR_KEYS = {
   adminApiKeys: "/api/admin/api-key",
 
   // ── Groups ────────────────────────────────────────────────────────────────
-  adminUserGroups: "/api/manage/admin/user-group",
-  adminUserGroupsWithDefault:
-    "/api/manage/admin/user-group?include_default=true",
-  shareableGroups: "/api/manage/user-groups/minimal",
+  adminUserGroups: "/api/manage/groups",
+  adminUserGroupsWithDefault: "/api/manage/groups?include_default=true",
+  shareableGroups: "/api/manage/groups/minimal",
   userGroupPermissions: (groupId: number) =>
     `/api/manage/admin/user-group/${groupId}/permissions`,
   permissionRegistry: "/api/manage/admin/permissions/registry",

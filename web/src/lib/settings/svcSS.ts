@@ -21,7 +21,7 @@ export async function fetchStandardSettingsSS(): Promise<Settings | null> {
 
 export async function fetchEnterpriseSettingsSS(): Promise<EnterpriseSettings | null> {
   try {
-    const response = await fetchSS("/enterprise-settings");
+    const response = await fetchSS("/theme");
     if (!response?.ok) return null;
     return response.json();
   } catch {
@@ -43,7 +43,7 @@ async function fetchCustomAnalyticsScriptSS(): Promise<string | null> {
 
 export async function fetchSettingsSS(): Promise<CombinedSettings | null> {
   const settingsTask = fetchSS("/settings");
-  const enterpriseTask = fetchSS("/enterprise-settings");
+  const enterpriseTask = fetchSS("/theme");
   const analyticsTask = CUSTOM_ANALYTICS_ENABLED
     ? fetchSS("/enterprise-settings/custom-analytics-script")
     : Promise.resolve(null);

@@ -20,6 +20,7 @@ import {
 import { MessageTextRenderer } from "./renderers/MessageTextRenderer";
 import { ImageToolRenderer } from "./renderers/ImageToolRenderer";
 import { PythonToolRenderer } from "./timeline/renderers/code/PythonToolRenderer";
+import { DocumentToolRenderer } from "./timeline/renderers/document/DocumentToolRenderer";
 import { CodingAgentRenderer } from "./timeline/renderers/code/CodingAgentRenderer";
 import { isCodingAgentPackets } from "./timeline/packetHelpers";
 import { ReasoningRenderer } from "./timeline/renderers/reasoning/ReasoningRenderer";
@@ -57,6 +58,10 @@ function isInternalSearchPacket(packet: Packet): boolean {
 
 function isImageToolPacket(packet: Packet) {
   return packet.obj.type === PacketType.IMAGE_GENERATION_TOOL_START;
+}
+
+function isDocumentToolPacket(packet: Packet) {
+  return packet.obj.type === PacketType.DOCUMENT_TOOL_START;
 }
 
 function isPythonToolPacket(packet: Packet) {
@@ -148,6 +153,9 @@ export function findRenderer(
   }
   if (groupedPackets.packets.some((packet) => isPythonToolPacket(packet))) {
     return PythonToolRenderer;
+  }
+  if (groupedPackets.packets.some((packet) => isDocumentToolPacket(packet))) {
+    return DocumentToolRenderer;
   }
   if (groupedPackets.packets.some((packet) => isFileReaderToolPacket(packet))) {
     return FileReaderToolRenderer;

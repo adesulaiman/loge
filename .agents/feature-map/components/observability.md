@@ -253,7 +253,7 @@ directly via `add_trace_processor`, independent of Braintrust/Langfuse.
   embeddings/rerank to `model_server`) that bypass `LLM` entirely.
 
 Both build a `model_config` dict tagging `flow` (an `LLMFlow` value,
-`tracing/flows.py`) and `model_provider`; `flows.py:LLMFlow` enumerates every
+`tracing/flows.py`) and `model_provider`; `flows.py:LLMFlow` (including `DOCUMENT_ASSIST` for comment, continue and rewrite on a chat document, see [[chat-documents]]) enumerates every
 tagged operation, grouped by area (chat/agent, secondary LLM flows, Craft,
 `LLM_GATEWAY`, indexing, image, voice, embeddings/rerank).
 `[[llm-providers]]` covers the LLM-provider-side detail of resolution and

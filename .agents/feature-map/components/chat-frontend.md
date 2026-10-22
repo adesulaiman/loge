@@ -206,6 +206,7 @@ types present and returns one renderer:
 | `search_tool_start` with `is_internet_search` falsy | `InternalSearchToolRenderer` (`web/src/app/app/message/messageComponents/timeline/renderers/search/`) |
 | `image_generation_start` | `ImageToolRenderer` (`messageComponents/renderers/ImageToolRenderer.tsx`) |
 | `python_tool_start`, or `tool_call_argument_delta` for a code-interpreter tool type | `PythonToolRenderer` (`web/src/app/app/message/messageComponents/timeline/renderers/code/`) |
+| `document_tool_start` | `DocumentToolRenderer` (`.../timeline/renderers/document/`). A write opens the document panel through `useDocumentPanelStore`. |
 | `file_reader_start` | `FileReaderToolRenderer` (`web/src/app/app/message/messageComponents/timeline/renderers/filereader/`) |
 | `custom_tool_start` | `CustomToolRenderer` (`messageComponents/renderers/CustomToolRenderer.tsx`) |
 | `open_url_start` | `FetchToolRenderer` (`web/src/app/app/message/messageComponents/timeline/renderers/fetch/`) |

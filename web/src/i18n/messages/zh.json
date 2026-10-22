@@ -9765,7 +9765,7 @@
         "title": "欢迎使用 {appName}"
       },
       "welcomeSubtitle": {
-        "text": "面向工作的开源 AI 平台"
+        "text": "面向工作的 AI 平台"
       },
       "workEmailField": {
         "label": "工作邮箱"
@@ -10734,6 +10734,26 @@
             "status": "正在生成计划"
           }
         },
+        "document": {
+          "default": {
+            "status": "文档"
+          },
+          "writing": {
+            "status": "正在撰写文档"
+          },
+          "saved": {
+            "status": "文档已保存"
+          },
+          "failed": {
+            "status": "文档操作失败"
+          },
+          "open": {
+            "label": "打开"
+          },
+          "version": {
+            "label": "版本 {version}"
+          }
+        },
         "doneStep": {
           "header": "完成"
         },
@@ -10798,6 +10818,9 @@
           },
           "updatingMemory": {
             "label": "正在更新记忆..."
+          },
+          "writingDocument": {
+            "label": "正在撰写文档"
           }
         },
         "internalSearch": {
@@ -10919,6 +10942,7 @@
           "codeInterpreter": "代码解释器",
           "codingAgent": "编码智能体",
           "customTool": "自定义工具",
+          "document": "文档",
           "generateImage": "生成图片",
           "generatePlan": "生成计划",
           "internalSearch": "内部搜索",
@@ -12013,12 +12037,18 @@
         "text": "用户"
       }
     },
+    "owner": {
+      "label": "PT Axon Integra Solution",
+      "logo": {
+        "alt": "Axon logo"
+      }
+    },
     "logo": {
       "image": {
         "alt": "徽标"
       },
       "poweredBy": {
-        "label": "由 Loge 提供支持"
+        "label": "PT Axon Integra Solution"
       }
     },
     "modelSelectors": {
@@ -14934,5 +14964,162 @@
     "jvmMemoryTitle": "JVM 内存",
     "vectorMemoryTitle": "向量内存",
     "viewDetails": "查看详情"
+  },
+  "documents": {
+    "panel": {
+      "untitled": {
+        "label": "未命名文档"
+      },
+      "mode": {
+        "edit": {
+          "label": "编辑"
+        },
+        "preview": {
+          "label": "预览"
+        }
+      },
+      "status": {
+        "saving": {
+          "label": "正在保存…"
+        },
+        "saved": {
+          "label": "已保存 · 版本 {version}"
+        },
+        "unsaved": {
+          "label": "有未保存的更改"
+        }
+      },
+      "close": {
+        "label": "关闭"
+      },
+      "loading": {
+        "label": "正在加载文档…"
+      },
+      "loadFailed": {
+        "label": "无法加载文档。"
+      },
+      "conflict": {
+        "title": "文档已更改",
+        "body": "助手或其他标签页保存了较新的版本。",
+        "loadLatest": {
+          "label": "加载最新版本"
+        },
+        "keepMine": {
+          "label": "保留我的更改"
+        }
+      },
+      "history": {
+        "label": "历史记录",
+        "restore": {
+          "label": "恢复"
+        },
+        "entry": {
+          "label": "版本 {version} · {author}"
+        },
+        "author": {
+          "user": "你",
+          "agent": "助手"
+        }
+      },
+      "export": {
+        "label": "导出",
+        "md": {
+          "label": "Markdown"
+        },
+        "docx": {
+          "label": "Word (.docx)"
+        },
+        "pdf": {
+          "label": "PDF"
+        }
+      },
+      "diagramError": {
+        "label": "无法渲染图表。"
+      },
+      "assist": {
+        "instruction": {
+          "placeholder": "给 AI 的指令（可选）"
+        },
+        "knowledge": {
+          "label": "搜索知识库"
+        }
+      },
+      "selection": {
+        "comment": {
+          "label": "AI 评论"
+        },
+        "continue": {
+          "label": "续写"
+        },
+        "rewrite": {
+          "label": "改写"
+        },
+        "instruct": {
+          "placeholder": "告诉 AI 根据所选内容写什么…",
+          "label": "生成"
+        }
+      },
+      "comments": {
+        "label": "评论",
+        "empty": {
+          "label": "暂无评论。选中文本后选择 AI 评论。"
+        },
+        "detached": {
+          "label": "引用的文本已不在文档中。"
+        },
+        "author": {
+          "user": "你",
+          "ai": "AI"
+        },
+        "reply": {
+          "placeholder": "写回复",
+          "label": "回复"
+        },
+        "askAi": {
+          "label": "询问 AI"
+        },
+        "asking": {
+          "label": "正在询问…"
+        },
+        "resolve": {
+          "label": "解决"
+        },
+        "reopen": {
+          "label": "重新打开"
+        },
+        "delete": {
+          "label": "删除"
+        }
+      },
+      "suggestion": {
+        "continue": {
+          "title": "AI 续写"
+        },
+        "rewrite": {
+          "title": "AI 改写"
+        },
+        "accept": {
+          "label": "接受"
+        },
+        "reject": {
+          "label": "拒绝"
+        },
+        "stop": {
+          "label": "停止"
+        },
+        "error": {
+          "label": "AI 请求失败。"
+        },
+        "instruct": {
+          "title": "AI 结果"
+        },
+        "replace": {
+          "label": "替换所选内容"
+        },
+        "insertBelow": {
+          "label": "插入到下方"
+        }
+      }
+    }
   }
 }

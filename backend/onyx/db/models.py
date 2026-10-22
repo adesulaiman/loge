@@ -7603,3 +7603,98 @@ class SSOProvider(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+
+class ChatDocument(Base):
+    """A Markdown document the agent and its owner edit in turn."""
+
+    __tablename__ = "chat_document"
+
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("user.id"), nullable=False, index=True
+    )
+    # No foreign key: the document outlives the chat that created it.
+    chat_session_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), nullable=True, index=True
+    )
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    current_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    deleted: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    versions: Mapped[list["ChatDocumentVersion"]] = relationship(
+        "ChatDocumentVersion",
+        back_populates="document",
+        cascade="all, delete-orphan",
+        order_by="ChatDocumentVersion.version",
+    )
+
+
+class ChatDocumentVersion(Base):
+    __tablename__ = "chat_document_version"
+
+    document_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("chat_document.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    version: Mapped[int] = mapped_column(Integer, primary_key=True)
+    content_md: Mapped[str] = mapped_column(Text, nullable=False)
+    # "user" or "agent"
+    author: Mapped[str] = mapped_column(String, nullable=False)
+    summary: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    document: Mapped["ChatDocument"] = relationship(
+        "ChatDocument", back_populates="versions"
+    )
+
+
+class ChatDocumentComment(Base):
+    """A comment anchored to quoted text in a document. Replies point to a root comment."""
+
+    __tablename__ = "chat_document_comment"
+
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    document_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("chat_document.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    parent_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("chat_document_comment.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    # "user" or "ai"
+    author: Mapped[str] = mapped_column(String, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    # The anchor is text, not an offset, so it survives edits and the Markdown round trip.
+    quote: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    prefix: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    suffix: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_on_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    resolved: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

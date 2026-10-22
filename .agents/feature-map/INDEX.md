@@ -78,6 +78,7 @@ What an admin or user configures to change how chat behaves.
 |---|---|---|
 | ✅ | [agents-personas](components/agents-personas.md) | Agents (DB name: `Persona`): prompt, tools, document sets, sharing, pinning. |
 | ✅ | [projects](components/projects.md) | A durable file + instruction scope across sessions. |
+| ✅ | [chat-documents](components/chat-documents.md) | Versioned Markdown documents the agent and the user edit in turn. |
 | ✅ | [mcp-and-custom-tools](components/mcp-and-custom-tools.md) | MCP servers and OpenAPI-defined custom actions. |
 | ✅ | [chat-preferences](components/chat-preferences.md) | Input prompts, reminders, default assistant, per-user settings. |
 | ✅ | [standard-answers](components/standard-answers.md) | Canned answers matched before the LLM runs, used by the bots. |

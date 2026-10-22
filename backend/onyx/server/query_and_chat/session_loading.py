@@ -34,6 +34,8 @@ from onyx.server.query_and_chat.streaming_models import (
     CustomToolDelta,
     CustomToolErrorInfo,
     CustomToolStart,
+    DocumentToolFinal,
+    DocumentToolStart,
     FileReaderResult,
     FileReaderStart,
     GeneratedImage,
@@ -61,6 +63,7 @@ from onyx.server.query_and_chat.streaming_models import (
 from onyx.tools.tool_implementations.coding_agent.coding_agent_tool import (
     CodingAgentTool,
 )
+from onyx.tools.tool_implementations.document.document_tool import DocumentTool
 from onyx.tools.tool_implementations.file_reader.file_reader_tool import FileReaderTool
 from onyx.tools.tool_implementations.images.image_generation_tool import (
     ImageGenerationTool,
@@ -475,6 +478,31 @@ def create_python_tool_packets(
     return packets
 
 
+def create_document_tool_packets(
+    action: str,
+    response: dict[str, Any],
+    turn_index: int,
+    tab_index: int = 0,
+) -> list[Packet]:
+    """Recreate DocumentToolStart + DocumentToolFinal + SectionEnd from the
+    stored tool call so the document card shows again on page reload."""
+    placement = Placement(turn_index=turn_index, tab_index=tab_index)
+    return [
+        Packet(placement=placement, obj=DocumentToolStart()),
+        Packet(
+            placement=placement,
+            obj=DocumentToolFinal(
+                action=action,
+                doc_id=response.get("doc_id"),
+                version=response.get("version"),
+                title=response.get("title"),
+                error=response.get("error"),
+            ),
+        ),
+        Packet(placement=placement, obj=SectionEnd()),
+    ]
+
+
 def create_search_packets(
     search_queries: list[str],
     search_docs: list[SavedSearchDoc],
@@ -697,6 +725,32 @@ def translate_assistant_message_to_packets(
                                     index=memory_data.get("index"),
                                 )
                             )
+
+                    elif tool.in_code_tool_id == DocumentTool.__name__:
+                        document_response: dict[str, Any] = {}
+                        if tool_call.tool_call_response:
+                            try:
+                                parsed_document = json.loads(
+                                    tool_call.tool_call_response
+                                )
+                                if isinstance(parsed_document, dict):
+                                    document_response = parsed_document
+                            except json.JSONDecodeError:
+                                document_response = {
+                                    "error": tool_call.tool_call_response
+                                }
+                        packet_list.extend(
+                            create_document_tool_packets(
+                                action=str(
+                                    (tool_call.tool_call_arguments or {}).get(
+                                        "action", ""
+                                    )
+                                ),
+                                response=document_response,
+                                turn_index=turn_num,
+                                tab_index=tool_call.tab_index,
+                            )
+                        )
 
                     elif tool.in_code_tool_id == PythonTool.__name__:
                         code = cast(

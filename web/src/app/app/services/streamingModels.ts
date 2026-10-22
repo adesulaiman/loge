@@ -23,6 +23,8 @@ export enum PacketType {
   IMAGE_GENERATION_TOOL_DELTA = "image_generation_final",
   PYTHON_TOOL_START = "python_tool_start",
   PYTHON_TOOL_DELTA = "python_tool_delta",
+  DOCUMENT_TOOL_START = "document_tool_start",
+  DOCUMENT_TOOL_FINAL = "document_tool_final",
   FETCH_TOOL_START = "open_url_start",
   FETCH_TOOL_URLS = "open_url_urls",
   FETCH_TOOL_DOCUMENTS = "open_url_documents",
@@ -174,6 +176,19 @@ export interface PythonToolDelta extends BaseObj {
   stdout: string;
   stderr: string;
   file_ids: string[];
+}
+
+export interface DocumentToolStart extends BaseObj {
+  type: "document_tool_start";
+}
+
+export interface DocumentToolFinal extends BaseObj {
+  type: "document_tool_final";
+  action: string;
+  doc_id: string | null;
+  version: number | null;
+  title: string | null;
+  error: string | null;
 }
 
 export interface ToolCallArgumentDelta extends BaseObj {
@@ -383,6 +398,11 @@ export type PythonToolObj =
   | ToolCallArgumentDelta
   | SectionEnd
   | PacketError;
+export type DocumentToolObj =
+  | DocumentToolStart
+  | DocumentToolFinal
+  | SectionEnd
+  | PacketError;
 export type FetchToolObj =
   | FetchToolStart
   | FetchToolUrls
@@ -410,6 +430,7 @@ export type NewToolObj =
   | SearchToolObj
   | ImageGenerationToolObj
   | PythonToolObj
+  | DocumentToolObj
   | FetchToolObj
   | CustomToolObj
   | FileReaderToolObj
@@ -507,6 +528,11 @@ export interface ImageGenerationToolPacket {
 export interface PythonToolPacket {
   placement: Placement;
   obj: PythonToolObj;
+}
+
+export interface DocumentToolPacket {
+  placement: Placement;
+  obj: DocumentToolObj;
 }
 
 export interface FetchToolPacket {
