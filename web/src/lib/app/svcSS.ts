@@ -10,9 +10,7 @@ export async function fetchAppName(): Promise<string> {
 export async function generateFaviconMetadata(): Promise<Metadata["icons"]> {
   const enterprise = await fetchEnterpriseSettingsSS();
   return {
-    icon: enterprise?.use_custom_logo
-      ? "/api/theme/logo"
-      : "/loge/mark.svg",
+    icon: enterprise?.use_custom_logo ? "/api/theme/logo" : "/loge/mark.svg",
   };
 }
 

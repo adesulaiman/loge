@@ -519,9 +519,7 @@ export const AppearanceThemeSettings = forwardRef<
             state={errors.custom_help_link_url ? "error" : "idle"}
             className="flex-1"
           >
-            <FormField.Label>
-              {t("helpLink.label")}
-            </FormField.Label>
+            <FormField.Label>{t("helpLink.label")}</FormField.Label>
             <FormField.Control asChild>
               <InputTypeIn
                 ref={customHelpLinkUrlInputRef}

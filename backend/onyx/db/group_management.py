@@ -70,7 +70,11 @@ def get_group(db_session: Session, group_id: int) -> UserGroup:
 def _assert_users_exist(db_session: Session, user_ids: Collection[UUID]) -> None:
     if not user_ids:
         return
-    found = set(db_session.scalars(select(User.id).where(User.id.in_(user_ids))).all())
+    found = set(
+        db_session.scalars(
+            select(User.id).where(User.id.in_(user_ids))  # ty: ignore[no-matching-overload, unresolved-attribute]
+        ).all()
+    )
     missing = set(user_ids) - found
     if missing:
         raise OnyxError(
@@ -144,13 +148,15 @@ def update_members(
 
 def add_members(db_session: Session, group_id: int, user_ids: Collection[UUID]) -> None:
     get_group(db_session, group_id)
-    existing = set(
-        db_session.scalars(
+    existing = {
+        user_id
+        for user_id in db_session.scalars(
             select(User__UserGroup.user_id).where(
                 User__UserGroup.user_group_id == group_id
             )
         ).all()
-    )
+        if user_id is not None
+    }
     _set_members(db_session, group_id, existing | set(user_ids))
     db_session.commit()
 
