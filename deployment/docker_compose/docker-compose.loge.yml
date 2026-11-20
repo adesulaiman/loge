@@ -1,0 +1,165 @@
+# Standalone Loge stack. Pulls prebuilt images from GHCR. No repo needed.
+# Use:  cp .env.loge.example .env  &&  docker compose -f docker-compose.loge.yml up -d
+name: loge
+
+x-backend-image: &backend-image ${ONYX_BACKEND_IMAGE:-ghcr.io/adesulaiman/loge-backend:${IMAGE_TAG:-latest}}
+x-model-image: &model-image ${ONYX_MODEL_SERVER_IMAGE:-ghcr.io/adesulaiman/loge-model-server:${IMAGE_TAG:-latest}}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "50m"
+    max-file: "6"
+
+x-backend-env: &backend-env
+  AUTH_TYPE: ${AUTH_TYPE:-basic}
+  WEB_DOMAIN: ${WEB_DOMAIN:-http://localhost:3000}
+  FILE_STORE_BACKEND: s3
+  POSTGRES_HOST: relational_db
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+  OPENSEARCH_HOST: opensearch
+  OPENSEARCH_ADMIN_PASSWORD: ${OPENSEARCH_ADMIN_PASSWORD:-StrongPassword123!}
+  REDIS_HOST: cache
+  MODEL_SERVER_HOST: inference_model_server
+  INDEXING_MODEL_SERVER_HOST: indexing_model_server
+  S3_ENDPOINT_URL: http://minio:9000
+  S3_AWS_ACCESS_KEY_ID: ${S3_AWS_ACCESS_KEY_ID:-minioadmin}
+  S3_AWS_SECRET_ACCESS_KEY: ${S3_AWS_SECRET_ACCESS_KEY:-minioadmin}
+  API_SERVER_PROTOCOL: http
+  API_SERVER_HOST: api_server
+
+services:
+  api_server:
+    image: *backend-image
+    command: >
+      /bin/sh -c "alembic upgrade head &&
+      uvicorn onyx.main:app --host 0.0.0.0 --port 8080"
+    environment: *backend-env
+    env_file:
+      - path: .env
+        required: false
+    depends_on: [relational_db, opensearch, cache, inference_model_server, minio]
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - api_server_logs:/var/log/onyx
+      - file-system:/app/file-system
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 600s
+
+  background:
+    image: *backend-image
+    command: /app/scripts/supervisord_entrypoint.sh
+    environment: *backend-env
+    env_file:
+      - path: .env
+        required: false
+    depends_on: [relational_db, opensearch, cache, inference_model_server, indexing_model_server, minio]
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - background_logs:/var/log/onyx
+      - file-system:/app/file-system
+    logging: *logging
+
+  web_server:
+    image: ${ONYX_WEB_SERVER_IMAGE:-ghcr.io/adesulaiman/loge-web-server:${IMAGE_TAG:-latest}}
+    environment:
+      INTERNAL_URL: http://api_server:8080
+    env_file:
+      - path: .env
+        required: false
+    depends_on: [api_server]
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+    logging: *logging
+
+  inference_model_server:
+    image: *model-image
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    volumes:
+      - model_cache_huggingface:/app/.cache/huggingface/
+    logging: *logging
+
+  indexing_model_server:
+    image: *model-image
+    environment:
+      INDEXING_ONLY: "True"
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    volumes:
+      - indexing_huggingface_model_cache:/app/.cache/huggingface/
+    logging: *logging
+
+  relational_db:
+    image: postgres:15.2-alpine
+    shm_size: 1g
+    command: -c 'max_connections=250'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    restart: unless-stopped
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  opensearch:
+    image: opensearchproject/opensearch:3.6.0
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_ADMIN_PASSWORD:-StrongPassword123!}
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    logging: *logging
+
+  cache:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: redis-server --save "" --appendonly no
+    tmpfs:
+      - /data
+
+  minio:
+    image: onyxdotapp/minio:RELEASE.2025-07-23T15-54-02Z-cpuv1@sha256:7330be2e7320a7a699b36f72bd06a94d8a21ec9f6f397345d9c38fc6751141f5
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${S3_AWS_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_AWS_SECRET_ACCESS_KEY:-minioadmin}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  db_volume:
+  minio_data:
+  model_cache_huggingface:
+  indexing_huggingface_model_cache:
+  api_server_logs:
+  background_logs:
+  file-system:
+  opensearch-data:

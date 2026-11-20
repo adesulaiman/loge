@@ -64,3 +64,11 @@ services:
       context: ../../backend
       dockerfile: Dockerfile
       target: runtime
+
+  mcp_server:
+    image: onyx-backend:local
+    pull_policy: missing
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+      target: runtime
